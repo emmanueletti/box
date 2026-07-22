@@ -1,0 +1,53 @@
+[language-server.ruby-lsp]
+command = "ruby-lsp"
+config = { formatter = "standard", addonSettings = { "Standard Ruby" = { enabled = false }, "RuboCop LSP Addon" = { enabled = false } } }
+
+[language-server.standard-ruby]
+command = "standardrb"
+args = ["--lsp"]
+
+[language-server.herb]
+command = "herb-language-server"
+args = ["--stdio"]
+
+[language-server.docker-language-server]
+command = "docker-language-server"
+
+[language-server.hx-lsp]
+command = "hx-lsp"
+
+[language-server.emmet-lsp]
+command = "emmet-language-server"
+args = ["--stdio"]
+
+[[language]]
+name = "ruby"
+language-servers = ["ruby-lsp", "standard-ruby", "hx-lsp"]
+formatter = { command = "bundle", args = ["exec", "standardrb", "--stdin", "foo.rb", "--fix", "--stderr"] }
+auto-format = true
+
+[[language]]
+name = "erb"
+language-servers = ["herb", "emmet-lsp", "hx-lsp"]
+file-types = ["erb", "html.erb"]
+roots = ["Gemfile", "package.json"]
+formatter = { command = "herb", args = ["format"] }
+auto-format = true
+
+[[language]]
+name = "dockerfile"
+language-servers = ["docker-language-server"]
+
+[[language]]
+name = "javascript"
+language-servers = ["hx-lsp"]
+
+[[language]]
+name = "bash"
+language-servers = ["hx-lsp"]
+
+[[language]]
+name = "markdown"
+language-servers = ["hx-lsp"]
+formatter = { command = "prettier", args = ["--parser", "markdown"] }
+auto-format = true

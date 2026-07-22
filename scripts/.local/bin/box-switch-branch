@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Picks a local or remote branch to check out, with a log preview.
+
+set -euo pipefail
+
+branch="$(git for-each-ref --format='%(refname:short)' --sort=-committerdate \
+  refs/heads refs/remotes 2>/dev/null \
+  | sed 's#^origin/##' | awk '!seen[$0]++' \
+  | fzf --preview 'git log --oneline --graph --decorate --color=always -20 {}')"
+
+if [[ -n $branch ]]; then
+  git checkout "$branch"
+fi

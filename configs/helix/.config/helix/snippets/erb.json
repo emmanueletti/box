@@ -1,0 +1,49 @@
+{
+  "ERB tag": {
+    "prefix": "erb",
+    "description": "<% %> logic tag",
+    "body": "<% $0 %>"
+  },
+  "ERB output tag": {
+    "prefix": "erbo",
+    "description": "<%= %> output tag",
+    "body": "<%= $0 %>"
+  },
+  "ERB comment": {
+    "prefix": "erbc",
+    "description": "<%# %> comment tag",
+    "body": "<%# $0 %>"
+  },
+  "Strict locals": {
+    "prefix": "locals",
+    "description": "Partial strict locals magic comment",
+    "body": "<%# locals: (${1:required_var}:, ${2:optional_var}: nil) -%>"
+  },
+  "ERB if": {
+    "prefix": "erbif",
+    "description": "<% if %> ... <% end %>",
+    "body": [
+      "<% if ${1:condition} %>",
+      "  $0",
+      "<% end %>"
+    ]
+  },
+  "ERB each": {
+    "prefix": "erbeach",
+    "description": "<% collection.each %> ... <% end %>",
+    "body": [
+      "<% ${1:collection}.each do |${2:item}| %>",
+      "  $0",
+      "<% end %>"
+    ]
+  },
+  "ERB block": {
+    "prefix": "erbdo",
+    "description": "<%= helper do %> ... <% end %>",
+    "body": [
+      "<%= ${1:helper} do %>",
+      "  $0",
+      "<% end %>"
+    ]
+  }
+}

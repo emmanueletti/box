@@ -1,0 +1,12 @@
+{
+  "Bash shebang": {
+    "prefix": "bash",
+    "description": "#!/usr/bin/env bash",
+    "body": "#!/usr/bin/env bash"
+  },
+  "POSIX sh shebang": {
+    "prefix": "sh",
+    "description": "#!/usr/bin/env sh",
+    "body": "#!/usr/bin/env sh"
+  }
+}

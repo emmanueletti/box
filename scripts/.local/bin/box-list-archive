@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Lists an archive's contents without extracting.
+
+set -euo pipefail
+
+ouch list "$@"

@@ -1,0 +1,19 @@
+[tools]
+go = "latest"
+node = "latest"
+python = "latest"
+ruby = "latest"
+rust = "latest"
+
+# helix language servers and formatters
+"gem:herb" = "latest"
+"gem:rails" = "latest"
+"gem:ruby-lsp" = "latest"
+"gem:standard" = "latest"
+"npm:@herb-tools/language-server" = "latest"
+"npm:@microsoft/compose-language-service" = "latest"
+"npm:@olrtg/emmet-language-server" = "latest"
+"npm:emmet" = "latest"
+"npm:prettier" = "latest"
+"go:github.com/docker/docker-language-server/cmd/docker-language-server" = "latest"
+"ubi:erasin/hx-lsp" = "latest"

@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Env files
+.env
+
+# Agent local settings
+**/.claude/settings.local.json

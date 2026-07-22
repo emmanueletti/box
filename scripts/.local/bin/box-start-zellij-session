@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#
+# Opens a zellij session named after the current directory, on the dev layout.
+
+set -euo pipefail
+
+zellij options \
+  --session-name "$(basename "$PWD")" \
+  --attach-to-session true \
+  --default-layout dev

@@ -1,0 +1,184 @@
+{
+  "Model test file": {
+    "prefix": "testfilemodel",
+    "description": "Model test file skeleton (ActiveSupport::TestCase)",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "require \"test_helper\"",
+      "",
+      "class ${1:Name}Test < ActiveSupport::TestCase",
+      "  test \"#${2:method} handles ${3:case}\" do",
+      "    $0",
+      "  end",
+      "end"
+    ]
+  },
+  "Controller test file": {
+    "prefix": "testfilecontroller",
+    "description": "Controller test file skeleton (ActionDispatch::IntegrationTest)",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "require \"test_helper\"",
+      "",
+      "class ${1:Name}ControllerTest < ActionDispatch::IntegrationTest",
+      "  test \"#${2:action} handles ${3:case}\" do",
+      "    $0",
+      "  end",
+      "end"
+    ]
+  },
+  "Mailer test file": {
+    "prefix": "testfilemailer",
+    "description": "Mailer test file skeleton (ActionMailer::TestCase)",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "require \"test_helper\"",
+      "",
+      "class ${1:Name}MailerTest < ActionMailer::TestCase",
+      "  test \"#${2:method} handles ${3:case}\" do",
+      "    $0",
+      "  end",
+      "end"
+    ]
+  },
+  "View test file": {
+    "prefix": "testfileview",
+    "description": "View/helper test file skeleton (ActionView::TestCase)",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "require \"test_helper\"",
+      "",
+      "class ${1:Name}HelperTest < ActionView::TestCase",
+      "  test \"#${2:method} handles ${3:case}\" do",
+      "    $0",
+      "  end",
+      "end"
+    ]
+  },
+  "Test unit": {
+    "prefix": "testunit",
+    "description": "test \"...\" block",
+    "body": [
+      "test \"${1:description}\" do",
+      "  $0",
+      "end"
+    ]
+  },
+  "Test unit, instance method": {
+    "prefix": "testunitinstancem",
+    "description": "test \"#method handles ...\" block",
+    "body": [
+      "test \"#${1:method} handles ${2:case}\" do",
+      "  $0",
+      "end"
+    ]
+  },
+  "Test unit, class method": {
+    "prefix": "testunitclassm",
+    "description": "test \".method handles ...\" block",
+    "body": [
+      "test \".${1:method} handles ${2:case}\" do",
+      "  $0",
+      "end"
+    ]
+  },
+  "Method definition": {
+    "prefix": "def",
+    "description": "def method_name ... end",
+    "body": [
+      "def ${1:method_name}",
+      "  $0",
+      "end"
+    ]
+  },
+  "Method definition with args": {
+    "prefix": "defa",
+    "description": "def method_name(args) ... end",
+    "body": [
+      "def ${1:method_name}(${2:args})",
+      "  $0",
+      "end"
+    ]
+  },
+  "Class with initialize": {
+    "prefix": "class",
+    "description": "New class with def initialize",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "class ${1:Name}",
+      "  def initialize(${2:arg})",
+      "    @${2:arg} = ${2:arg}",
+      "  end",
+      "",
+      "  $0",
+      "end"
+    ]
+  },
+  "Rails concern": {
+    "prefix": "moduleconcern",
+    "description": "New ActiveSupport::Concern skeleton",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "module ${1:Name}",
+      "  extend ActiveSupport::Concern",
+      "",
+      "  included do",
+      "    $2",
+      "  end",
+      "",
+      "  class_methods do",
+      "    $3",
+      "  end",
+      "",
+      "  $0",
+      "end"
+    ]
+  },
+  "Custom error class": {
+    "prefix": "error",
+    "description": "class FooError < StandardError; end",
+    "body": "class ${1:Name}Error < StandardError; end"
+  },
+  "Data value object": {
+    "prefix": "data",
+    "description": "Data.define value object",
+    "body": [
+      "${1:Name} = Data.define(:${2:attribute}) do",
+      "  $0",
+      "end"
+    ]
+  },
+  "ActiveJob": {
+    "prefix": "job",
+    "description": "New ActiveJob skeleton",
+    "body": [
+      "# frozen_string_literal: true",
+      "",
+      "class ${1:Name}Job < ApplicationJob",
+      "  queue_as :${2:default}",
+      "",
+      "  def perform(${3:args})",
+      "    $0",
+      "  end",
+      "end"
+    ]
+  },
+  "respond_to html/turbo_stream": {
+    "prefix": "respond",
+    "description": "respond_to with format.html/format.turbo_stream",
+    "body": [
+      "respond_to do |format|",
+      "  format.html { $1 }",
+      "  format.turbo_stream do",
+      "    $0",
+      "  end",
+      "end"
+    ]
+  }
+}

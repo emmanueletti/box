@@ -1,0 +1,18 @@
+{
+  "Stimulus controller": {
+    "prefix": "stimulus",
+    "description": "New Stimulus controller skeleton",
+    "body": [
+      "import { Controller } from \"@hotwired/stimulus\";",
+      "",
+      "export default class extends Controller {",
+      "  static targets = [${1:\"target\"}];",
+      "  static values = { ${2:name}: ${3:String} };",
+      "",
+      "  connect() {",
+      "    $0",
+      "  }",
+      "}"
+    ]
+  }
+}

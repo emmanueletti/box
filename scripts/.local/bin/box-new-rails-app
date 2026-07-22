@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Creates a rails app on postgres and tailwind, with authentication generated.
+#
+#   box-new-rails-app myapp
+
+set -euo pipefail
+
+name="${1:-myapp}"
+
+rails new "$name" -d postgresql -c tailwind
+cd "$name" && bin/rails generate authentication

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Picks a live zellij session to delete.
+
+set -euo pipefail
+
+session="$(zellij list-sessions --no-formatting \
+  | grep -v 'EXITED' \
+  | awk '{print $1}' \
+  | fzf --prompt="kill session> " --height=40% --reverse)"
+
+if [[ -n $session ]]; then
+  zellij delete-session --force "$session"
+fi

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Compresses files into an archive. box-compress-archive f1 dir/ out.tar.zst
+
+set -euo pipefail
+
+ouch compress "$@"

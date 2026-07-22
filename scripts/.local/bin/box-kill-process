@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Picks processes to kill, sorted by cpu. TAB multi-selects.
+#
+#   box-kill-process [signal]
+
+set -euo pipefail
+
+pids="$(ps -eo pid,user,%cpu,%mem,command --sort=-%cpu \
+  | sed 1d \
+  | fzf --multi --header='TAB to multi-select, Enter to kill' \
+  | awk '{print $1}')"
+
+if [[ -n $pids ]]; then
+  echo "$pids" | xargs -r kill -"${1:-TERM}"
+fi

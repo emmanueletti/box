@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Kills whatever is listening on a tcp port.
+#
+#   box-kill-port 3000
+
+set -euo pipefail
+
+port="${1:-}"
+
+if [[ -z $port ]]; then
+  echo "usage: box-kill-port <port>" >&2
+  exit 1
+fi
+
+lsof -ti "tcp:${port}" | xargs -r kill -9 2>/dev/null || true
+sleep 0.3
+lsof -ti "tcp:${port}" | xargs -r kill -9 2>/dev/null || true

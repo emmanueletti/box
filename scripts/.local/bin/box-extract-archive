@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Extracts one or more archives, format auto-detected.
+
+set -euo pipefail
+
+ouch decompress "$@"

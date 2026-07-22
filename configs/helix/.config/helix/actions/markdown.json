@@ -1,0 +1,20 @@
+{
+  "table": {
+    "title": "Table: expand spec (3x4, Name,Age,City)",
+    "filter": "printf '%s' \"$TM_SELECTED_TEXT\" | grep -qE '^([0-9]+([xX*][0-9]+)?|[^,|.!?]+([,|][^,|.!?]+)+( *[xX*] *[0-9]+)?)$' && echo true || echo false",
+    "shell": ["$HOME/.config/helix/scripts/md-table.rb \"$TM_SELECTED_TEXT\""],
+    "description": "Expand NxM or a comma list into a markdown table grid"
+  },
+  "bold": {
+    "title": "Bold",
+    "filter": "",
+    "shell": ["printf '%s' \"**${TM_SELECTED_TEXT}**\""],
+    "description": "Wrap selection in bold"
+  },
+  "italic": {
+    "title": "Italic",
+    "filter": "",
+    "shell": ["printf '%s' \"_${TM_SELECTED_TEXT}_\""],
+    "description": "Wrap selection in italics"
+  }
+}

@@ -1,0 +1,151 @@
+theme = "dark_plus"
+
+# TODO: once plugin system is finished, add the following plugins
+# https://github.com/thomasschafer/scooter.hx
+# 
+# ── General Editor Settings ──────────────────────────────────────
+
+[editor]
+# line-number = "relative"
+rulers = []
+text-width = 100
+scrolloff = 5                  # keep 5 lines visible above/below cursor
+true-color = true
+bufferline = "multiple"
+color-modes = true
+# auto-completion = false
+end-of-line-diagnostics = "disable"
+
+# ── Auto Save ────────────────────────────────────────────────────
+
+[editor.auto-save]
+focus-lost = true
+after-delay.enable = true
+after-delay.timeout = 1000
+
+# ── File Picker ──────────────────────────────────────────────────
+
+[editor.file-picker]
+hidden = false
+
+# ── Inline Diagnostics ──────────────────────────────────────────
+
+[editor.inline-diagnostics]
+cursor-line = "hint"           # show all diagnostics inline on cursor line
+other-lines = "disable"        # don't clutter other lines
+
+# ── Cursor Shape ─────────────────────────────────────────────────
+
+[editor.cursor-shape]
+normal = "block"
+insert = "bar"
+select = "underline"
+
+# ── LSP ──────────────────────────────────────────────────────────
+
+[editor.lsp]
+display-messages = true        # show LSP status messages
+display-inlay-hints = true     # show type hints, parameter names inline
+
+# ── Statusline ───────────────────────────────────────────────────
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control", "file-name", "file-modification-indicator"]
+center = ["diagnostics"]
+# right = ["selections", "position", "file-encoding", "file-line-ending"]
+
+# ── Soft Wrap ────────────────────────────────────────────────────
+
+[editor.soft-wrap]
+enable = true
+wrap-at-text-width = true
+
+# ── Normal Mode Keys ────────────────────────────────────────────
+
+[keys.normal]
+"C-/" = ["toggle_comments"]
+esc = ["collapse_selection", "keep_primary_selection"]
+x = "select_line_below"
+X = "select_line_above"
+S-left = "goto_previous_buffer"
+S-right = "goto_next_buffer"
+C-left = "move_prev_word_start"
+C-right = "move_next_word_start"
+C-del = "delete_word_forward"
+C-backspace = "delete_word_backward"
+C-S-left = "jump_view_left"
+C-S-right = "jump_view_right"
+C-S-up = "jump_view_up"
+C-S-down = "jump_view_down"
+A-w = ":buffer-close"
+A-W = ":buffer-close-others"
+A-q = ":quit"
+C-r = ":reload-all"
+C-n = ':! echo -e "\e]52;;$(echo %{buffer_name} | base64)\007" > /dev/tty' # Current filename to system clipboard
+C-s = ":format"
+C-j = "save_selection"
+ret = "goto_word" # Enter = jump to word
+z = ":toggle gutters.line-numbers.min-width 40 3"
+Z = ":toggle gutters.line-numbers.min-width 95 3"
+"C-`" = "switch_to_uppercase"
+a = ["append_mode", "collapse_selection"]
+home = "goto_first_nonwhitespace"
+V = ["goto_first_nonwhitespace", "extend_to_line_end"]
+S-down = [
+  "extend_to_line_bounds",
+  "delete_selection",
+  "paste_after",
+  "select_mode",
+  "goto_line_start",
+  "normal_mode",
+]
+S-up = [
+  "extend_to_line_bounds",
+  "delete_selection",
+  "move_line_up",
+  "paste_before",
+  "flip_selections",
+]
+
+[keys.normal.space]
+l = "file_picker_in_current_buffer_directory"
+
+[keys.normal.space.t]
+a = ":theme dark_plus"
+b = ":theme rose_pine_dawn"
+f = ':open %sh{~/.config/helix/scripts/rails-file-to-test.sh %{buffer_name}}'
+p = ':open %sh{ruby ~/.config/helix/scripts/rails-render-to-partial.rb %{buffer_name} %{cursor_line}}'
+i = ':open %sh{ruby ~/.config/helix/scripts/rails-i18n-key-to-entry.rb %{buffer_name} %{cursor_line}}'
+t = [":buffer-close! tmp/helix_test.log", ':vsplit %sh{ruby ~/.config/helix/scripts/rails-run-test-at-cursor.rb %{buffer_name} %{cursor_line}}']
+T = [":buffer-close! tmp/helix_test.log", ':vsplit %sh{~/.config/helix/scripts/rails-run-test-file.sh %{buffer_name}}']
+s = ':open %sh{ruby ~/.config/helix/scripts/rails-model-to-schema.rb %{buffer_name}}'
+j = ':open %sh{ruby ~/.config/helix/scripts/rails-view-to-stimulus.rb %{buffer_name} %{cursor_line}}'
+c = ':open %sh{ruby ~/.config/helix/scripts/rails-model-to-factory.rb %{buffer_name}}'
+r = ':echo %sh{ruby ~/.config/helix/scripts/rails-action-to-route.rb %{buffer_name} %{cursor_line}}'
+e = [':open %sh{ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name} %{selection_line_start} %{selection_line_end}}', ":reload"]
+
+[keys.normal.g]
+left = "goto_first_nonwhitespace"
+right = "goto_line_end"
+
+# ── Insert Mode Keys ────────────────────────────────────────────
+
+[keys.insert]
+j = { j = "normal_mode" }
+C-del = "delete_word_forward"
+C-backspace = "delete_word_backward"
+C-left = "move_prev_word_start"
+C-right = "move_next_word_start"
+
+# ── Select Mode Keys ────────────────────────────────────────────
+
+[keys.select]
+x = "select_line_below"
+X = "select_line_above"
+
+[keys.select.g]
+left = "goto_first_nonwhitespace"
+right = "goto_line_end"
+
+[keys.select.space.t]
+e = [':open %sh{ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name} %{selection_line_start} %{selection_line_end}}', ":reload"]

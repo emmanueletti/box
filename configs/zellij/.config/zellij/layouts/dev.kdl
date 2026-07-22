@@ -1,0 +1,55 @@
+layout {
+    tab name="Agent" focus=true {
+        pane {
+            command "zsh"
+            args "-c" "claude --chrome --enable-auto-mode"
+        }
+    }
+    tab name="Code" {
+        pane name="editor" focus=true {
+            command "hx"
+            args "."
+        }
+    }
+    tab name="Git" {
+        pane {
+            command "lazygit"
+        }
+    }
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="https://github.com/dj95/zjstatus/releases/download/v0.24.0/zjstatus.wasm" {
+                format_left   "{mode} #[default,fg=white,bold]{session}"
+                format_center "{tabs}{pipe_zjstatus_hints}"
+                format_right  "#[fg=blue]{datetime} "
+                format_space  ""
+
+                pipe_zjstatus_hints_format "{output}"
+
+                border_enabled "false"
+
+                mode_normal  "#[bg=blue,fg=black,bold] NOR "
+                mode_locked  "#[bg=yellow,fg=black,bold] LOC "
+                mode_resize  "#[bg=cyan,fg=black,bold] RES "
+                mode_pane    "#[bg=magenta,fg=black,bold] PAN "
+                mode_tab     "#[bg=green,fg=black,bold] TAB "
+                mode_scroll  "#[bg=white,fg=black,bold] SCR "
+                mode_search  "#[bg=white,fg=black,bold] SEA "
+                mode_session "#[bg=red,fg=black,bold] SES "
+
+                tab_normal              "#[fg=white,dim] {index} {name} "
+                tab_normal_fullscreen   "#[fg=white,dim] {index} {name} [F] "
+                tab_normal_sync         "#[fg=white,dim] {index} {name} [S] "
+                tab_active              "#[bg=blue,fg=black,bold] {index} {name} "
+                tab_active_fullscreen   "#[bg=blue,fg=black,bold] {index} {name} [F] "
+                tab_active_sync         "#[bg=blue,fg=black,bold] {index} {name} [S] "
+                tab_separator           " "
+
+                datetime_format "%a %d %b"
+                datetime_timezone "America/Vancouver"
+                // datetime_timezone "America/Toronto"
+            }
+        }
+    }
+}

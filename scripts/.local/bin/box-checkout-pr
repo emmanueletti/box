@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Picks an open pull request to check out, with a full preview.
+
+set -euo pipefail
+
+num="$(gh pr list --limit 100 \
+  --json number,title,headRefName \
+  --template '{{range .}}{{printf "#%v\t%s\t(%s)\n" .number .title .headRefName}}{{end}}' \
+  | fzf --preview 'gh pr view {1}' | awk '{print $1}' | tr -d '#')"
+
+if [[ -n $num ]]; then
+  gh pr checkout "$num"
+fi
