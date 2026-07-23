@@ -31,33 +31,18 @@
     "command": "bash \"$HOME/.claude/statusline-command.sh\""
   },
   "enabledPlugins": {
-    "general@itsusstudio": true,
-    "copywriter@itsusstudio": true,
-    "designer@itsusstudio": true,
-    "engineer@itsusstudio": true,
-    "sales@itsusstudio": true,
     "caveman@caveman": true,
     "ruby-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "figma@claude-plugins-official": false,
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
-    "stripe@claude-plugins-official": false,
-    "shopify-ai-toolkit@claude-plugins-official": false,
-    "context7@claude-plugins-official": false,
-    "serena@claude-plugins-official": true
+    "stripe@claude-plugins-official": true,
   },
   "extraKnownMarketplaces": {
-    "itsusstudio": {
-      "source": {
-        "source": "github",
-        "repo": "itsusstudio/jean-claude"
-      }
-    },
     "caveman": {
       "source": {
         "source": "github",
