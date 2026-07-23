@@ -3,7 +3,7 @@ theme = dark:Tomorrow Night,light:Alabaster
 
 # Font
 font-size = 11
-font-family = "JetBrains Mono"
+config-file = ?font.conf
 font-thicken = true
 adjust-cell-height = 20%
 

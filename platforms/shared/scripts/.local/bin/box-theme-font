@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Picks the terminal font with fzf and writes it to the ghostty font config.
+#
+#   box-theme-font
+#
+# Fonts: JetBrains Mono, Fira Code (both installed by box).
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+font="$(printf '%s\n' "JetBrains Mono" "Fira Code" \
+  | fzf --prompt="font> " --height=40% --reverse)" || exit 0
+
+printf 'font-family = "%s"\n' "$font" \
+  > "${XDG_CONFIG_HOME:-$HOME/.config}/ghostty/font.conf"
+
+echo "✅ box: font set to ${font}, reload ghostty to apply"
