@@ -2,6 +2,7 @@ bindkey -e
 bindkey "\e[3~" delete-char
 bindkey "^[[3;5~" kill-word     # ctrl + delete
 bindkey "^H" backward-kill-word # ctrl + backspace
+bindkey "^[^?" backward-kill-word # opt + delete
 bindkey "^[[1;5C" forward-word  # ctrl + ->
 bindkey "^[[1;5D" backward-word # ctrl + <-
 bindkey '^[[H' beginning-of-line # Home key
