@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# Editors
+.idea/
+*.swp
+*.swo
+*~
+
+# Language servers
+.ruby-lsp/
+.solargraph.yml
+
+# Dependencies
+node_modules/
+
+# Box
+*.box-bak
