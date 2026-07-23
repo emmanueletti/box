@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
 session="$(zellij list-sessions --no-formatting \
   | grep -v 'EXITED' \
   | awk '{print $1}' \

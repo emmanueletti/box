@@ -6,6 +6,8 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
 name="${1:-myapp}"
 
 rails new "$name" -d postgresql -c tailwind

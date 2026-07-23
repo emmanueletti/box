@@ -4,6 +4,10 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# --template is go templating, printing one "#12<tab>title<tab>(branch)" line
+# per PR. fzf's {1} in the preview is the first field of the selected line.
 num="$(gh pr list --limit 100 \
   --json number,title,headRefName \
   --template '{{range .}}{{printf "#%v\t%s\t(%s)\n" .number .title .headRefName}}{{end}}' \

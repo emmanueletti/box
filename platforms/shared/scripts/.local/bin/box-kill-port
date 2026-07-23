@@ -6,6 +6,8 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
 port="${1:-}"
 
 if [[ -z $port ]]; then

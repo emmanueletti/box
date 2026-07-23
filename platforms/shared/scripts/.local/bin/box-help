@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+#
+# Lists the box commands, or prints one command's usage.
+#
+#   box-help
+#   box-help kill-port
+#   box-help box-kill-port
+#   box-help --check         exits 1 if any command is missing a summary
+#
+# Help text is the comment block at the top of each script, so a new command
+# needs no registration. Write it like this and box-help picks it up:
+#
+#   #!/usr/bin/env bash
+#   #
+#   # First line is the summary shown in the listing.
+#   #
+#   #   box-thing <arg>        further lines are detail, shown by -h
+#
+#   set -euo pipefail
+#
+#   [[ ${1:-} == -h ]] && exec box-help "$0"
+#
+# Then chmod +x, and rerun the configs module to symlink it into ~/.local/bin.
+
+set -euo pipefail
+
+bin="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+
+# Prints the comment block under the shebang, with the leading "# " removed.
+header() {
+  local line
+
+  while IFS= read -r line; do
+    case "$line" in
+      "#!"*) continue ;;   # the shebang
+      "#") echo "" ;;      # a bare # is a blank line in the block
+      "#"*) echo "${line#\# }" ;;
+      *) return ;;         # first line that is not a comment ends the block
+    esac
+  done < "$1"
+}
+
+# First non-blank line of the block.
+summary() {
+  header "$1" | grep -m1 .
+}
+
+if [[ ${1:-} == --check ]]; then
+  missing=0
+
+  for script in "$bin"/box-*; do
+    if [[ -z $(summary "$script") ]]; then
+      echo "❌ box: no summary in $(basename "$script")" >&2
+      missing=$((missing + 1))
+    fi
+  done
+
+  if (( missing > 0 )); then
+    echo "box: ${missing} command(s) missing a summary" >&2
+    exit 1
+  fi
+
+  echo "✅ box: all commands documented"
+  exit 0
+fi
+
+if [[ -z ${1:-} || ${1:-} == -h ]]; then
+  echo "box commands:"
+
+  for script in "$bin"/box-*; do
+    printf "  %-26s %s\n" "$(basename "$script")" "$(summary "$script")"
+  done
+
+  echo
+  echo "box-help <command> for usage"
+  exit 0
+fi
+
+# Accepts a name, a short name, or the $0 a script passes when handling -h.
+command="$(basename "$1")"
+[[ $command == box-* ]] || command="box-${command}"
+script="${bin}/${command}"
+
+if [[ ! -x $script ]]; then
+  echo "❌ box: no such command: ${command}" >&2
+  exit 1
+fi
+
+echo "$command"
+header "$script"

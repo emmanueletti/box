@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
 zellij options \
   --session-name "$(basename "$PWD")" \
   --attach-to-session true \

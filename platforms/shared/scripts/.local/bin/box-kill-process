@@ -6,6 +6,9 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# sed 1d drops the ps header row; awk '{print $1}' keeps just the pid column.
 pids="$(ps -eo pid,user,%cpu,%mem,command --sort=-%cpu \
   | sed 1d \
   | fzf --multi --header='TAB to multi-select, Enter to kill' \

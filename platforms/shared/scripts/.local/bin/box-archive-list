@@ -4,4 +4,6 @@
 
 set -euo pipefail
 
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
 ouch list "$@"

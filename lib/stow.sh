@@ -20,11 +20,11 @@ if (( $# == 0 )); then
 fi
 
 for package in "${packages[@]}"; do
-  package="${package%/}"
+  package="${package%/}"   # strip the trailing slash the */ glob leaves on
 
   # stow refuses to overwrite a real file, so clear the way first.
   (cd "$package" && find . -type f ! -name .DS_Store) | while read -r file; do
-    target="${HOME}/${file#./}"
+    target="${HOME}/${file#./}"   # find prints ./a/b, strip the ./ to join onto $HOME
 
     # Symlinks are stow's own, --restow clears them.
     if [[ -e $target && ! -L $target ]]; then
