@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Prints the box OS identifier: macos or arch.
+# Prints the box OS identifier: macos, arch or fedora.
 # Exits 1 with a message on stderr when the OS is unsupported.
 
 set -euo pipefail
@@ -17,6 +17,11 @@ if [[ $os == "Linux" && -r /etc/os-release ]]; then
   . /etc/os-release
   if [[ ${ID:-} == "arch" ]]; then
     echo arch
+    exit 0
+  fi
+
+  if [[ ${ID:-} == "fedora" ]]; then
+    echo fedora
     exit 0
   fi
 fi
