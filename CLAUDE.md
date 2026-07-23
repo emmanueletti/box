@@ -1,6 +1,5 @@
 ## Style
 
-- Two spaces for indentation, no tabs
 - All scripts use bash 5
 - Use `[[ ]]` for string/file tests and `(( ))` for numeric tests
 - In `[[ ]]`, don't quote variables; do quote string literals when comparing (e.g. `[[ $branch == "dev" ]]`)
