@@ -15,4 +15,4 @@ if [[ $reply != "y" ]]; then
   exit 1
 fi
 
-exec "${BOX_ROOT}/${BOX_OS}/install.sh"
+exec "${BOX_ROOT}/platforms/${BOX_OS}/install.sh"
