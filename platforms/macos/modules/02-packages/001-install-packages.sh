@@ -15,7 +15,8 @@ echo "box: installing packages"
 
 # brew bundle tries every entry and exits non-zero if any failed. A failed
 # package should not take the rest of the install down with it.
-if brew bundle install --file "${MODULE_ROOT}/Brewfile" --jobs auto; then
+if HOMEBREW_VERBOSE_USING_DOTS=1 \
+  brew bundle install --file "${MODULE_ROOT}/Brewfile" --jobs auto --verbose; then
   echo "✅ box: packages installed"
 else
   echo "⚠️ box: some packages failed, continuing"

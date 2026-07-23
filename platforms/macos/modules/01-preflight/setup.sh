@@ -6,7 +6,7 @@ set -euo pipefail
 
 MODULE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🍎 box: preflight"
+echo "📦 box: preflight"
 
 for step in "${MODULE_ROOT}"/[0-9]*.sh; do
   "$step"
