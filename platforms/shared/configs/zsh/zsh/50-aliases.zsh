@@ -28,6 +28,7 @@ alias top='btop'   # dust / procs also installed — call by name (don't shadow 
 
 alias box='cd ~/box'
 alias dev='cd ~/projects'
+alias projects='cd ~/projects'
 alias notes='glow ~/notes'
 
 alias z='zellij'
