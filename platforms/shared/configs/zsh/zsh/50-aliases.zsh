@@ -26,6 +26,7 @@ alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lah --color=auto --group-directories-first'
 alias top='btop'   # dust / procs also installed — call by name (don't shadow du/ps)
 
+alias box='cd ~/box'
 alias dev='cd ~/projects'
 alias notes='glow ~/notes'
 
