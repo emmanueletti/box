@@ -20,6 +20,13 @@ command = "hx-lsp"
 command = "emmet-language-server"
 args = ["--stdio"]
 
+[language-server.marksman]
+command = "marksman"
+args = ["server"]
+
+[language-server.efm]
+command = "efm-langserver"
+
 [[language]]
 name = "ruby"
 language-servers = ["ruby-lsp", "standard-ruby", "hx-lsp"]
@@ -48,6 +55,6 @@ language-servers = ["hx-lsp"]
 
 [[language]]
 name = "markdown"
-language-servers = ["hx-lsp"]
+language-servers = ["marksman", "efm", "hx-lsp"]
 formatter = { command = "prettier", args = ["--parser", "markdown"] }
 auto-format = true

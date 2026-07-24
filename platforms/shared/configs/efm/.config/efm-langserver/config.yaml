@@ -1,0 +1,19 @@
+version: 2
+
+tools:
+  markdownlint-cli2: &markdownlint-cli2
+    lint-command: 'markdownlint-cli2 ${INPUT}'
+    lint-stdin: false
+    lint-ignore-exit-code: true
+    root-markers:
+      - .markdownlint.jsonc
+      - .markdownlint.json
+      - .markdownlint.yaml
+      - .markdownlint-cli2.jsonc
+    lint-formats:
+      - '%f:%l:%c %m'
+      - '%f:%l %m'
+
+languages:
+  markdown:
+    - *markdownlint-cli2
