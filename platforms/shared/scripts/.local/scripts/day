@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Prints the date as "Fri Mar 08". Handy for Helix :insert-output day.
+
+set -euo pipefail
+
+date "+%a %b %d"
