@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Lints every shell script in the repo with shellcheck. Run from anywhere in
+# the tree. The pre-commit hook calls this.
+
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+
+# Prefer shellcheck on PATH; fall back to the mise-managed copy when the mise
+# shell hook has not put it there yet.
+sc="$(command -v shellcheck || true)"
+if [[ -z $sc ]] && command -v mise >/dev/null; then
+  sc="$(mise which shellcheck 2>/dev/null || true)"
+fi
+if [[ -z $sc ]]; then
+  echo "bin/style: shellcheck not found (run: mise install)" >&2
+  exit 1
+fi
+
+# Every shell script: *.sh under platforms/lib, the extensionless box-* commands,
+# the git hooks, and this bin/ dir itself.
+mapfile -t files < <(
+  {
+    find "$root/platforms" "$root/lib" -type f -name '*.sh'
+    find "$root/platforms/shared/scripts/.local/scripts" -type f -name 'box-*'
+    find "$root/.githooks" "$root/bin" -type f 2>/dev/null
+    echo "$root/install.sh"
+  } | sort -u
+)
+
+"$sc" -S warning "${files[@]}"
+echo "✅ box: shellcheck clean (${#files[@]} scripts)"
