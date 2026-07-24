@@ -11,6 +11,6 @@ if [[ $reply != "y" ]]; then
   exit 0
 fi
 
-box-theme-wallpaper \
+"${SCRIPTS_DIR}/box-theme-wallpaper" \
   "${BOX_ROOT}/assets/wallpapers/light/blue-grid.png" \
   "${BOX_ROOT}/assets/wallpapers/dark/blue-grid.png"

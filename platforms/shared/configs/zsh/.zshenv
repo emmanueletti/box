@@ -12,6 +12,7 @@ export LESS="-FRX"                                  # -R color, -F quit-if-one-s
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANROFFOPT="-c"                              # force groff overstrike mode so col -bx works
 export _ZO_DOCTOR=0                                 # silence zoxide false-positive doctor warning in tool-spawned shells
+export BOX_ROOT="$HOME/box"                          # repo root; box-* scripts read this (with a fallback)
 
 # --- core PATH (user dirs) -------------------------------
 # Homebrew's own PATH is built in ~/zsh/95-homebrew-path.zsh instead of here,

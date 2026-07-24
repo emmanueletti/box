@@ -6,7 +6,7 @@ set -euo pipefail
 
 MODULE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-export BOX_ROOT="${BOX_ROOT:-$(cd "${MODULE_ROOT}/../../../.." && pwd)}"
+source "${MODULE_ROOT}/../../../../lib/box-env.sh"
 
 echo "📦 box: postinstall"
 
