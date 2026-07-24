@@ -25,5 +25,8 @@ rust = "latest"
 "github:erasin/hx-lsp" = "latest"
 "github:koalaman/shellcheck" = "latest"
 
+[settings]
+lockfile = true
+
 [settings.ruby]
 compile = false
