@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#
+# Moves files to the trash, so they can be recovered (safer than rm).
+#
+#   box-trash-item file.txt
+#   box-trash-item *.log old-dir/
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if (( $# == 0 )); then
+  echo "usage: box-trash-item <path>..." >&2
+  exit 1
+fi
+
+trash-put "$@"

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Restores files from the trash (shows a numbered menu to pick from).
+#
+#   box-trash-restore          # pick from everything in the trash
+#   box-trash-restore ~/notes  # only items that were under this path
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+trash-restore "$@"

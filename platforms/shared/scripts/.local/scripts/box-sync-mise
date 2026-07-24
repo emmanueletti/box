@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Installs the global mise toolset from anywhere (ignores project-local tools).
+#
+# Runs from $HOME so only the global config applies, not a project's tools.
+#
+#   box-sync-mise
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+cd "$HOME"
+exec mise install "$@"

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# Re-syncs box config packages into $HOME (fzf menu, or named packages).
+#
+#   box-sync-config           # pick from a menu
+#   box-sync-config helix zsh # sync these packages
+#
+# Only needed after adding, renaming, or removing files. Editing a file's
+# contents writes through the symlink already, so no sync is needed for that.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box="${BOX_ROOT:-$HOME/box}"
+configs="$box/platforms/shared/configs"
+
+if (( $# == 0 )); then
+  # No names given: show a menu of the package folders.
+  # TAB marks multiple, ENTER confirms, ESC cancels.
+  chosen=$(ls -1 "$configs" | fzf --multi --prompt='sync> ')
+
+  # Pressed ESC or picked nothing? Stop here.
+  if [[ -z $chosen ]]; then
+    echo "Nothing selected, exiting."
+    exit 0
+  fi
+
+  # shellcheck disable=SC2206  # intentional split: fzf prints one name per line
+  packages=($chosen)
+else
+  packages=("$@")             # names came from the command line
+fi
+
+"$box/lib/stow.sh" "$configs" "${packages[@]}"

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Permanently deletes trashed files. This cannot be undone.
+#
+#   box-trash-empty      # empty the whole trash (asks first)
+#   box-trash-empty 30   # only items trashed more than 30 days ago
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# Emptying everything is irreversible, so confirm when no age limit is given.
+if (( $# == 0 )); then
+  read -r -p "Permanently empty the ENTIRE trash? [y/N] " reply
+  [[ $reply == [yY]* ]] || { echo "Cancelled."; exit 0; }
+fi
+
+trash-empty "$@"

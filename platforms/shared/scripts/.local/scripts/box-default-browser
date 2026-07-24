@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# Sets the default web browser (what opens when a link is clicked).
+#
+#   box-default-browser                # pick from a menu
+#   box-default-browser zen
+#   box-default-browser brave-browser
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# Friendly name -> .desktop file it maps to.
+declare -A browsers=(
+  [zen]=app.zen_browser.zen.desktop
+  [brave-browser]=brave-browser.desktop
+)
+
+# True if a .desktop file exists in any of the standard application dirs.
+desktop_installed() {
+  local file=$1 dir
+  for dir in \
+    /usr/share/applications \
+    /usr/local/share/applications \
+    "$HOME/.local/share/applications" \
+    /var/lib/flatpak/exports/share/applications \
+    "$HOME/.local/share/flatpak/exports/share/applications"
+  do
+    [[ -f $dir/$file ]] && return 0
+  done
+  return 1
+}
+
+# Pick a browser: from the argument, or an fzf menu when none is given.
+if (( $# == 0 )); then
+  choice=$(printf '%s\n' "${!browsers[@]}" | sort | fzf --prompt='browser> ')
+  [[ -n $choice ]] || exit 0
+else
+  choice=$1
+fi
+
+desktop=${browsers[$choice]:-}
+if [[ -z $desktop ]]; then
+  echo "box-default-browser: unknown browser '$choice' (choose: ${!browsers[*]})" >&2
+  exit 1
+fi
+
+if ! desktop_installed "$desktop"; then
+  echo "box-default-browser: '$choice' is not installed ($desktop not found)" >&2
+  exit 1
+fi
+
+xdg-settings set default-web-browser "$desktop"
+xdg-mime default "$desktop" x-scheme-handler/http x-scheme-handler/https text/html
+
+echo "Default browser set to $choice."
