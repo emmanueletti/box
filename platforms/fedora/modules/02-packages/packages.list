@@ -38,13 +38,16 @@ fira-code-fonts
 
 awscli2
 libyaml-devel
+vips
 
-moby-engine
-docker-compose
+podman
+podman-docker
+podman-compose
 
 1password
 1password-cli
+brave-browser
+code
 calibre
-flameshot
 sushi
 7zip
