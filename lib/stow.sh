@@ -4,8 +4,9 @@
 #
 #   stow.sh <stow-dir> [package...]
 #
-# With no package names, every directory in <stow-dir> is stowed. Box is the
-# source of truth, so files already sitting at a target path are backed up.
+# With no package names, every directory in <stow-dir> is stowed. A real file
+# already sitting at a target path makes stow abort that package and name the
+# path. Move or delete it yourself, then re-run.
 
 set -euo pipefail
 
@@ -21,23 +22,6 @@ fi
 
 for package in "${packages[@]}"; do
   package="${package%/}"   # strip the trailing slash the */ glob leaves on
-
-  # stow refuses to overwrite a real file, so move any pre-existing real file
-  # out of the way first -- into the XDG state dir, mirroring its path, so it
-  # stays recoverable without littering .box-bak next to your configs. Clean
-  # these out later with box-purge-backups.
-  backup_root="${XDG_STATE_HOME:-$HOME/.local/state}/box"
-  (cd "$package" && find . -type f ! -name .DS_Store ! -name .stow-fold) | while read -r file; do
-    rel="${file#./}"                # find prints ./a/b -> a/b
-    target="${HOME}/${rel}"
-
-    # Symlinks are stow's own, --restow clears them. Only back up real files.
-    if [[ -e $target && ! -L $target ]]; then
-      backup="${backup_root}/${rel}"
-      mkdir -p "$(dirname "$backup")"
-      mv "$target" "$backup"
-    fi
-  done
 
   # Folding decides how much of a package $HOME points at:
   #
