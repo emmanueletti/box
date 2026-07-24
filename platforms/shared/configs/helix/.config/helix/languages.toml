@@ -56,5 +56,6 @@ language-servers = ["hx-lsp"]
 [[language]]
 name = "markdown"
 language-servers = ["marksman", "efm", "hx-lsp"]
-formatter = { command = "prettier", args = ["--parser", "markdown"] }
+formatter = { command = "prettier", args = ["--parser", "markdown", "--prose-wrap", "always", "--print-width", "80"] }
 auto-format = true
+soft-wrap.enable = false

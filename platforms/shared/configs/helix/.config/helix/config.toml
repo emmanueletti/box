@@ -6,14 +6,12 @@ theme = "dark_plus"
 # ── General Editor Settings ──────────────────────────────────────
 
 [editor]
-# line-number = "relative"
 rulers = []
-text-width = 100
+text-width = 80
 scrolloff = 5                  # keep 5 lines visible above/below cursor
 true-color = true
 bufferline = "multiple"
 color-modes = true
-# auto-completion = false
 end-of-line-diagnostics = "disable"
 
 # ── Auto Save ────────────────────────────────────────────────────
@@ -57,7 +55,7 @@ center = ["diagnostics"]
 # ── Soft Wrap ────────────────────────────────────────────────────
 
 [editor.soft-wrap]
-enable = true
+# enable = true
 wrap-at-text-width = true
 
 # ── Normal Mode Keys ────────────────────────────────────────────
