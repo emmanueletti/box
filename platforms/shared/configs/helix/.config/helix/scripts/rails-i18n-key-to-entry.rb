@@ -7,7 +7,7 @@ require "psych"
 
 caller_path = ARGV[0]
 cursor_line = ARGV[1].to_i
-lines = File.readlines(caller_path)
+lines = File.readlines(caller_path) rescue (puts(caller_path); exit)
 current_line = lines[cursor_line - 1] || ""
 
 match = current_line.match(/\b(?:translate|t)\(\s*['"]([^'"]+)['"]/)
@@ -47,7 +47,12 @@ else
 end
 
 yaml_path = "config/locales/en.yml"
-root = Psych.parse_stream(File.read(yaml_path)).children.first.children.first
+begin
+  root = Psych.parse_stream(File.read(yaml_path)).children.first.children.first
+rescue
+  puts caller_path
+  exit
+end
 
 node = root
 ("en." + full_key).split(".").each do |part|

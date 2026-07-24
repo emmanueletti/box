@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Toggle between app/**/name.rb and test/**/name_test.rb (Rails convention).
-f="$1"
+set -euo pipefail
+f="${1:-}"
 
 if [[ "$f" == app/* && "$f" == *.rb ]]; then
   rel="${f#app/}"

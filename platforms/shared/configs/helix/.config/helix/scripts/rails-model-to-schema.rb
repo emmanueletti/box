@@ -24,7 +24,7 @@ table_name =
   end
 
 schema_path = "db/schema.rb"
-lines = File.readlines(schema_path)
+lines = File.readlines(schema_path) rescue []
 line_no = lines.find_index { |l| l =~ /create_table\s+["']#{Regexp.escape(table_name)}["']/ }
 
 if line_no

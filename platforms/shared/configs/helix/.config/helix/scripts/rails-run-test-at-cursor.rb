@@ -6,6 +6,8 @@
 # 0 failures" pass) if the line isn't actually inside a test block -- this
 # refuses to invoke bin/rails test at all unless the cursor genuinely sits
 # inside a `test "..." do ... end`.
+require "fileutils"
+
 caller_path = ARGV[0]
 cursor_line = ARGV[1].to_i
 
@@ -14,7 +16,7 @@ unless caller_path.start_with?("test/") && caller_path.end_with?("_test.rb")
   exit
 end
 
-lines = File.readlines(caller_path)
+lines = File.readlines(caller_path) rescue (puts(caller_path); exit)
 
 test_start = nil
 test_indent = nil
@@ -34,6 +36,8 @@ lines.each_with_index do |text, idx|
     test_indent = nil
   end
 end
+
+FileUtils.mkdir_p("tmp")
 
 if found_line
   File.open("tmp/helix_test.log", "w") do |log|
