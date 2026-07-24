@@ -35,6 +35,7 @@ fi
 typeset -U path                                     # auto-dedupe PATH entries
 path=(
   $HOME/.local/bin
+  $HOME/.local/scripts   # box's own commands, kept out of .local/bin
   $BUN_INSTALL/bin
   $path
 )

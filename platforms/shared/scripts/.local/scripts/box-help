@@ -20,7 +20,8 @@
 #
 #   [[ ${1:-} == -h ]] && exec box-help "$0"
 #
-# Then chmod +x, and rerun the configs module to symlink it into ~/.local/bin.
+# Then chmod +x. The scripts dir is folded, so it appears immediately -- no
+# re-stow needed (see .stow-fold in the package root).
 
 set -euo pipefail
 

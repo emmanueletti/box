@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Symlinks the box-* machine scripts into ~/.local/bin.
+# Symlinks the box-* machine scripts into ~/.local/scripts.
 
 set -euo pipefail
 
