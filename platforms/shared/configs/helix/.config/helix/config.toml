@@ -120,7 +120,7 @@ s = ':open %sh{ruby ~/.config/helix/scripts/rails-model-to-schema.rb %{buffer_na
 j = ':open %sh{ruby ~/.config/helix/scripts/rails-view-to-stimulus.rb %{buffer_name} %{cursor_line}}'
 c = ':open %sh{ruby ~/.config/helix/scripts/rails-model-to-factory.rb %{buffer_name}}'
 r = ':echo %sh{ruby ~/.config/helix/scripts/rails-action-to-route.rb %{buffer_name} %{cursor_line}}'
-e = [':open %sh{ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name} %{selection_line_start} %{selection_line_end}}', ":reload"]
+e = ':pipe ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name}'
 
 [keys.normal.g]
 left = "goto_first_nonwhitespace"
@@ -146,4 +146,4 @@ left = "goto_first_nonwhitespace"
 right = "goto_line_end"
 
 [keys.select.space.t]
-e = [':open %sh{ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name} %{selection_line_start} %{selection_line_end}}', ":reload"]
+e = ':pipe ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name}'
