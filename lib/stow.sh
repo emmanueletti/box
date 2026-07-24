@@ -22,19 +22,44 @@ fi
 for package in "${packages[@]}"; do
   package="${package%/}"   # strip the trailing slash the */ glob leaves on
 
-  # stow refuses to overwrite a real file, so clear the way first.
-  (cd "$package" && find . -type f ! -name .DS_Store) | while read -r file; do
-    target="${HOME}/${file#./}"   # find prints ./a/b, strip the ./ to join onto $HOME
+  # stow refuses to overwrite a real file, so move any pre-existing real file
+  # out of the way first -- into the XDG state dir, mirroring its path, so it
+  # stays recoverable without littering .box-bak next to your configs. Clean
+  # these out later with box-purge-backups.
+  backup_root="${XDG_STATE_HOME:-$HOME/.local/state}/box"
+  (cd "$package" && find . -type f ! -name .DS_Store ! -name .stow-fold) | while read -r file; do
+    rel="${file#./}"                # find prints ./a/b -> a/b
+    target="${HOME}/${rel}"
 
-    # Symlinks are stow's own, --restow clears them.
+    # Symlinks are stow's own, --restow clears them. Only back up real files.
     if [[ -e $target && ! -L $target ]]; then
-      mv "$target" "${target}.box-bak"
+      backup="${backup_root}/${rel}"
+      mkdir -p "$(dirname "$backup")"
+      mv "$target" "$backup"
     fi
   done
 
-  # --restow prunes symlinks left behind by files dropped from the package.
-  # --no-folding keeps directories real, so stow only links leaf files. Without
-  # it a clean $HOME gets ~/.config itself replaced by a symlink.
-  stow --restow --no-folding --ignore='\.DS_Store$' \
+  # Folding decides how much of a package $HOME points at:
+  #
+  #   folded (.stow-fold marker present): the package DIRECTORY is symlinked, so
+  #     ~/dir -> repo/dir. Every file under it is reached through that one link,
+  #     which means adding, renaming, or deleting files in the repo shows up
+  #     immediately -- no re-stow needed. Safe only for box-exclusive dirs
+  #     (~/zsh, ~/.local/scripts); a stray file written there lands in the repo.
+  #
+  #   leaf-linked (default, --no-folding): each FILE is symlinked individually
+  #     and the directory itself stays real. This is required for shared dirs
+  #     (~/.config, ~/.claude) so other tools can write alongside box's files --
+  #     but it means the links only match the file list as of the last stow.
+  #     Add/rename/delete a file in the repo and you must re-stow to reconcile.
+  #
+  # Re-stowing (--restow) is that reconcile: stow first UNSTOWS (removes the
+  # symlinks it owns, including ones left dangling by deleted repo files) then
+  # STOWS again (links whatever files exist now). Net effect: stale links pruned,
+  # new files linked, moved files repointed.
+  fold=(--no-folding)
+  [[ -e $package/.stow-fold ]] && fold=()
+
+  stow --restow "${fold[@]}" --ignore='\.DS_Store$' --ignore='\.stow-fold$' \
     --dir="$stow_dir" --target="$HOME" "$package"
 done

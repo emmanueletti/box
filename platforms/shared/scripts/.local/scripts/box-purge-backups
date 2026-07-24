@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# Trashes box's displaced-file backups from its state dir (recoverable).
+#
+#   box-purge-backups       # list, then trash after a prompt
+#   box-purge-backups -n    # list only, trash nothing
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+dry=0
+[[ ${1:-} == -n ]] && dry=1
+
+# stow.sh backs up displaced real files here, mirroring their $HOME path.
+backup_root="${XDG_STATE_HOME:-$HOME/.local/state}/box"
+
+if [[ ! -d $backup_root ]]; then
+  echo "box: no backups (${backup_root} does not exist)"
+  exit 0
+fi
+
+mapfile -t baks < <(find "$backup_root" -type f | sort)
+
+if (( ${#baks[@]} == 0 )); then
+  echo "box: no backups to clean"
+  exit 0
+fi
+
+printf '%s\n' "${baks[@]}"
+echo "(${#baks[@]} files)"
+
+if (( dry )); then
+  exit 0
+fi
+
+read -r -p "trash these ${#baks[@]} backups? [y/N] " reply
+[[ $reply == [yY]* ]] || { echo "Cancelled."; exit 0; }
+
+trash-put "${baks[@]}"
+find "$backup_root" -type d -empty -delete 2>/dev/null || true   # drop emptied dirs
+echo "✅ box: trashed ${#baks[@]} backups"
