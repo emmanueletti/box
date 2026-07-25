@@ -1,7 +1,6 @@
 [user]
   name = Emmanuel Etti
   email = emmanueletti@gmail.com
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOFE+wABBsIiFYZKZPGfQ+vjzhSm58TZydg4dujVcbR8
 [core]
 	editor = $EDITOR
   commitGraph = true
@@ -44,13 +43,12 @@
 [rebase]
 	instructionFormat = %s %Cgreen(%ar)%Creset
 	autosquash = true
-# [gpg]
-# 	format = ssh
-# [gpg "ssh"]
-# 	program = /opt/1Password/op-ssh-sign
-[credential "https://github.com"]
-  helper =
-  helper = !gh auth git-credential
 [credential "https://gist.github.com"]
-  helper =
-  helper = !gh auth git-credential
+	helper =
+	helper = !gh auth git-credential
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com/
+[url "git@bitbucket.org:"]
+	insteadOf = https://bitbucket.org/
