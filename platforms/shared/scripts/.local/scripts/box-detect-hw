@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#
+# Prints this machine's hardware identity: vendor, model and firmware/BIOS.
+#
+#   box-detect-hw
+#
+# Read-only, no sudo. Reads DMI on Linux and sysctl on macOS. Used by
+# box-check-firmware-update and box-check-updates for context.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+
+# Value of a readable file, or "unknown" when absent.
+val() {
+  [[ -r $1 ]] && printf '%s' "$(<"$1")" || printf 'unknown'
+}
+
+row() {
+  printf '%-8s %s\n' "$1" "$2"
+}
+
+case "$os" in
+  macos)
+    row vendor: Apple
+    row model: "$(sysctl -n hw.model 2>/dev/null || echo unknown)"
+    row chip: "$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo unknown)"
+    ;;
+
+  arch | fedora)
+    dmi=/sys/class/dmi/id
+    row vendor: "$(val "$dmi/sys_vendor")"
+    row model: "$(val "$dmi/product_name")"
+    row bios: "$(val "$dmi/bios_version")"
+    ;;
+esac

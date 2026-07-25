@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#
+# Reports OS/system updates from the vendor updater.
+#
+#   box-check-os-update
+#
+# macOS uses softwareupdate. Linux has no separate OS updater -- the kernel and
+# base system ship as packages -- so there it defers to box-check-package-update.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# shellcheck source=/dev/null
+. "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
+
+os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+
+box_check_section "OS update"
+
+case "$os" in
+  macos)
+    box_check_require softwareupdate
+    box_check_run "" softwareupdate -l
+    ;;
+
+  arch | fedora)
+    echo "no separate OS updater on $os; kernel and base system come through packages (see box-check-package-update)"
+    ;;
+esac

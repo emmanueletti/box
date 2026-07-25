@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# Reports pending firmware/BIOS updates.
+#
+#   box-check-firmware-update
+#
+# Linux uses fwupd (refresh metadata, then list). macOS firmware ships through
+# softwareupdate, so there it defers to box-check-os-update.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# shellcheck source=/dev/null
+. "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
+
+os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+
+box_check_section "firmware & BIOS"
+
+case "$os" in
+  macos)
+    echo "macOS firmware ships through softwareupdate (see box-check-os-update)"
+    ;;
+
+  arch | fedora)
+    box_check_require fwupdmgr
+    box_check_run "0 2" fwupdmgr refresh --force   # 2 == metadata already current
+    box_check_run "0 2" fwupdmgr get-updates       # 2 == nothing to update
+    ;;
+esac
