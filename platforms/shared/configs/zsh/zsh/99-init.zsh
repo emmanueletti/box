@@ -2,13 +2,12 @@
 # has to be sourced after everything else, and the Homebrew PATH precmd hook has to
 # register after mise's so it wins each prompt (see the block at the bottom).
 
-# Point docker/compose at the running engine's socket. Prefer the rootless
-# podman socket on Linux; fall back to the docker context (Docker Desktop)
-# elsewhere. Guarded & quiet so an absent engine doesn't error at shell start.
+# Point docker/compose at the engine's socket: rootless podman on Linux, Docker
+# Desktop on macOS. Literal paths, no subprocess, so shell start stays fast.
 if [[ -S ${XDG_RUNTIME_DIR:-/run/user/$UID}/podman/podman.sock ]]; then
   export DOCKER_HOST="unix://${XDG_RUNTIME_DIR:-/run/user/$UID}/podman/podman.sock"
-elif (( $+commands[docker] )); then
-  export DOCKER_HOST="$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null)"
+elif [[ $OSTYPE == darwin* && -S $HOME/.docker/run/docker.sock ]]; then
+  export DOCKER_HOST="unix://$HOME/.docker/run/docker.sock"
 fi
 
 # Starship prompt
