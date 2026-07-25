@@ -1,0 +1,11 @@
+[[ssh-keys]]
+item = "e-macmini-global"
+vault = "Personal"
+
+[[ssh-keys]]
+item = "e-fw13-global"
+vault = "Personal"
+
+[[ssh-keys]]
+item = "e-fw13-brother"
+vault = "Personal"
