@@ -27,7 +27,7 @@ shell-integration = detect
 shell-integration-features = no-cursor
 
 # Scrollback
-scrollback-limit = 100000000
+scrollback-limit = 1000000
 mouse-scroll-multiplier="0.5"
 
 # Clipboard
