@@ -16,27 +16,23 @@ set -euo pipefail
 
 os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
 
-box_check_section "packages (mise)"
 box_check_require mise
 # Run from $HOME so only the global toolset is checked, not a project's tools.
-( cd "$HOME" && box_check_run "" mise outdated )
+( cd "$HOME" && box_check_run "packages (mise)" "" "re:up to date" mise outdated --bump )
 
 case "$os" in
   macos)
-    box_check_section "packages (brew)"
     box_check_require brew
-    box_check_run "" brew outdated --verbose
+    box_check_run "packages (brew)" "" empty brew outdated --verbose
     ;;
 
   arch)
-    box_check_section "packages (pacman)"
     box_check_require checkupdates   # from pacman-contrib; no DB lock, no sudo
-    box_check_run 2 checkupdates     # exit 2 == no updates
+    box_check_run "packages (pacman)" 2 "code:2" checkupdates   # exit 2 == no updates
     ;;
 
   fedora)
-    box_check_section "packages (dnf)"
     box_check_require dnf
-    box_check_run 100 dnf check-update   # exit 100 == updates available
+    box_check_run "packages (dnf)" 100 "!code:100" dnf check-update   # exit 100 == updates available
     ;;
 esac

@@ -16,16 +16,15 @@ set -euo pipefail
 
 os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
 
-box_check_section "firmware & BIOS"
-
 case "$os" in
   macos)
+    box_check_section "firmware & BIOS"
     echo "macOS firmware ships through softwareupdate (see box-check-os-update)"
     ;;
 
   arch | fedora)
     box_check_require fwupdmgr
-    box_check_run "0 2" fwupdmgr refresh --force   # 2 == metadata already current
-    box_check_run "0 2" fwupdmgr get-updates       # 2 == nothing to update
+    fwupdmgr refresh --force >/dev/null 2>&1 || true   # refresh metadata; 2 == already current
+    box_check_run "firmware & BIOS" "0 2" "code:2" fwupdmgr get-updates   # exit 2 == nothing to update
     ;;
 esac

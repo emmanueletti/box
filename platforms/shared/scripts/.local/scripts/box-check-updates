@@ -26,5 +26,3 @@ box-detect-hw
 box-check-os-update
 box-check-package-update
 box-check-firmware-update
-
-printf '\n✅ box-check-updates: done\n'
