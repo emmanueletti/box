@@ -29,6 +29,7 @@ uv = "latest"
 
 [settings]
 lockfile = true
+prefer_offline = true
 
 [settings.ruby]
 compile = false
