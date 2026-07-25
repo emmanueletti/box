@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Installs OS/system updates from the vendor updater.
+#
+#   box-update-os        # macOS softwareupdate; Linux OS comes through packages
+#
+# The mirror of box-check-os-update. On Linux the kernel and base system ship as
+# packages, so there this defers to box-update-packages.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# shellcheck source=/dev/null
+. "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
+
+os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+
+case "$os" in
+  macos)
+    box_update_section "OS update"
+    box_update_require softwareupdate
+    sudo softwareupdate -i -a   # -i install, -a all recommended; needs root
+    ;;
+
+  arch | fedora)
+    box_update_section "OS update"
+    echo "no separate OS updater on $os; run box-update-packages for the kernel and base system"
+    ;;
+esac
+
+echo "✅ box-update-os: done"

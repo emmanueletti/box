@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Applies package updates from every package manager on this machine.
+#
+#   box-update-packages        # upgrade mise tools, then brew/pacman/dnf packages
+#
+# The mirror of box-check-package-update: what that reports, this installs. Uses
+# mise --bump to match the check, so major versions come through too.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# shellcheck source=/dev/null
+. "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
+
+os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+
+box_update_section "packages (mise)"
+box_update_require mise
+# Run from $HOME for the global toolset. --bump rewrites mise's pins, which box
+# tracks in git, so this leaves the repo dirty.
+( cd "$HOME" && mise upgrade --bump )
+
+case "$os" in
+  macos)
+    box_update_section "packages (brew)"
+    box_update_require brew
+    brew upgrade
+    ;;
+
+  arch)
+    box_update_section "packages (pacman)"
+    box_update_require pacman
+    sudo pacman -Syu            # pacman prompts before applying
+    ;;
+
+  fedora)
+    box_update_section "packages (dnf)"
+    box_update_require dnf
+    sudo dnf upgrade --refresh  # --refresh pulls fresh metadata first; dnf prompts
+    ;;
+esac
+
+echo "✅ box-update-packages: done"
