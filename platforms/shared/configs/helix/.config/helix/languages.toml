@@ -27,6 +27,12 @@ args = ["server"]
 [language-server.efm]
 command = "efm-langserver"
 
+# Swift LSP. `xcrun` resolves sourcekit-lsp from the active toolchain
+# (works with Command Line Tools or full Xcode).
+[language-server.sourcekit-lsp]
+command = "xcrun"
+args = ["sourcekit-lsp"]
+
 [[language]]
 name = "ruby"
 language-servers = ["ruby-lsp", "standard-ruby", "hx-lsp"]
@@ -39,6 +45,12 @@ language-servers = ["herb", "emmet-lsp", "hx-lsp"]
 file-types = ["erb", "html.erb"]
 roots = ["Gemfile", "package.json"]
 formatter = { command = "herb", args = ["format"] }
+auto-format = true
+
+[[language]]
+name = "swift"
+language-servers = ["sourcekit-lsp", "hx-lsp"]
+formatter = { command = "swiftformat", args = ["--quiet"] }
 auto-format = true
 
 [[language]]

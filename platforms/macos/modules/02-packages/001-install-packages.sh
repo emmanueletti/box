@@ -13,6 +13,10 @@ fi
 
 echo "box: installing packages"
 
+# facebook/fb is a non-official tap (idb-companion); brew refuses to load its
+# formulae until the tap is trusted.
+brew trust --tap facebook/fb
+
 # brew bundle tries every entry and exits non-zero if any failed. A failed
 # package should not take the rest of the install down with it.
 if HOMEBREW_VERBOSE_USING_DOTS=1 \

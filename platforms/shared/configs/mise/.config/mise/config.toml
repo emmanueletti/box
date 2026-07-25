@@ -4,6 +4,8 @@ node = "latest"
 python = "latest"
 ruby = "latest"
 rust = "latest"
+uv = "latest"
+"pipx:fb-idb" = { version = "latest", pipx_args = "--python 3.12" }
 
 # helix language servers and formatters
 "gem:herb" = "latest"

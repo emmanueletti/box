@@ -1,3 +1,5 @@
+tap "facebook/fb"
+
 brew "bat"
 brew "eza"
 brew "fd"
@@ -34,6 +36,7 @@ brew "dockutil"
 brew "lazydocker"
 brew "kubernetes-cli"
 brew "awscli"
+brew "idb-companion"
 
 # gnu tools, so the shared shell config matches linux
 brew "coreutils"
