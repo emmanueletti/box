@@ -26,6 +26,7 @@ uv = "latest"
 "github:artempyanykh/marksman" = "latest"
 "github:erasin/hx-lsp" = "latest"
 "github:koalaman/shellcheck" = "latest"
+"github:render-oss/cli" = { version = "latest", bin = "render" }
 
 [settings]
 lockfile = true
