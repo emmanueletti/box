@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Wipes your shell command history. This cannot be undone.
+#
+#   box-clear-history      # clear zsh and bash history (asks first, default no)
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+read -r -p "Permanently wipe your shell history? [y/N] " reply || reply=""
+[[ $reply == [yY]* ]] || { echo "Cancelled."; exit 0; }
+
+files=()
+for f in "${HISTFILE:-}" "$HOME/.zsh_history" "$HOME/.bash_history"; do
+  [[ -n $f && -f $f ]] || continue
+  for seen in "${files[@]}"; do [[ $seen == "$f" ]] && continue 2; done
+  files+=("$f")
+done
+
+if (( ${#files[@]} == 0 )); then
+  echo "No history files found."
+  exit 0
+fi
+
+for f in "${files[@]}"; do
+  : > "$f"
+  echo "Cleared $f"
+done
+
+echo
+echo "Now run:  exec ${SHELL##*/}   (or just open a new terminal)"
