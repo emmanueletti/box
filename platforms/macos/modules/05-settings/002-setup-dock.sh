@@ -29,6 +29,7 @@ done
 # sort dateadded puts the newest file nearest the dock.
 dockutil --no-restart --add ~/Desktop --view fan --display stack --sort dateadded
 dockutil --no-restart --add ~/Documents --view fan --display stack --sort dateadded
+dockutil --no-restart --add ~/Downloads --view fan --display stack --sort dateadded
 
 killall Dock
 
