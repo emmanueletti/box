@@ -10,6 +10,6 @@ sudo sysadminctl -screenLock immediate -password ''
 echo "✅ box: screen lock set to immediate"
 
 defaults write com.apple.screencapture show-thumbnail -bool true
-killall SystemUIServer 2>/dev/null || true
+killall cfprefsd 2>/dev/null || true
 
 echo "✅ box: screenshot floating thumbnail on"
