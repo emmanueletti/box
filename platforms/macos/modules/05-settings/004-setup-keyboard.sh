@@ -5,9 +5,8 @@
 
 set -euo pipefail
 
-# KeyRepeat 1 and InitialKeyRepeat 15 are below what System Settings offers.
-defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain KeyRepeat -int 3
+defaults write NSGlobalDomain InitialKeyRepeat -int 20
 
 # Press-and-hold shows the accent picker, which swallows key repeat.
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
