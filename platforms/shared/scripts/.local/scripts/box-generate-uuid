@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Generates a random v4 UUID, lowercased.
+#
+#   box-generate-uuid
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# Lowercase -- uuidgen shouts in caps on macOS, quiet on Linux.
+uuidgen | tr '[:upper:]' '[:lower:]'
