@@ -1,6 +1,7 @@
 alias shconfig='$EDITOR ~/zsh'
 alias hxlang='$EDITOR ~/.config/helix/languages.toml'
 alias zconfig='$EDITOR ~/.config/zellij/config.kdl'
+alias gconfig='$EDITOR ~/.config/ghostty/config'
 alias reload='exec $SHELL'
 alias c='clear'
 alias x='exit'
