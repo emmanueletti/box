@@ -79,7 +79,7 @@ fi
 
 # Accepts a name, a short name, or the $0 a script passes when handling -h.
 command="$(basename "$1")"
-[[ $command == box-* ]] || command="box-${command}"
+[[ $command == box-* || $command == _box-* ]] || command="box-${command}"
 script="${bin}/${command}"
 
 if [[ ! -x $script ]]; then

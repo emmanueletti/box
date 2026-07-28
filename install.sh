@@ -5,7 +5,7 @@
 set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/lib/box-env.sh"   # sets BOX_ROOT, SCRIPTS_DIR
-BOX_OS="$("${BOX_ROOT}/lib/box-detect-os.sh")"
+BOX_OS="$("${SCRIPTS_DIR}/_box-detect-os")"
 export BOX_OS
 
 read -r -p "box: detected ${BOX_OS}. continue? [y/N] " reply

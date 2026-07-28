@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Reports available updates on a box-managed machine (read-only, installs nothing).
+#
+#   box-updates-check
+#
+# Orchestrates the _box-check-* sub-tools, in order:
+#   _box-detect-hw             hardware identity for context
+#   _box-updates-check-os       vendor OS updates (macOS softwareupdate)
+#   _box-updates-check-packages  outdated packages, incl. the kernel (mise/brew/pacman/dnf)
+#   _box-updates-check-firmware firmware/BIOS (Linux fwupd)
+#
+# The kernel is just a package, so there is no separate kernel check. Each
+# sub-tool also runs standalone. A failing sub-tool aborts the run.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# shellcheck source=/dev/null
+. "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
+
+box_check_section "hardware"
+_box-detect-hw
+
+_box-updates-check-os
+_box-updates-check-packages
+_box-updates-check-firmware

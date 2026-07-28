@@ -25,6 +25,19 @@ the shebang. No registration -- the comment *is* the docs. Rules:
 
 Every script MUST have a summary line or `box-help --check` fails.
 
+## Private scripts (`_box-*`)
+
+A script that exists to be called by another box script -- a sub-step of an
+orchestrator, or a shared detector like `_box-detect-os` -- is named with a
+leading underscore: `_box-detect-hw`, `_box-updates-run-os`. This is a *hint*, not a
+fence: it still sits on PATH and you can run it directly when you know you want
+just that step.
+
+box-help lists `box-*` only, so `_box-*` scripts stay out of the listing (and out
+of `--check`). The front-door command that orchestrates them is the public one
+(`box-updates-run` drives `_box-updates-run-*`; `box-updates-check` drives `_box-updates-check-*`).
+`_box-* -h` still prints the script's own header.
+
 ## The -h line
 
 Right after `set -euo pipefail`, forward `-h` to box-help:
@@ -57,11 +70,11 @@ immediately -- no re-stow.
 
 ## Standalone rule
 
-A script may be run on its own, not just via install.sh. Self-locate BOX_ROOT;
-never assume an env var was exported for you:
+A script may be run on its own, not just via install.sh. Detect the OS with the
+`_box-detect-os` command (it sits on PATH alongside the other box commands):
 
 ```bash
-os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+os="$(_box-detect-os)"
 ```
 
 Per-OS work dispatches on that value (`macos`, `arch`, `fedora`).

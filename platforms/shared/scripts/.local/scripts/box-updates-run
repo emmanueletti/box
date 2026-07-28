@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# Installs available updates on a box-managed machine (the apply side of box-updates-check).
+#
+#   box-updates-run
+#
+# Orchestrates the _box-update-* sub-tools, in order:
+#   _box-updates-run-os        vendor OS updates (macOS softwareupdate)
+#   _box-updates-run-packages  packages, incl. the kernel (mise/brew/pacman/dnf)
+#   _box-updates-run-firmware  firmware/BIOS (Linux fwupd)
+#
+# Each sub-tool also runs standalone. A failing sub-tool aborts the run. Some
+# steps use sudo and will prompt for your password.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+_box-updates-run-os
+_box-updates-run-packages
+_box-updates-run-firmware

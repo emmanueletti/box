@@ -2,9 +2,9 @@
 #
 # Applies package updates from every package manager on this machine.
 #
-#   box-update-packages        # upgrade mise tools, then brew/pacman/dnf packages
+#   _box-updates-run-packages        # upgrade mise tools, then brew/pacman/dnf packages
 #
-# The mirror of box-check-package-update: what that reports, this installs. Uses
+# The mirror of _box-updates-check-packages: what that reports, this installs. Uses
 # mise --bump to match the check, so major versions come through too.
 
 set -euo pipefail
@@ -14,7 +14,7 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
 
-os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+os="$(_box-detect-os)"
 
 box_update_section "packages (mise)"
 box_update_require mise
@@ -42,4 +42,4 @@ case "$os" in
     ;;
 esac
 
-echo "✅ box-update-packages: done"
+echo "✅ _box-updates-run-packages: done"

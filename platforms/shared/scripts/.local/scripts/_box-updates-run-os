@@ -2,10 +2,10 @@
 #
 # Installs OS/system updates from the vendor updater.
 #
-#   box-update-os        # macOS softwareupdate; Linux OS comes through packages
+#   _box-updates-run-os        # macOS softwareupdate; Linux OS comes through packages
 #
-# The mirror of box-check-os-update. On Linux the kernel and base system ship as
-# packages, so there this defers to box-update-packages.
+# The mirror of _box-updates-check-os. On Linux the kernel and base system ship as
+# packages, so there this defers to _box-updates-run-packages.
 
 set -euo pipefail
 
@@ -14,7 +14,7 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
 
-os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+os="$(_box-detect-os)"
 
 case "$os" in
   macos)
@@ -25,8 +25,8 @@ case "$os" in
 
   arch | fedora)
     box_update_section "OS update"
-    echo "no separate OS updater on $os; run box-update-packages for the kernel and base system"
+    echo "no separate OS updater on $os; run _box-updates-run-packages for the kernel and base system"
     ;;
 esac
 
-echo "✅ box-update-os: done"
+echo "✅ _box-updates-run-os: done"

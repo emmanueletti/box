@@ -2,7 +2,7 @@
 #
 # Reports outdated packages from every package manager on this machine.
 #
-#   box-check-package-update
+#   _box-updates-check-packages
 #
 # mise everywhere, plus brew (macOS) / pacman (arch) / dnf (fedora). The Linux
 # kernel is a package, so a pending kernel upgrade shows up here.
@@ -14,7 +14,7 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
 
-os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+os="$(_box-detect-os)"
 
 box_check_require mise
 # Run from $HOME so only the global toolset is checked, not a project's tools.

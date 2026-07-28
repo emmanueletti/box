@@ -23,7 +23,7 @@ fi
 mapfile -t files < <(
   {
     find "$root/platforms" "$root/lib" -type f -name '*.sh'
-    find "$root/platforms/shared/scripts/.local/scripts" -type f -name 'box-*'
+    find "$root/platforms/shared/scripts/.local/scripts" -type f \( -name 'box-*' -o -name '_box-*' \)
     find "$root/.githooks" "$root/bin" -type f 2>/dev/null
     echo "$root/install.sh"
   } | sort -u

@@ -2,10 +2,10 @@
 #
 # Installs pending firmware/BIOS updates.
 #
-#   box-update-firmware        # Linux fwupd; macOS firmware comes through the OS
+#   _box-updates-run-firmware        # Linux fwupd; macOS firmware comes through the OS
 #
-# The mirror of box-check-firmware-update. macOS firmware ships through
-# softwareupdate, so there this defers to box-update-os.
+# The mirror of _box-updates-check-firmware. macOS firmware ships through
+# softwareupdate, so there this defers to _box-updates-run-os.
 
 set -euo pipefail
 
@@ -14,12 +14,12 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
 
-os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+os="$(_box-detect-os)"
 
 case "$os" in
   macos)
     box_update_section "firmware & BIOS"
-    echo "macOS firmware ships through softwareupdate; run box-update-os"
+    echo "macOS firmware ships through softwareupdate; run _box-updates-run-os"
     ;;
 
   arch | fedora)
@@ -30,4 +30,4 @@ case "$os" in
     ;;
 esac
 
-echo "✅ box-update-firmware: done"
+echo "✅ _box-updates-run-firmware: done"

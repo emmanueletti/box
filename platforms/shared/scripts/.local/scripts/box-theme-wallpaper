@@ -40,7 +40,7 @@ if [[ -n $dark ]]; then
   dark="$(absolute "$dark")"
 fi
 
-os="$("${BOX_ROOT:-$HOME/box}/lib/box-detect-os.sh")"
+os="$(_box-detect-os)"
 
 case "$os" in
   macos)
