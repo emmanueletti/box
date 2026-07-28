@@ -44,6 +44,8 @@ podman
 podman-docker
 podman-compose
 
+tailscale
+
 1password
 1password-cli
 brave-browser

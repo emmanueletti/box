@@ -13,6 +13,19 @@ baseurl=https://brave-browser-rpm-release.s3.brave.com/$basearch
 EOF
 fi
 
+if [[ ! -f /etc/yum.repos.d/tailscale.repo ]]; then
+  sudo tee /etc/yum.repos.d/tailscale.repo > /dev/null <<'EOF'
+[tailscale-stable]
+name=Tailscale stable
+baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
+enabled=1
+type=rpm
+repo_gpgcheck=1
+gpgcheck=1
+gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
+EOF
+fi
+
 if [[ ! -f /etc/yum.repos.d/vscode.repo ]]; then
   sudo tee /etc/yum.repos.d/vscode.repo > /dev/null <<'EOF'
 [code]
