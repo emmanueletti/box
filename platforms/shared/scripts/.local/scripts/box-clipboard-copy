@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# Copies text to the system clipboard, picking the right tool per platform.
+#
+#   echo hello | box-clipboard-copy      # from stdin
+#   box-clipboard-copy "some text"       # from arguments
+#   box-clipboard-copy path/to/file      # e.g. current filename
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# Reads stdin and writes it to the clipboard with whatever tool the platform
+# provides: macOS ships pbcopy; Wayland has wl-copy; X11 has xclip or xsel.
+copy() {
+  if command -v pbcopy >/dev/null 2>&1; then
+    pbcopy
+  elif command -v wl-copy >/dev/null 2>&1; then
+    wl-copy
+  elif command -v xclip >/dev/null 2>&1; then
+    xclip -selection clipboard
+  elif command -v xsel >/dev/null 2>&1; then
+    xsel --clipboard --input
+  else
+    echo "box-clipboard-copy: no clipboard tool found (need pbcopy, wl-copy, xclip, or xsel)" >&2
+    return 1
+  fi
+}
+
+# Text comes from the arguments when given, otherwise from stdin.
+if (( $# > 0 )); then
+  printf '%s' "$*"
+else
+  cat
+fi | copy

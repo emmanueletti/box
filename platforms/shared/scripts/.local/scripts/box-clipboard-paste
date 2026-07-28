@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#
+# Prints the system clipboard to stdout, picking the right tool per platform.
+#
+#   box-clipboard-paste                  # dump clipboard
+#   box-clipboard-paste > file.txt       # save it
+#   diff <(box-clipboard-paste) file     # compare against it
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# macOS ships pbpaste; Wayland has wl-paste (-n keeps pbpaste's no-trailing-
+# newline behaviour); X11 has xclip or xsel.
+if command -v pbpaste >/dev/null 2>&1; then
+  pbpaste
+elif command -v wl-paste >/dev/null 2>&1; then
+  wl-paste -n
+elif command -v xclip >/dev/null 2>&1; then
+  xclip -selection clipboard -o
+elif command -v xsel >/dev/null 2>&1; then
+  xsel --clipboard --output
+else
+  echo "box-clipboard-paste: no clipboard tool found (need pbpaste, wl-paste, xclip, or xsel)" >&2
+  exit 1
+fi
