@@ -5,7 +5,7 @@ theme = dark:Tomorrow Night,light:Alabaster
 
 # Font
 font-size = 11
-adjust-cell-height = 20%
+adjust-cell-height = 30%
 config-file = ?font.conf
 
 # Disable programming ligatures (calt drives them; liga as a safety net)
