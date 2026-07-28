@@ -79,7 +79,7 @@ A-w = ":buffer-close"
 A-W = ":buffer-close-others"
 A-q = ":quit"
 C-r = ":reload-all"
-C-n = ':! echo -e "\e]52;;$(echo %{buffer_name} | base64)\007" > /dev/tty' # Current filename to system clipboard
+C-n = ':sh box-clipboard-copy %{buffer_name}' # Current filename to system clipboard
 C-s = ":format"
 C-j = "save_selection"
 ret = "goto_word" # Enter = jump to word
