@@ -35,8 +35,7 @@ args = ["sourcekit-lsp"]
 
 [[language]]
 name = "ruby"
-language-servers = ["ruby-lsp", "standard-ruby", "hx-lsp"]
-formatter = { command = "bundle", args = ["exec", "standardrb", "--stdin", "foo.rb", "--fix", "--stderr"] }
+language-servers = [{ name = "ruby-lsp", except-features = ["format"] }, "standard-ruby", "hx-lsp"]
 auto-format = true
 
 [[language]]
