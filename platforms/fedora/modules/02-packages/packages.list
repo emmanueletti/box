@@ -44,6 +44,8 @@ podman
 podman-docker
 podman-compose
 
+remmina
+remmina-plugins-vnc
 tailscale
 
 1password
