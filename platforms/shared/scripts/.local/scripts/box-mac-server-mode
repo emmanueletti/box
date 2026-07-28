@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# Orchestrates always-on headless server setup: power, SSH, Tailscale and a
+# solid-gray idle screen. Sequences the box-mac-power and box-mac-remote-login
+# primitives; auto-login stays a separate step (it writes a password, so you
+# run it deliberately).
+#
+#   box-mac-server-mode on       # power on + SSH on + tailscale up
+#   box-mac-server-mode off      # power off + SSH off + tailscale down
+#   box-mac-server-mode status   # show power, SSH, Tailscale and auto-login
+
+set -euo pipefail
+
+# Naked call (or -h) prints this script's help instead of acting.
+[[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
+
+os="$(_box-detect-os)"
+[[ $os == "macos" ]] || { echo "box-mac-server-mode: macOS only, skipping."; exit 0; }
+
+cmd="$1"
+
+if [[ $cmd == "status" ]]; then
+  # Each primitive prints its own labelled line; just run them.
+  box-mac-power status
+  box-mac-remote-login status
+  if command -v tailscale >/dev/null; then
+    tailscale status >/dev/null 2>&1 && echo "Tailscale: up" || echo "Tailscale: down"
+  else
+    echo "Tailscale: not installed"
+  fi
+  box-mac-autologin status
+  exit 0
+fi
+
+if [[ $cmd != "on" && $cmd != "off" ]]; then
+  echo "❌ box-mac-server-mode: unknown argument '$cmd' (use on, off, status)" >&2
+  exit 1
+fi
+
+box-mac-power "$cmd"
+box-mac-remote-login "$cmd"
+
+if [[ $cmd == "on" ]]; then
+  if command -v tailscale >/dev/null; then
+    tailscale up               # first run prints a login URL to authenticate
+  else
+    echo "box-mac-server-mode: tailscale not installed -- install it, then: tailscale up" >&2
+  fi
+
+  # Solid-gray idle screen. macOS has no solid-colour saver, so disable the
+  # photo saver (idleTime 0) and set a flat gray desktop -- also keeps VNC
+  # light, since a flat colour is almost nothing to stream per frame.
+  defaults -currentHost write com.apple.screensaver idleTime 0
+  box-theme-wallpaper \
+    "${BOX_ROOT:-$HOME/box}/assets/wallpapers/light/solid-gray.png" \
+    "${BOX_ROOT:-$HOME/box}/assets/wallpapers/dark/solid-gray.png"
+
+  # FileVault blocks unattended reboot -- warn, but don't block (the rest is
+  # still valid). Auto-login is the deliberate separate step below.
+  if fdesetup status | grep -q "FileVault is On"; then
+    echo "⚠️  box-mac-server-mode: FileVault is on -- mini won't reboot unattended." >&2
+  fi
+  echo "Next: run 'box-mac-autologin on' so the keychain unlocks after boot."
+else
+  command -v tailscale >/dev/null && tailscale down || true
+  defaults -currentHost write com.apple.screensaver idleTime 1200  # 20 min, normal
+  # Desktop wallpaper left as-is -- set your own with box-theme-wallpaper.
+fi
+
+echo "Server mode: $cmd"

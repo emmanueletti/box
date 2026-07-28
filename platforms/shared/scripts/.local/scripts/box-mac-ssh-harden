@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+# Harden incoming SSH: keys only, no passwords, no root login. Drops a
+# sshd_config.d override so macOS updates that rewrite the main sshd_config
+# leave it intact, then reloads sshd.
+#
+#   box-mac-ssh-harden on       # keys-only: disable password + root login
+#   box-mac-ssh-harden off      # remove the override, back to macOS default
+#   box-mac-ssh-harden status   # show the override and effective sshd settings
+
+set -euo pipefail
+
+# Naked call (or -h) prints this script's help instead of acting.
+[[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
+
+os="$(_box-detect-os)"
+[[ $os == "macos" ]] || { echo "box-mac-ssh-harden: macOS only, skipping."; exit 0; }
+
+# macOS sshd_config ends with `Include /etc/ssh/sshd_config.d/*`, so a file
+# here wins over the stock config and survives OS updates.
+readonly DROPIN="/etc/ssh/sshd_config.d/100-box-hardening.conf"
+
+cmd="$1"
+
+if [[ $cmd == "status" ]]; then
+  if [[ -f $DROPIN ]]; then
+    echo "SSH hardening: on ($DROPIN)"
+  else
+    echo "SSH hardening: off (no override)"
+  fi
+  # -T prints the settings sshd would actually use, after all includes.
+  echo "Effective:"
+  sudo sshd -T 2>/dev/null \
+    | grep -iE "^(passwordauthentication|kbdinteractiveauthentication|pubkeyauthentication|permitrootlogin) " \
+    | sed 's/^/  /'
+  exit 0
+fi
+
+if [[ $cmd != "on" && $cmd != "off" ]]; then
+  echo "❌ box-mac-ssh-harden: unknown argument '$cmd' (use on, off, status)" >&2
+  exit 1
+fi
+
+if [[ $cmd == "off" ]]; then
+  sudo rm -f "$DROPIN"
+  sudo launchctl kickstart -k system/com.openssh.sshd
+  echo "SSH hardening: off"
+  exit 0
+fi
+
+# --- on: refuse to lock you out ---
+# Disabling passwords with no usable key means nobody can SSH in ever again
+# (this box auto-logs-in, so the console can still recover it, but don't rely
+# on that headless). Require at least one authorized key first.
+keys="$HOME/.ssh/authorized_keys"
+if [[ ! -s $keys ]]; then
+  echo "❌ box-mac-ssh-harden: $keys is empty or missing." >&2
+  echo "   Add your public key first, or you'll lock yourself out:" >&2
+  echo "     ssh-copy-id $USER@<this-host>" >&2
+  exit 1
+fi
+
+# tee via sudo: the shell can't redirect into a root-owned path on its own.
+sudo tee "$DROPIN" >/dev/null <<'EOF'
+# Managed by box-mac-ssh-harden. Edit the script, not this file.
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin no
+
+# Optional: restrict SSH to named accounts. Uncomment and set yours -- a wrong
+# name here locks everyone else out, so leave off unless you mean it.
+#AllowUsers your-user
+EOF
+
+# Reject the new config before reload -- a syntax error would otherwise leave
+# sshd refusing to start, killing remote access.
+if ! sudo sshd -t; then
+  echo "❌ box-mac-ssh-harden: sshd rejected the config, reverting." >&2
+  sudo rm -f "$DROPIN"
+  exit 1
+fi
+
+sudo launchctl kickstart -k system/com.openssh.sshd
+echo "✅ SSH hardening: on -- keys only, no passwords, no root login."
+echo "   Keep your current session open and test a fresh key login before trusting it."

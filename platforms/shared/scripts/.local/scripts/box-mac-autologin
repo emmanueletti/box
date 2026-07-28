@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# Turns on macOS auto-login so a headless Mac boots straight to a logged-in
+# session (needed for the signing keychain to unlock unattended).
+#
+#   box-mac-autologin on          # enable for the current user
+#   box-mac-autologin on <user>   # enable for a specific user
+#   box-mac-autologin off         # disable auto-login
+#   box-mac-autologin status      # show current setting
+
+set -euo pipefail
+
+# Naked call (or -h) prints this script's help instead of acting.
+[[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
+
+# macOS-only: sysadminctl and the loginwindow prefs don't exist elsewhere.
+os="$(_box-detect-os)"
+[[ $os == "macos" ]] || { echo "box-mac-autologin: macOS only, skipping."; exit 0; }
+
+autologin_user() {
+  # Empty when auto-login is off.
+  defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser 2>/dev/null || true
+}
+
+cmd="$1"
+
+if [[ $cmd == "status" ]]; then
+  user="$(autologin_user)"
+  [[ -n $user ]] && echo "Auto-login: on ($user)" || echo "Auto-login: off"
+  exit 0
+fi
+
+if [[ $cmd == "off" ]]; then
+  sudo sysadminctl -autologin off
+  echo "Auto-login: off"
+  exit 0
+fi
+
+if [[ $cmd != "on" ]]; then
+  echo "❌ box-mac-autologin: unknown argument '$cmd' (use on, off, status)" >&2
+  exit 1
+fi
+
+user="${2:-$USER}"
+
+# Enabling from here: writes the user's password obfuscated to /etc/kcpassword,
+# so guard it. FileVault forces a pre-boot login that defeats auto-login, so
+# refuse rather than leave a broken setup.
+if fdesetup status | grep -q "FileVault is On"; then
+  echo "❌ box-mac-autologin: FileVault is on -- auto-login won't work. Turn FileVault off first." >&2
+  exit 1
+fi
+
+echo "This stores $user's password (obfuscated, reversible) in /etc/kcpassword."
+read -r -p "Enable auto-login for $user? [y/N] " reply || reply=""
+[[ $reply == [yY]* ]] || { echo "Cancelled."; exit 0; }
+
+# '-password -' makes sysadminctl prompt for the password instead of taking it
+# on the command line, so it never lands in the process list or shell history.
+sudo sysadminctl -autologin set -userName "$user" -password -
+
+echo "Auto-login: on ($user)"
+echo "Reboot to verify it lands in a logged-in session."

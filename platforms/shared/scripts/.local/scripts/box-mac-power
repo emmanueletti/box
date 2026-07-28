@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+#
+# Toggles macOS power for always-on (never sleep) vs normal desktop behaviour.
+#
+#   box-mac-power on        # never sleep, wake on network, auto-restart
+#   box-mac-power off       # restore normal desktop power behaviour
+#   box-mac-power toggle    # flip between the two
+#   box-mac-power status    # show current mode, change nothing
+
+set -euo pipefail
+
+# Naked call (or -h) prints this script's help instead of acting.
+[[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
+
+# pmset lives only on macOS. On Linux this is a no-op, not a failure -- the
+# same script ships to every box, so exit clean instead of erroring.
+os="$(_box-detect-os)"
+[[ $os == "macos" ]] || { echo "box-mac-power: macOS only, skipping."; exit 0; }
+
+# Server mode is defined by sleep being disabled on AC power. `$1=="sleep"`
+# avoids matching disksleep/displaysleep. Empty if pmset can't read it.
+current_sleep="$(pmset -g | awk '$1 == "sleep" { print $2 }')"
+[[ $current_sleep == "0" ]] && current=on || current=off
+
+mode="$1"
+[[ $mode == "toggle" ]] && { [[ $current == "on" ]] && mode=off || mode=on; }
+
+if [[ $mode == "status" ]]; then
+  echo "Power: $current"
+  exit 0
+fi
+
+if [[ $mode != "on" && $mode != "off" ]]; then
+  echo "❌ box-mac-power: unknown argument '$mode' (use on, off, toggle, status)" >&2
+  exit 1
+fi
+
+# -c = settings while on wall/AC power (the only source a mini has).
+if [[ $mode == "on" ]]; then
+  sudo pmset -c sleep 0        # never system-sleep -- keeps SSH reachable
+  sudo pmset -c disksleep 0
+  sudo pmset -c womp 1         # wake on network access
+  sudo pmset -c autorestart 1  # power back on after an outage
+else
+  sudo pmset -c sleep 10       # sane desktop defaults
+  sudo pmset -c disksleep 10
+  sudo pmset -c womp 0
+  sudo pmset -c autorestart 0
+fi
+
+echo "Power: $mode"
