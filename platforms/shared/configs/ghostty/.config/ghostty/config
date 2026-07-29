@@ -12,6 +12,8 @@ config-file = ?font.conf
 font-feature = -calt
 font-feature = -liga
 
+macos-option-as-alt = true
+
 # Cursor
 cursor-style = block
 cursor-style-blink = false
