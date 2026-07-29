@@ -62,7 +62,7 @@ wrap-at-text-width = true
 
 [keys.normal]
 "C-/" = ["toggle_comments"]
-esc = ["collapse_selection", "keep_primary_selection"]
+esc = "collapse_selection"
 x = "select_line_below"
 X = "select_line_above"
 S-left = "goto_previous_buffer"
@@ -71,10 +71,6 @@ C-left = "move_prev_word_start"
 C-right = "move_next_word_start"
 C-del = "delete_word_forward"
 C-backspace = "delete_word_backward"
-C-S-left = "jump_view_left"
-C-S-right = "jump_view_right"
-C-S-up = "jump_view_up"
-C-S-down = "jump_view_down"
 A-w = ":buffer-close"
 A-W = ":buffer-close-others"
 A-q = ":quit"
@@ -83,11 +79,11 @@ C-n = ':sh box-clipboard-copy %{buffer_name}' # Current filename to system clipb
 C-s = ":format"
 C-j = "save_selection"
 ret = "goto_word" # Enter = jump to word
-z = ":toggle gutters.line-numbers.min-width 40 3"
-Z = ":toggle gutters.line-numbers.min-width 95 3"
-"C-`" = "switch_to_uppercase"
+"C-`" = "switch_case"
 a = ["append_mode", "collapse_selection"]
+D = "delete_selection_noyank" # A-d is the default for this
 home = "goto_first_nonwhitespace"
+"$" = "extend_to_line_end"
 V = ["goto_first_nonwhitespace", "extend_to_line_end"]
 S-down = [
   "extend_to_line_bounds",
@@ -106,11 +102,29 @@ S-up = [
 ]
 
 [keys.normal.space]
+space = "command_palette"
 l = "file_picker_in_current_buffer_directory"
 
+# Space t = toggles
 [keys.normal.space.t]
 a = ":theme dark_plus"
 b = ":theme rose_pine_dawn"
+w = ":toggle soft-wrap.enable"
+r = ":toggle line-number relative absolute"
+g = ":toggle indent-guides.render"
+f = ":toggle auto-format"
+n = ":toggle gutters.line-numbers.min-width 3 40 95" # cycle gutter width
+c = ":toggle auto-completion"
+h = ":toggle lsp.display-inlay-hints"
+d = ":toggle inline-diagnostics.cursor-line hint disable"
+z = [
+  ":toggle auto-completion",
+  ":toggle lsp.display-inlay-hints",
+  ":toggle inline-diagnostics.cursor-line hint disable",
+]
+
+# Space x = execute scripts
+[keys.normal.space.x]
 f = ':open %sh{~/.config/helix/scripts/rails-file-to-test.sh %{buffer_name}}'
 p = ':open %sh{ruby ~/.config/helix/scripts/rails-render-to-partial.rb %{buffer_name} %{cursor_line}}'
 i = ':open %sh{ruby ~/.config/helix/scripts/rails-i18n-key-to-entry.rb %{buffer_name} %{cursor_line}}'
@@ -145,5 +159,6 @@ X = "select_line_above"
 left = "goto_first_nonwhitespace"
 right = "goto_line_end"
 
-[keys.select.space.t]
+# Space x = execute scripts
+[keys.select.space.x]
 e = ':pipe ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name}'
