@@ -14,5 +14,99 @@
       "  }",
       "}"
     ]
+  },
+  "console.log": {
+    "prefix": "clog",
+    "description": "console.log()",
+    "body": ["console.log($0);"]
+  },
+  "console.log labelled": {
+    "prefix": "cll",
+    "description": "console.log with a label string",
+    "body": ["console.log(\"${1:label}:\", ${2:value});$0"]
+  },
+  "console.info": {
+    "prefix": "cinfo",
+    "description": "console.info()",
+    "body": ["console.info($0);"]
+  },
+  "console.warn": {
+    "prefix": "cwarn",
+    "description": "console.warn()",
+    "body": ["console.warn($0);"]
+  },
+  "console.error": {
+    "prefix": "cerror",
+    "description": "console.error()",
+    "body": ["console.error($0);"]
+  },
+  "console.debug": {
+    "prefix": "cdebug",
+    "description": "console.debug()",
+    "body": ["console.debug($0);"]
+  },
+  "console.table": {
+    "prefix": "ctable",
+    "description": "console.table() — array/object as a grid",
+    "body": ["console.table($0);"]
+  },
+  "console.dir": {
+    "prefix": "cdir",
+    "description": "console.dir() — interactive object tree",
+    "body": ["console.dir($0);"]
+  },
+  "console.dirxml": {
+    "prefix": "cdirxml",
+    "description": "console.dirxml() — DOM tree of an element",
+    "body": ["console.dirxml($0);"]
+  },
+  "console.trace": {
+    "prefix": "ctrace",
+    "description": "console.trace() — stack trace at this point",
+    "body": ["console.trace($0);"]
+  },
+  "console.assert": {
+    "prefix": "cassert",
+    "description": "console.assert() — log only if condition is false",
+    "body": ["console.assert(${1:condition}, \"${2:message}\");$0"]
+  },
+  "console.count": {
+    "prefix": "ccount",
+    "description": "console.count() — increment a named counter",
+    "body": ["console.count(\"${1:label}\");$0"]
+  },
+  "console.countReset": {
+    "prefix": "ccountreset",
+    "description": "console.countReset() — reset a named counter",
+    "body": ["console.countReset(\"${1:label}\");$0"]
+  },
+  "console.group": {
+    "prefix": "cgroup",
+    "description": "console.group() ... groupEnd() — indented block",
+    "body": ["console.group(\"${1:label}\");", "$0", "console.groupEnd();"]
+  },
+  "console.groupCollapsed": {
+    "prefix": "cgroupc",
+    "description": "console.groupCollapsed() ... groupEnd()",
+    "body": [
+      "console.groupCollapsed(\"${1:label}\");",
+      "$0",
+      "console.groupEnd();"
+    ]
+  },
+  "console.time": {
+    "prefix": "ctime",
+    "description": "console.time() ... timeEnd() — measure elapsed time",
+    "body": ["console.time(\"${1:label}\");", "$0", "console.timeEnd(\"${1:label}\");"]
+  },
+  "console.timeLog": {
+    "prefix": "ctimelog",
+    "description": "console.timeLog() — log a running timer",
+    "body": ["console.timeLog(\"${1:label}\");$0"]
+  },
+  "console.clear": {
+    "prefix": "cclear",
+    "description": "console.clear()",
+    "body": ["console.clear();$0"]
   }
 }
