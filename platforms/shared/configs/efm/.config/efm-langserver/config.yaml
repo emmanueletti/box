@@ -2,7 +2,7 @@ version: 2
 
 tools:
   markdownlint-cli2: &markdownlint-cli2
-    lint-command: 'markdownlint-cli2 ${INPUT}'
+    lint-command: 'markdownlint-cli2 --config $HOME/.config/markdownlint/config.jsonc ${INPUT}'
     lint-stdin: false
     lint-ignore-exit-code: true
     root-markers:

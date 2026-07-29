@@ -1,0 +1,13 @@
+{
+  // Machine-wide markdownlint base config. Wired in via efm-langserver's
+  // lint-command (`markdownlint-cli2 --config <this file> ...`), because
+  // markdownlint-cli2 only auto-discovers .markdownlint* files by walking up
+  // the file tree — it does not read ~/.config on its own.
+  //
+  // Per-repo .markdownlint.jsonc files still layer on top of this base.
+
+  // Line-length (MD013): keep the 80-col limit for prose, but don't flag
+  // wide tables — Prettier aligns tables and won't wrap them, so a wide
+  // table row can't be shortened without hurting readability.
+  "MD013": { "tables": false }
+}
