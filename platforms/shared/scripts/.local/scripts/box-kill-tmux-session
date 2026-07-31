@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Picks a live tmux session to kill.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if ! tmux list-sessions > /dev/null 2>&1; then
+  echo "box-kill-tmux-session: no tmux server running" >&2
+  exit 0
+fi
+
+session="$(tmux list-sessions -F '#{session_name}' \
+  | fzf --prompt="kill session> " --height=40% --reverse)"
+
+if [[ -n $session ]]; then
+  tmux kill-session -t "$session"
+fi
