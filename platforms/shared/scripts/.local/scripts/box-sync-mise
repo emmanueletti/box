@@ -1,14 +1,38 @@
 #!/usr/bin/env bash
 #
-# Installs the global mise toolset from anywhere (ignores project-local tools).
+# Locks then installs the global mise toolset from anywhere (ignores project-local tools).
 #
 # Runs from $HOME so only the global config applies, not a project's tools.
 #
-#   box-sync-mise
+# Locking records the exact download URL and checksum of every tool in
+# ~/.config/mise/mise.lock, which install then enforces. Only `mise lock` writes
+# that file, so locking first is what gets a fresh config.toml edit covered.
+#
+#   box-sync-mise           # lock, then install
+#   box-sync-mise --bump    # let latest/fuzzy pins advance before locking
 
 set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
 cd "$HOME"
-exec mise install "$@"
+
+# Lock only the platform we are on. Left to itself mise locks all seven it knows
+# about, which is wasted work here: the lockfile stays on this machine and is
+# never shared.
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) platform="macos-arm64" ;;
+  Darwin-x86_64) platform="macos-x64" ;;
+  Linux-x86_64) platform="linux-x64" ;;
+  Linux-aarch64) platform="linux-arm64" ;;
+  *)
+    echo "❌ box-sync-mise: unsupported platform $(uname -s)-$(uname -m)" >&2
+    exit 1
+    ;;
+esac
+
+lock=(mise lock --global --platform "$platform")
+[[ ${1:-} == "--bump" ]] && lock+=(--bump)
+
+"${lock[@]}"
+exec mise install

@@ -6,6 +6,6 @@
 set -euo pipefail
 
 echo "box: installing mise tools"
-mise install
+"${SCRIPTS_DIR}/box-sync-mise"
 
 echo "✅ box: mise tools installed"
