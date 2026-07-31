@@ -83,6 +83,7 @@ ret = "goto_word" # Enter = jump to word
 a = ["append_mode", "collapse_selection"]
 D = "delete_selection_noyank" # A-d is the default for this
 home = "goto_first_nonwhitespace"
+"^" = "extend_to_first_nonwhitespace"
 "$" = "extend_to_line_end"
 V = ["goto_first_nonwhitespace", "extend_to_line_end"]
 S-down = [
@@ -135,6 +136,7 @@ j = ':open %sh{ruby ~/.config/helix/scripts/rails-view-to-stimulus.rb %{buffer_n
 c = ':open %sh{ruby ~/.config/helix/scripts/rails-model-to-factory.rb %{buffer_name}}'
 r = ':echo %sh{ruby ~/.config/helix/scripts/rails-action-to-route.rb %{buffer_name} %{cursor_line}}'
 e = ':pipe ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name}'
+d = ':echo %sh{echo "${PWD##*/}/%{buffer_name}"}'
 
 [keys.normal.g]
 left = "goto_first_nonwhitespace"
@@ -154,6 +156,7 @@ C-right = "move_next_word_start"
 [keys.select]
 x = "select_line_below"
 X = "select_line_above"
+"^" = "extend_to_first_nonwhitespace"
 
 [keys.select.g]
 left = "goto_first_nonwhitespace"
