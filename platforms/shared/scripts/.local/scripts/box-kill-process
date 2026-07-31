@@ -1,12 +1,36 @@
 #!/usr/bin/env bash
 #
-# Picks processes to kill, sorted by cpu. TAB multi-selects.
+# Kills a process by pid, or picks one interactively (fzf, sorted by cpu,
+# TAB multi-selects) when no pid is given.
 #
-#   box-kill-process [signal]
+#   box-kill-process                  interactive picker, TERM
+#   box-kill-process [signal]         interactive picker, given signal
+#   box-kill-process <pid> [signal]   kill that pid (and its children) directly
 
 set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
+
+# Also signals children: a hung parent (e.g. a forked test runner) can leave
+# workers behind that outlive it.
+kill_pid() {
+  local pid=$1 sig=${2:-TERM} stat
+
+  kill -"$sig" "$pid" 2>/dev/null || true
+  pkill -"$sig" -P "$pid" 2>/dev/null || true
+
+  sleep 0.3
+  if ps -p "$pid" > /dev/null 2>&1; then
+    stat="$(ps -o stat= -p "$pid" 2>/dev/null | tr -d ' ')"
+    echo "box-kill-process: pid ${pid} still alive (stat: ${stat:-?})" >&2
+    [[ $stat == D* ]] && echo "  stuck in uninterruptible I/O wait -- even -9 can't touch this" >&2
+  fi
+}
+
+if [[ ${1:-} =~ ^[0-9]+$ ]] && ps -p "$1" > /dev/null 2>&1; then
+  kill_pid "$1" "${2:-}"
+  exit 0
+fi
 
 # sed 1d drops the ps header row; awk '{print $1}' keeps just the pid column.
 pids="$(ps -eo pid,user,%cpu,%mem,command --sort=-%cpu \
