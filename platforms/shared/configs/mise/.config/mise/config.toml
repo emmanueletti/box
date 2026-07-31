@@ -1,36 +1,47 @@
 [tools]
-go = "latest"
-node = "latest"
-python = "latest"
-ruby = "latest"
-rust = "latest"
-uv = "latest"
-"pipx:fb-idb" = { version = "latest", pipx_args = "--python 3.12" }
+go = "1.26.5"
+node = "26.5.0"
+python = "3.14.6"
+ruby = "4.0.6"
+rust = "1.97.1"
+uv = "0.11.33"
+"pipx:fb-idb" = { version = "1.1.7", pipx_args = "--python 3.12" }
 
 # helix language servers and formatters
-"gem:herb" = "latest"
+"gem:herb" = "0.10.2"
 "gem:rails" = "latest"
-"gem:ruby-lsp" = "latest"
-"gem:standard" = "latest"
+"gem:ruby-lsp" = "0.26.10"
+"gem:standard" = "1.56.0"
 
-"npm:@herb-tools/language-server" = "latest"
-"npm:@microsoft/compose-language-service" = "latest"
-"npm:@olrtg/emmet-language-server" = "latest"
-"npm:emmet" = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:prettier" = "latest"
+"npm:@herb-tools/language-server" = "0.10.2"
+"npm:@microsoft/compose-language-service" = "0.5.0"
+"npm:@olrtg/emmet-language-server" = "2.8.0"
+"npm:emmet" = "2.4.11"
+"npm:markdownlint-cli2" = "0.23.2"
+"npm:prettier" = "3.9.6"
 
-"go:github.com/docker/docker-language-server/cmd/docker-language-server" = "latest"
-"go:github.com/mattn/efm-langserver" = "latest"
+"github:mattn/efm-langserver" = "0.0.57"
+"github:docker/docker-language-server" = { version = "0.20.1", bin = "docker-language-server" }
 
-"github:artempyanykh/marksman" = "latest"
-"github:erasin/hx-lsp" = "latest"
-"github:koalaman/shellcheck" = "latest"
-"github:render-oss/cli" = { version = "latest", bin = "render" }
+marksman = "2026-02-08"
+shellcheck = "0.11.0"
+
+"github:erasin/hx-lsp" = "0.3.0"
+
+"aqua:ddev/ddev" = "latest"
+lazydocker = "0.25.2"
+resvg = "0.47.0"
+stripe = "1.44.1"
+yazi = "26.5.6"
+"github:render-oss/cli" = { version = "2.22.0", bin = "render" }
 
 [settings]
-lockfile = true
 prefer_offline = true
 
 [settings.ruby]
 compile = false
+
+# Attestation checks hit the GitHub API, which rate limits anonymous callers to
+# 60 requests an hour. Borrow the gh CLI's token to raise that ceiling.
+[settings.github]
+credential_command = "gh auth token"
