@@ -3,27 +3,18 @@
 set -euo pipefail
 
 if [[ ! -f /etc/yum.repos.d/brave-browser.repo ]]; then
-  sudo tee /etc/yum.repos.d/brave-browser.repo > /dev/null <<'EOF'
-[brave-browser]
-name=Brave Browser
-enabled=1
-gpgcheck=1
-gpgkey=https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-baseurl=https://brave-browser-rpm-release.s3.brave.com/$basearch
-EOF
+  sudo dnf config-manager addrepo \
+    --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 fi
 
 if [[ ! -f /etc/yum.repos.d/tailscale.repo ]]; then
-  sudo tee /etc/yum.repos.d/tailscale.repo > /dev/null <<'EOF'
-[tailscale-stable]
-name=Tailscale stable
-baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
-enabled=1
-type=rpm
-repo_gpgcheck=1
-gpgcheck=1
-gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
-EOF
+  sudo dnf config-manager addrepo \
+    --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+fi
+
+if [[ ! -f /etc/yum.repos.d/gh-cli.repo ]]; then
+  sudo dnf config-manager addrepo \
+    --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
 fi
 
 if [[ ! -f /etc/yum.repos.d/vscode.repo ]]; then
@@ -35,4 +26,20 @@ enabled=1
 gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 EOF
+fi
+
+if [[ ! -f /etc/yum.repos.d/1password.repo ]]; then
+  sudo tee /etc/yum.repos.d/1password.repo > /dev/null <<'EOF'
+[1password]
+name=1Password Stable Channel
+baseurl=https://downloads.1password.com/linux/rpm/stable/$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://downloads.1password.com/linux/keys/1password.asc
+EOF
+fi
+
+if [[ ! -f /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo ]]; then
+  sudo dnf copr enable -y scottames/ghostty
 fi
