@@ -8,6 +8,11 @@ bindkey "^[[1;5D" backward-word # ctrl + <-
 bindkey '^[[H' beginning-of-line # Home key
 bindkey '^[[F' end-of-line       # End key
 
+# Treat `/` as a word boundary, so word motions and kills stop at each path
+# segment instead of jumping the whole path. Also makes ctrl + -> take an
+# autosuggested path one segment at a time (see 99-init.zsh).
+WORDCHARS="${WORDCHARS:s@/@}"
+
 setopt INTERACTIVE_COMMENTS
 setopt AUTO_CD
 setopt HIST_IGNORE_ALL_DUPS   # supersedes HIST_IGNORE_DUPS

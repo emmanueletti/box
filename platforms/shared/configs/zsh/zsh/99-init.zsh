@@ -27,7 +27,7 @@ fi
 if [[ -r $_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
   source $_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-  bindkey '^ ' autosuggest-accept   # Ctrl-Space accepts the suggestion
+  bindkey '^ ' autosuggest-accept   # Ctrl-Space accepts the whole suggestion
 fi
 
 # syntax highlighting (must be last)
