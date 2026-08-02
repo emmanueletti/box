@@ -13,11 +13,13 @@
   - [Case, repeat, macro](#case-repeat-macro)
   - [Shell outs](#shell-outs)
   - [Recipes](#recipes)
+    - [Select with a motion, skip `v`](#select-with-a-motion-skip-v)
     - [Jump straight to a line number](#jump-straight-to-a-line-number)
     - [Split a block into per-line cursors](#split-a-block-into-per-line-cursors)
     - [Rename every occurrence of a word in a file](#rename-every-occurrence-of-a-word-in-a-file)
     - [Rename every occurrence within a selection](#rename-every-occurrence-within-a-selection)
     - [Align a markdown table](#align-a-markdown-table)
+    - [Picking a repeat: dot, alt-dot, or macro](#picking-a-repeat-dot-alt-dot-or-macro)
     - [Record and play a macro](#record-and-play-a-macro)
     - [Append text to the end of every line](#append-text-to-the-end-of-every-line)
     - [Change inside quotes and brackets](#change-inside-quotes-and-brackets)
@@ -123,7 +125,6 @@ whole functions, args, and types, not just brackets.
 | `gh` / `gl`         | line start / end                                |
 | `C-o` / `C-i`       | jump back / forward                             |
 | `gf`                | goto file under cursor                          |
-| `A-.`               | repeat last `f` / `t`                           |
 
 ## Windows
 
@@ -146,7 +147,8 @@ Helix defaults (no custom split binds).
 | `~`                 | toggle case           |
 | `` ` `` / `` A-` `` | to lower / upper case |
 | `.`                 | repeat last insert    |
-| `q` / `Q`           | record / replay macro |
+| `A-.`               | repeat last `f` / `t` |
+| `Q` / `q`           | record / replay macro |
 
 ## Shell outs
 
@@ -165,6 +167,17 @@ Examples: select lines, `\|` `sort` `Enter` — replace with sorted. `!` `date`
 `Enter` — drop today's date before the cursor.
 
 ## Recipes
+
+### Select with a motion, skip `v`
+
+Helix has no vim-style "press `v` to start selecting" step — motions extend a
+selection on their own.
+
+1. `f;` — selects from cursor up to and including next `;` (no `v` needed)
+2. `d` — delete it
+
+Same deal for `t`, `w`, `b`, `e`, etc. Selection collapses back to a cursor
+after the next edit or `Esc`.
 
 ### Jump straight to a line number
 
@@ -209,11 +222,22 @@ Same as above, but scope the region instead of the whole file:
 2. `s` `\|` `Enter` — selection on every `|`
 3. `&` — align them into columns
 
+### Picking a repeat: dot, alt-dot, or macro
+
+| Want to repeat...                        | Use             |
+| ----------------------------------------- | --------------- |
+| just the last insert (typed text)         | `.`             |
+| the last `f` / `t` / `F` / `T` jump       | `A-.`           |
+| a multi-step sequence (motion + edit + motion + edit...) | macro (`Q` record, `q` play) |
+
+`.` and `A-.` only ever replay ONE thing each, no setup needed. Macro is for
+chaining several actions together, at the cost of recording it first.
+
 ### Record and play a macro
 
-1. `q` — start recording (do edits + a motion to the next target)
-2. `q` — stop recording
-3. `Q` — replay once; `5Q` replays 5x
+1. `Q` — start recording (do edits + a motion to the next target)
+2. `Q` — stop recording
+3. `q` — replay once; `5q` replays 5x
 
 ### Append text to the end of every line
 
