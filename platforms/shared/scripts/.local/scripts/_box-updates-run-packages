@@ -26,7 +26,9 @@ case "$os" in
   macos)
     box_update_section "packages (brew)"
     box_update_require brew
+    brew update    # refresh formula metadata before upgrading
     brew upgrade
+    brew cleanup   # prune old versions and stale downloads
     ;;
 
   arch)
