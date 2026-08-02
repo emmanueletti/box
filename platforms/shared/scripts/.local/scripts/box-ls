@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Fuzzy-search the box commands when you forget what you have.
+#
+#   box-ls              pick a command; its usage prints on select
+#   box-ls kill         start the search with "kill" already typed
+#
+# Preview pane shows each command's full header as you scroll. Needs fzf.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+command -v fzf >/dev/null || { echo "❌ box-ls: fzf not found" >&2; exit 1; }
+
+# box-help already knows how to list every command and its summary; reuse that
+# so box-ls never grows its own copy of the header-parsing rules.
+choice="$(box-help \
+  | sed -n 's/^  \(box-[^ ]*\)  */\1\t/p' \
+  | fzf --query="${1:-}" \
+        --delimiter='\t' --with-nth=1,2 \
+        --preview='box-help {1}' --preview-window=right:60% \
+  | cut -f1)"
+
+# Empty on ESC/Ctrl-C -- nothing picked, nothing to show.
+[[ -n $choice ]] || exit 0
+
+exec box-help "$choice"
