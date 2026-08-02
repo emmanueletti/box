@@ -9,3 +9,7 @@ vault = "Personal"
 [[ssh-keys]]
 item = "e-fw13-brother"
 vault = "Personal"
+
+[[ssh-keys]]
+item = "brother_devbox"
+vault = "Personal"
