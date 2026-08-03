@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Seeds box's default files into $HOME, keeping whatever is already there.
+#
+#   box-sync-defaults           # copy in anything missing, report what it kept
+#   box-sync-defaults --force   # replace too, saving each old copy as .box-bak
+#   box-sync-defaults claude    # just this package
+#
+# Defaults are real copies, not symlinks, so a machine is free to drift from
+# them. That is why an existing file is kept by default: it is the machine's
+# own, not box's. To sync the symlinked configs instead, use box-sync-config.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box="${BOX_ROOT:-$HOME/box}"
+
+# seed.sh wants the flag before the directory and package names after it, so
+# peel --force off the front rather than passing "$@" through in one go.
+force=()
+if [[ ${1:-} == "--force" ]]; then
+  force=(--force)
+  shift
+fi
+
+exec "$box/lib/seed.sh" "${force[@]}" "$box/platforms/shared/defaults" "$@"
