@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Re-runs the whole configs module for this machine's platform.
+#
+#   box-sync-configs-all      # relink every config package, plus the scripts
+#
+# Same step install.sh runs, so it relinks all packages at once. To sync a few
+# packages by name instead, use box-sync-config.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box="${BOX_ROOT:-$HOME/box}"
+os="$(_box-detect-os)"
+module="$box/platforms/$os/modules/03-configs/setup.sh"
+
+if [[ ! -x $module ]]; then
+  echo "❌ box-sync-configs-all: no configs module for $os at $module" >&2
+  exit 1
+fi
+
+exec "$module"
