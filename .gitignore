@@ -26,4 +26,3 @@ node_modules/
 
 # Box
 *.box-bak
-platforms/shared/configs/claude/.claude/settings.json
