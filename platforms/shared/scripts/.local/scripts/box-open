@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+# Opens a folder, file, or URL in the desktop app that handles it.
+#
+#   box-open                  open the current directory in the file manager
+#   box-open ~/Downloads      open some other folder
+#   box-open notes.md         open a file in its default app
+#   box-open https://ok.com   open a URL in the default browser
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+target="${1:-.}"
+
+# macOS ships `open`; Linux desktops ship `xdg-open`. Same idea, different name.
+if command -v open >/dev/null 2>&1; then
+  opener=open
+elif command -v xdg-open >/dev/null 2>&1; then
+  opener=xdg-open
+else
+  echo "❌ box-open: no opener found (need open or xdg-open)" >&2
+  exit 1
+fi
+
+# A URL is passed through as-is; anything else has to exist on disk first.
+if [[ $target != *://* && ! -e $target ]]; then
+  echo "❌ box-open: no such file or directory: $target" >&2
+  exit 1
+fi
+
+# xdg-open leaks the app's stdout/stderr into this terminal and can hang the
+# shell holding it, so let it go and detach.
+exec "$opener" "$target" >/dev/null 2>&1
