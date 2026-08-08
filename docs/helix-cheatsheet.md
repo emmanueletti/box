@@ -55,17 +55,19 @@
 
 ## Multiple cursors
 
-| Key         | Action                                      |
-| ----------- | ------------------------------------------- |
-| `C` / `A-C` | add cursor next / prev line                 |
-| `s`         | split selection by regex -> one cursor each |
-| `%`         | select whole file                           |
-| `A-s`       | split selection into one cursor per line    |
-| `&`         | align cursors                               |
-| `,`         | drop secondary cursors (keep primary)       |
-| `;` / `A-;` | collapse selection to cursor / flip anchor  |
-| `*`         | set search from selection                   |
-| `n` / `N`   | next / prev match                           |
+| Key         | Action                                            |
+| ----------- | ------------------------------------------------- |
+| `C` / `A-C` | add cursor next / prev line                       |
+| `s`         | select regex in selection -> one cursor each      |
+| `S`         | split selection on regex (keeps the between-bits) |
+| `%`         | select whole file                                 |
+| `A-s`       | split selection into one cursor per line          |
+| `K` / `A-K` | keep / remove selections matching regex           |
+| `&`         | align cursors                                     |
+| `,`         | drop secondary cursors (keep primary)             |
+| `;` / `A-;` | collapse selection to cursor / flip anchor        |
+| `*`         | set search from selection                         |
+| `n` / `N`   | next / prev match                                 |
 
 ## Tree-sitter selection
 
@@ -224,10 +226,10 @@ Same as above, but scope the region instead of the whole file:
 
 ### Picking a repeat: dot, alt-dot, or macro
 
-| Want to repeat...                        | Use             |
-| ----------------------------------------- | --------------- |
-| just the last insert (typed text)         | `.`             |
-| the last `f` / `t` / `F` / `T` jump       | `A-.`           |
+| Want to repeat...                                        | Use                          |
+| -------------------------------------------------------- | ---------------------------- |
+| just the last insert (typed text)                        | `.`                          |
+| the last `f` / `t` / `F` / `T` jump                      | `A-.`                        |
 | a multi-step sequence (motion + edit + motion + edit...) | macro (`Q` record, `q` play) |
 
 `.` and `A-.` only ever replay ONE thing each, no setup needed. Macro is for
@@ -287,7 +289,7 @@ chaining several actions together, at the cost of recording it first.
 ### Filter cursors by pattern
 
 1. Make a multi-selection (`s` split, or per-line `A-s`)
-2. `A-k` — keep only cursors matching a regex
+2. `K` — keep only cursors matching a regex
 3. `A-K` — or remove the ones matching
 
 ### Search and replace across the repo
