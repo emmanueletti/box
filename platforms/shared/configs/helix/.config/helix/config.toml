@@ -1,64 +1,44 @@
-theme = "dark_plus"
-
 # TODO: once plugin system is finished, add the following plugins
 # https://github.com/thomasschafer/scooter.hx
-# 
-# ── General Editor Settings ──────────────────────────────────────
+
+theme = "dark_plus"
 
 [editor]
 rulers = []
 text-width = 80
-scrolloff = 5                  # keep 5 lines visible above/below cursor
+scrolloff = 5
 true-color = true
 bufferline = "multiple"
 color-modes = true
 end-of-line-diagnostics = "disable"
-
-# ── Auto Save ────────────────────────────────────────────────────
 
 [editor.auto-save]
 focus-lost = true
 after-delay.enable = true
 after-delay.timeout = 1000
 
-# ── File Picker ──────────────────────────────────────────────────
-
 [editor.file-picker]
 hidden = false
 
-# ── Inline Diagnostics ──────────────────────────────────────────
-
 [editor.inline-diagnostics]
-cursor-line = "hint"           # show all diagnostics inline on cursor line
-other-lines = "disable"        # don't clutter other lines
-
-# ── Cursor Shape ─────────────────────────────────────────────────
+cursor-line = "hint"
+other-lines = "disable"
 
 [editor.cursor-shape]
 normal = "block"
 insert = "bar"
 select = "underline"
 
-# ── LSP ──────────────────────────────────────────────────────────
-
 [editor.lsp]
-display-messages = true        # show LSP status messages
-display-inlay-hints = true     # show type hints, parameter names inline
-
-# ── Statusline ───────────────────────────────────────────────────
+display-messages = true
+display-inlay-hints = true
 
 [editor.statusline]
 left = ["mode", "spinner", "version-control", "file-name", "file-modification-indicator"]
 center = ["diagnostics"]
-# right = ["selections", "position", "file-encoding", "file-line-ending"]
-
-# ── Soft Wrap ────────────────────────────────────────────────────
 
 [editor.soft-wrap]
-# enable = true
 wrap-at-text-width = true
-
-# ── Normal Mode Keys ────────────────────────────────────────────
 
 [keys.normal]
 "C-/" = ["toggle_comments"]
@@ -81,7 +61,7 @@ C-r = ":reload-all"
 C-n = ':sh box-clipboard-copy %{buffer_name}' # Current filename to system clipboard
 C-s = ":format"
 C-j = "save_selection"
-ret = "goto_word" # Enter = jump to word
+ret = "goto_word"
 "C-`" = "switch_case"
 a = ["append_mode", "collapse_selection"]
 D = "delete_selection_noyank" # A-d is the default for this
@@ -110,6 +90,26 @@ space = "command_palette"
 l = "file_picker_in_current_buffer_directory"
 f = "file_picker_in_current_directory"
 F = "file_picker"
+
+[keys.normal.g]
+left = "goto_first_nonwhitespace"
+right = "goto_line_end"
+
+[keys.insert]
+j = { j = "normal_mode" }
+C-del = "delete_word_forward"
+C-backspace = "delete_word_backward"
+C-left = "move_prev_word_start"
+C-right = "move_next_word_start"
+
+[keys.select]
+x = "select_line_below"
+X = "select_line_above"
+"^" = "extend_to_first_nonwhitespace"
+
+[keys.select.g]
+left = "goto_first_nonwhitespace"
+right = "goto_line_end"
 
 # Space t = toggles
 [keys.normal.space.t]
@@ -142,30 +142,5 @@ r = ':echo %sh{ruby ~/.config/helix/scripts/rails-action-to-route.rb %{buffer_na
 e = ':pipe ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name}'
 d = ':echo %sh{echo "${PWD##*/}/%{buffer_name}"}'
 
-[keys.normal.g]
-left = "goto_first_nonwhitespace"
-right = "goto_line_end"
-
-# ── Insert Mode Keys ────────────────────────────────────────────
-
-[keys.insert]
-j = { j = "normal_mode" }
-C-del = "delete_word_forward"
-C-backspace = "delete_word_backward"
-C-left = "move_prev_word_start"
-C-right = "move_next_word_start"
-
-# ── Select Mode Keys ────────────────────────────────────────────
-
-[keys.select]
-x = "select_line_below"
-X = "select_line_above"
-"^" = "extend_to_first_nonwhitespace"
-
-[keys.select.g]
-left = "goto_first_nonwhitespace"
-right = "goto_line_end"
-
-# Space x = execute scripts
 [keys.select.space.x]
 e = ':pipe ruby ~/.config/helix/scripts/rails-extract-partial.rb %{buffer_name}'
