@@ -36,6 +36,7 @@ args = ["sourcekit-lsp"]
 [[language]]
 name = "ruby"
 language-servers = [{ name = "ruby-lsp", except-features = ["format"] }, "standard-ruby", "hx-lsp"]
+roots = ["Gemfile"]
 auto-format = true
 
 [[language]]
