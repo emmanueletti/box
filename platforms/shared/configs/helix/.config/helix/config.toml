@@ -40,6 +40,10 @@ center = ["diagnostics"]
 [editor.soft-wrap]
 wrap-at-text-width = true
 
+[editor.whitespace]
+render = { newline = "all" }
+characters = { newline = "¬" }
+
 [keys.normal]
 "C-/" = ["toggle_comments"]
 esc = "collapse_selection"
