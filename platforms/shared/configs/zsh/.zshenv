@@ -33,6 +33,12 @@ if [[ $OSTYPE == darwin* ]]; then
 fi
 # linux has no homebrew, so HOMEBREW_PREFIX stays unset.
 
+if [[ $OSTYPE == darwin* ]]; then
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+else
+  export ANDROID_HOME="$HOME/Android/Sdk"
+fi
+
 typeset -U path                                     # auto-dedupe PATH entries
 path=(
   $HOME/.local/bin
@@ -40,3 +46,9 @@ path=(
   $BUN_INSTALL/bin
   $path
 )
+
+for _d in $ANDROID_HOME/platform-tools $ANDROID_HOME/emulator \
+          $ANDROID_HOME/cmdline-tools/latest/bin $HOME/android-studio/bin; do
+  [[ -d $_d ]] && path=($path $_d)
+done
+unset _d
