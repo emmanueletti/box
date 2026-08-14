@@ -18,7 +18,7 @@ os="$(_box-detect-os)"
 
 box_check_require mise
 # Run from $HOME so only the global toolset is checked, not a project's tools.
-( cd "$HOME" && box_check_run "packages (mise)" "" "re:up to date" mise outdated --bump )
+( cd "$HOME" && box_check_run "packages (mise)" "" "re:up to date" mise outdated )
 
 case "$os" in
   macos)

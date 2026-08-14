@@ -1,43 +1,42 @@
 [tools]
-go = "1.26.5"
-node = "26.5.1"
-python = "3.14.6"
-ruby = "4.0.6"
-rust = "1.97.1"
-uv = "0.12.0"
+go = "latest"
+node = "latest"
+python = "latest"
+ruby = "latest"
+rust = "latest"
+uv = "latest"
 
-# helix language servers and formatters
-"gem:herb" = "0.10.2"
+"gem:herb" = "latest"
 "gem:rails" = "latest"
-"gem:ruby-lsp" = "0.26.10"
-"gem:standard" = "1.56.0"
+# gem backend does not filter prereleases; "latest" resolves to 0.27.0.beta4.
+"gem:ruby-lsp" = "0.26"
+"gem:standard" = "latest"
 
-"npm:@herb-tools/language-server" = "0.10.2"
-"npm:@microsoft/compose-language-service" = "0.5.0"
-"npm:@olrtg/emmet-language-server" = "2.8.0"
-"npm:emmet" = "2.4.11"
-"npm:markdownlint-cli2" = "0.23.2"
-"npm:prettier" = "3.9.6"
+"npm:@herb-tools/language-server" = "latest"
+"npm:@microsoft/compose-language-service" = "latest"
+"npm:@olrtg/emmet-language-server" = "latest"
+"npm:emmet" = "latest"
+"npm:markdownlint-cli2" = "latest"
+"npm:prettier" = "latest"
 
-"github:mattn/efm-langserver" = "0.0.57"
-"github:docker/docker-language-server" = { version = "0.20.1", bin = "docker-language-server" }
+"github:mattn/efm-langserver" = "latest"
+"github:docker/docker-language-server" = { version = "latest", bin = "docker-language-server" }
 
-marksman = "2026-02-08"
+marksman = "latest"
 
-"github:erasin/hx-lsp" = "0.3.0"
+"github:erasin/hx-lsp" = "latest"
 
-lazydocker = "0.25.2"
-resvg = "0.47.0"
-stripe = "1.45.0"
-"github:render-oss/cli" = { version = "2.22.0", bin = "render" }
+lazydocker = "latest"
+resvg = "latest"
+stripe = "latest"
+"github:render-oss/cli" = { version = "latest", bin = "render" }
 
 [settings]
 prefer_offline = true
+lockfile = true
 
 [settings.ruby]
 compile = false
 
-# Attestation checks hit the GitHub API, which rate limits anonymous callers to
-# 60 requests an hour. Borrow the gh CLI's token to raise that ceiling.
 [settings.github]
 credential_command = "gh auth token"
