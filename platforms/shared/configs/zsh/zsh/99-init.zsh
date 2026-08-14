@@ -38,6 +38,8 @@ fi
 unset _plugins
 
 # zoxide
+# $HOME is zoxide's built-in default; setting this var replaces it, so keep it.
+export _ZO_EXCLUDE_DIRS="$HOME:*/server:*/ios:*/android:*/marketing"
 eval "$(zoxide init --cmd cd zsh)"
 
 # Homebrew's bin and its GNU tools, put ahead of the system BSD tools.
