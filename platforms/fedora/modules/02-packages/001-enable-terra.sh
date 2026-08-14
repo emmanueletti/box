@@ -28,6 +28,7 @@ TERRA_PACKAGES=(
   zellij
   ouch
   golang-github-jesseduffield-lazygit
+  yazi
 )
 
 ver=$(rpm -E %fedora)

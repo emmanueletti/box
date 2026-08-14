@@ -5,6 +5,7 @@ zsh-syntax-highlighting
 git
 gh
 jq
+ShellCheck
 tmux
 fzf
 ripgrep
@@ -13,6 +14,7 @@ zoxide
 bat
 eza
 tree
+yazi
 glow
 tealdeer
 helix
