@@ -357,13 +357,13 @@ plugins {
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
-    zjstatus-hints location="https://github.com/b0o/zjstatus-hints/releases/download/v0.1.4/zjstatus-hints.wasm" {
+    zjstatus-hints location="file:~/.config/zellij/plugins/zjstatus-hints.wasm" {
         max_length 90
         overflow_str "..."
         pipe_name "zjstatus_hints"
         hide_in_base_mode true
     }
-    forgot location="https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm"
+    forgot location="file:~/.config/zellij/plugins/zellij_forgot.wasm"
 }
 
 // Plugins to load in the background when a new session starts
