@@ -54,8 +54,7 @@ alias zka='zellij delete-all-sessions --force --yes'
 alias ztt='zellij action toggle-theme'
 
 
-alias cc='claude --enable-auto-mode'
-alias ccc='claude --chrome --enable-auto-mode'
+alias cc='claude --chrome'
 alias lg='lazygit'
 alias ld='lazydocker'
 alias ts='tailscale'

@@ -2,7 +2,7 @@ layout {
     tab name="Agent" focus=true {
         pane {
             command "zsh"
-            args "-c" "claude --chrome --enable-auto-mode"
+            args "-c" "claude --chrome"
         }
     }
     tab name="Code" {
