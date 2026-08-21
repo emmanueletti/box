@@ -11,6 +11,7 @@ true-color = true
 bufferline = "multiple"
 color-modes = true
 end-of-line-diagnostics = "disable"
+cursorline = true
 
 [editor.auto-save]
 focus-lost = true
