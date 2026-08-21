@@ -104,6 +104,42 @@
       "end"
     ]
   },
+  "If": {
+    "prefix": "if",
+    "description": "if condition ... end",
+    "body": [
+      "if ${1:condition}",
+      "  $0",
+      "end"
+    ]
+  },
+  "Unless": {
+    "prefix": "unless",
+    "description": "unless condition ... end",
+    "body": [
+      "unless ${1:condition}",
+      "  $0",
+      "end"
+    ]
+  },
+  "While": {
+    "prefix": "while",
+    "description": "while condition ... end",
+    "body": [
+      "while ${1:condition}",
+      "  $0",
+      "end"
+    ]
+  },
+  "Do block": {
+    "prefix": "do",
+    "description": "do |args| ... end",
+    "body": [
+      "do |${1:arg}|",
+      "  $0",
+      "end"
+    ]
+  },
   "Class with initialize": {
     "prefix": "class",
     "description": "New class with def initialize",
