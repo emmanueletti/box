@@ -137,16 +137,6 @@ keybinds clear-defaults=true {
             SwitchToMode "normal"
         }
     }
-    shared {
-        bind "F1" {
-            MessagePlugin "compact-bar" {
-                name "toggle_tooltip"
-                payload "1"
-                floating false
-                tooltip "F1"
-            }
-        }
-    }
     shared_except "locked" {
         bind "Alt left" { MoveFocusOrTab "left"; }
         bind "Alt down" { MoveFocus "down"; }
@@ -342,9 +332,7 @@ keybinds clear-defaults=true {
 // changing these requires a restart to take effect
 plugins {
     about location="zellij:about"
-    compact-bar location="zellij:compact-bar" {
-        tooltip "F1"
-    }
+    compact-bar location="zellij:compact-bar"
     configuration location="zellij:configuration"
     filepicker location="zellij:strider" {
         cwd "/"
@@ -357,21 +345,9 @@ plugins {
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
-    zjstatus-hints location="file:~/.config/zellij/plugins/zjstatus-hints.wasm" {
-        max_length 90
-        overflow_str "..."
-        pipe_name "zjstatus_hints"
-        hide_in_base_mode true
-    }
     forgot location="file:~/.config/zellij/plugins/zellij_forgot.wasm"
 }
 
-// Plugins to load in the background when a new session starts
-// eg. "file:/path/to/my-plugin.wasm"
-// eg. "https://example.com/my-plugin.wasm"
-load_plugins {
-    zjstatus-hints
-}
 ui {
     pane_frames {
         hide_session_name true
@@ -391,23 +367,38 @@ web_client {
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-theme "rose-pine-both"
-theme_dark "rose-pine-both"
-theme_light "catppuccin-latte"
+// Bare numbers are ANSI palette indices, so these render as indexed SGR and
+// pick up whatever palette Ghostty has loaded. Zellij ships no base16 theme.
+theme "base16-dark"
+theme_dark "base16-dark"
+theme_light "base16-light"
 
 themes {
-    rose-pine-both {
-        fg 224 222 244
-        bg 25 23 36
-        black 31 29 46
-        red 235 111 146
-        green 49 116 143
-        yellow 246 193 119
-        blue 156 207 216
-        magenta 196 167 231
-        cyan 235 188 186
-        white 224 222 244
-        orange 246 193 119
+    base16-dark {
+        fg 7
+        bg 0
+        black 0
+        red 1
+        green 2
+        yellow 3
+        blue 4
+        magenta 5
+        cyan 6
+        white 15
+        orange 3
+    }
+    base16-light {
+        fg 0
+        bg 15
+        black 0
+        red 1
+        green 2
+        yellow 3
+        blue 4
+        magenta 5
+        cyan 6
+        white 15
+        orange 3
     }
 }
  

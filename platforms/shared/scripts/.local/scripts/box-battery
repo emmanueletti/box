@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#
+# Prints battery charge with a level icon, e.g. "🔋 87%".
+# Icon is 🪫 at or below 20%, 🔋 above.
+# Prints nothing on machines without a battery (desktops).
+#
+#   box-battery            # 🔋 87%
+#   box-battery --plain    # 87
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+os="$(_box-detect-os)"
+
+pct=""
+
+if [[ $os == "macos" ]]; then
+  pct="$(pmset -g batt | grep -o '[0-9]\+%' | head -1 | tr -d '%')"
+else
+  for bat in /sys/class/power_supply/BAT*; do
+    [[ -r $bat/capacity ]] || continue
+    pct="$(<"$bat/capacity")"
+    break
+  done
+fi
+
+[[ -n $pct ]] || exit 0
+
+if [[ ${1:-} == "--plain" ]]; then
+  echo "$pct"
+  exit 0
+fi
+
+icon=🔋
+(( pct <= 20 )) && icon=🪫
+
+echo "$icon $pct%"

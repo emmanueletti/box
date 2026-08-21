@@ -19,13 +19,11 @@ set -euo pipefail
 
 declare -A plugin_urls=(
   [zjstatus.wasm]="https://github.com/dj95/zjstatus/releases/download/v0.24.0/zjstatus.wasm"
-  [zjstatus-hints.wasm]="https://github.com/b0o/zjstatus-hints/releases/download/v0.1.4/zjstatus-hints.wasm"
   [zellij_forgot.wasm]="https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm"
 )
 
 declare -A plugin_permissions=(
   [zjstatus.wasm]="ReadApplicationState ChangeApplicationState RunCommands"
-  [zjstatus-hints.wasm]="ReadApplicationState MessageAndLaunchOtherPlugins"
   [zellij_forgot.wasm]="ReadApplicationState ChangeApplicationState"
 )
 
