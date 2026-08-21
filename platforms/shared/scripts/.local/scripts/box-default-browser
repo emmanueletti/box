@@ -14,6 +14,7 @@ set -euo pipefail
 declare -A browsers=(
   [zen]=app.zen_browser.zen.desktop
   [brave-browser]=brave-browser.desktop
+  [google-chrome]=google-chrome.desktop
 )
 
 # True if a .desktop file exists in any of the standard application dirs.

@@ -7,6 +7,17 @@ if [[ ! -f /etc/yum.repos.d/brave-browser.repo ]]; then
     --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 fi
 
+if [[ ! -f /etc/yum.repos.d/google-chrome.repo ]]; then
+  sudo tee /etc/yum.repos.d/google-chrome.repo > /dev/null <<'EOF'
+[google-chrome]
+name=google-chrome
+baseurl=https://dl.google.com/linux/chrome/rpm/stable/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://dl.google.com/linux/linux_signing_key.pub
+EOF
+fi
+
 if [[ ! -f /etc/yum.repos.d/tailscale.repo ]]; then
   sudo dnf config-manager addrepo \
     --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo
