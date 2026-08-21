@@ -32,9 +32,25 @@ alias dev='cd ~/projects'
 alias projects='cd ~/projects'
 alias notes='glow ~/notes'
 
-alias z='zellij'
+z() {
+  local name="${1:-${PWD:t}}"
+  zellij attach -c "${name//[^a-zA-Z0-9_-]/-}"
+}
+
+zd() {
+  local name="${1:-${PWD:t}}"
+  zellij attach -c "${name//[^a-zA-Z0-9_-]/-}" options --default-layout dev
+}
+
+zkill() {
+  local session="${1:-$(zellij list-sessions --short | fzf --prompt='kill zellij session> ')}"
+  [[ -n $session ]] || return 0
+  zellij delete-session --force "$session"
+}
+
+alias zls='zellij list-sessions'
 alias zc='zellij --layout compact'
-alias zka='zellij kill-all-sessions --yes'
+alias zka='zellij delete-all-sessions --force --yes'
 alias ztt='zellij action toggle-theme'
 
 
