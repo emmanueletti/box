@@ -10,3 +10,4 @@ echo "🐧 box: running arch install"
 
 "${ARCH_ROOT}/modules/01-preflight/setup.sh"
 "${ARCH_ROOT}/modules/02-packages/setup.sh"
+"${ARCH_ROOT}/modules/03-configs/setup.sh"
