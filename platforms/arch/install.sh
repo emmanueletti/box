@@ -4,4 +4,8 @@
 
 set -euo pipefail
 
+ARCH_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "🐧 box: running arch install"
+
+"${ARCH_ROOT}/modules/01-preflight/setup.sh"
