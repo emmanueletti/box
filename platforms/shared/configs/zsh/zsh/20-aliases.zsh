@@ -138,6 +138,13 @@ alias hf='herb-format'
 
 alias nr='npm run'
 
+alias mi='mise install'
+alias mls='mise ls'
+alias mo='mise outdated'
+alias mx='mise exec'
+alias mrun='mise run'
+alias mup='mise update && mise prune'
+
 # Only functions that need the calling shell live here. Everything else is a
 # script in box/bin, discoverable with box-<TAB>.
 
