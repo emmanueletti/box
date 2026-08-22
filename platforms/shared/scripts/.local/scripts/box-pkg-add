@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Installs packages, dispatching to the right package manager for the OS.
+#
+#   box-pkg-add <packages...>       # install one or more packages
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if (( $# == 0 )); then
+  echo "❌ box-pkg-add: usage: box-pkg-add <packages...>" >&2
+  exit 1
+fi
+
+os="$(_box-detect-os)"
+
+case $os in
+  macos)
+    brew install "$@"
+    ;;
+  fedora)
+    sudo dnf install -y "$@"
+    ;;
+  arch)
+    yay -S --needed --noconfirm "$@"
+    ;;
+esac
