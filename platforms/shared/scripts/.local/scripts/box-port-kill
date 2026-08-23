@@ -2,7 +2,7 @@
 #
 # Kills whatever is listening on a tcp port.
 #
-#   box-kill-port 3000
+#   box-port-kill 3000
 
 set -euo pipefail
 
@@ -11,7 +11,7 @@ set -euo pipefail
 port="${1:-}"
 
 if [[ -z $port ]]; then
-  echo "usage: box-kill-port <port>" >&2
+  echo "usage: box-port-kill <port>" >&2
   exit 1
 fi
 

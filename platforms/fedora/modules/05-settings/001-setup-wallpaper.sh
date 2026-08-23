@@ -19,6 +19,6 @@ if [[ -f ${current#file://} ]]; then
   fi
 fi
 
-"${SCRIPTS_DIR}/box-theme-wallpaper" \
+"${SCRIPTS_DIR}/box-wallpaper-set" \
   "${BOX_ROOT}/assets/wallpapers/light/blue-grid.png" \
   "${BOX_ROOT}/assets/wallpapers/dark/blue-grid.png"

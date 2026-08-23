@@ -2,7 +2,7 @@
 #
 # Wipes your shell command history. This cannot be undone.
 #
-#   box-clear-history      # clear zsh and bash history (asks first, default no)
+#   box-history-clear      # clear zsh and bash history (asks first, default no)
 
 set -euo pipefail
 

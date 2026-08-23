@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Prints today's date as "Fri Mar 08".
+#
+#   box-date-today      print the date
+#
+# Handy inside an editor that can insert a command's output, e.g. helix's
+# :insert-output box-date-today.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+date "+%a %b %d"

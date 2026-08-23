@@ -2,7 +2,7 @@
 #
 # Flushes the local DNS cache so name lookups hit the resolver again.
 #
-#   box-clear-dns-cache        # flush whatever resolver this machine runs
+#   box-dns-flush        # flush whatever resolver this machine runs
 #
 # Handy after changing /etc/hosts, moving a domain to a new IP, or when a site
 # resolves to a stale address.
@@ -11,33 +11,33 @@ set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-os="$(_box-detect-os)"
+os="$(_box-os-detect)"
 
 case "$os" in
   macos)
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder   # the cache lives in this daemon; HUP makes it drop it
-    echo "✅ box-clear-dns-cache: flushed macOS DNS cache"
+    echo "✅ box-dns-flush: flushed macOS DNS cache"
     ;;
 
   arch | fedora)
     if systemctl is-active --quiet systemd-resolved; then
       resolvectl flush-caches
-      echo "✅ box-clear-dns-cache: flushed systemd-resolved cache"
+      echo "✅ box-dns-flush: flushed systemd-resolved cache"
     elif systemctl is-active --quiet nscd; then
       sudo nscd -i hosts
-      echo "✅ box-clear-dns-cache: flushed nscd host cache"
+      echo "✅ box-dns-flush: flushed nscd host cache"
     elif systemctl is-active --quiet dnsmasq; then
       sudo systemctl restart dnsmasq   # dnsmasq has no flush command; a restart is the flush
-      echo "✅ box-clear-dns-cache: restarted dnsmasq"
+      echo "✅ box-dns-flush: restarted dnsmasq"
     else
-      echo "❌ box-clear-dns-cache: no DNS cache running (systemd-resolved, nscd, dnsmasq all inactive)" >&2
+      echo "❌ box-dns-flush: no DNS cache running (systemd-resolved, nscd, dnsmasq all inactive)" >&2
       exit 1
     fi
     ;;
 
   *)
-    echo "❌ box-clear-dns-cache: unsupported os '$os'" >&2
+    echo "❌ box-dns-flush: unsupported os '$os'" >&2
     exit 1
     ;;
 esac

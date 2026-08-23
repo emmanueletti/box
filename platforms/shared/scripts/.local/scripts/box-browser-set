@@ -2,9 +2,9 @@
 #
 # Sets the default web browser (what opens when a link is clicked).
 #
-#   box-default-browser                # pick from a menu
-#   box-default-browser zen
-#   box-default-browser brave-browser
+#   box-browser-set                # pick from a menu
+#   box-browser-set zen
+#   box-browser-set brave-browser
 
 set -euo pipefail
 
@@ -42,12 +42,12 @@ fi
 
 desktop=${browsers[$choice]:-}
 if [[ -z $desktop ]]; then
-  echo "box-default-browser: unknown browser '$choice' (choose: ${!browsers[*]})" >&2
+  echo "box-browser-set: unknown browser '$choice' (choose: ${!browsers[*]})" >&2
   exit 1
 fi
 
 if ! desktop_installed "$desktop"; then
-  echo "box-default-browser: '$choice' is not installed ($desktop not found)" >&2
+  echo "box-browser-set: '$choice' is not installed ($desktop not found)" >&2
   exit 1
 fi
 

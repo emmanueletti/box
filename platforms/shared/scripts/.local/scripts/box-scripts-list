@@ -2,8 +2,8 @@
 #
 # Fuzzy-search the box commands when you forget what you have.
 #
-#   box-ls              pick a command; its usage prints on select
-#   box-ls kill         start the search with "kill" already typed
+#   box-scripts-list        pick a command; its usage prints on select
+#   box-scripts-list kill   start the search with "kill" already typed
 #
 # Preview pane shows each command's full header as you scroll. Needs fzf.
 
@@ -11,10 +11,10 @@ set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-command -v fzf >/dev/null || { echo "❌ box-ls: fzf not found" >&2; exit 1; }
+command -v fzf >/dev/null || { echo "❌ box-scripts-list: fzf not found" >&2; exit 1; }
 
 # box-help already knows how to list every command and its summary; reuse that
-# so box-ls never grows its own copy of the header-parsing rules.
+# so box-scripts-list never grows its own copy of the header-parsing rules.
 choice="$(box-help \
   | sed -n 's/^  \(box-[^ ]*\)  */\1\t/p' \
   | fzf --query="${1:-}" \

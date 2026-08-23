@@ -2,16 +2,16 @@
 #
 # Prints this machine's hardware identity: vendor, model and firmware/BIOS.
 #
-#   _box-detect-hw
+#   _box-hw-detect
 #
-# Read-only, no sudo. Reads DMI on Linux and sysctl on macOS. Used by
-# _box-updates-check-firmware and box-updates-check for context.
+# Read-only, no sudo. Reads DMI on Linux and sysctl on macOS. box-system-outdated
+# runs it for context.
 
 set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-os="$(_box-detect-os)"
+os="$(_box-os-detect)"
 
 # Value of a readable file, or "unknown" when absent.
 val() {

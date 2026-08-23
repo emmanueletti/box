@@ -3,8 +3,8 @@
 # Lists the box commands, or prints one command's usage.
 #
 #   box-help
-#   box-help kill-port
-#   box-help box-kill-port
+#   box-help port-kill
+#   box-help box-port-kill
 #   box-help --check         exits 1 if any command is missing a summary
 #
 # Help text is the comment block at the top of each script, so a new command
@@ -14,7 +14,7 @@
 #   #
 #   # First line is the summary shown in the listing.
 #   #
-#   #   box-thing <arg>        further lines are detail, shown by -h
+#   #   box-noun-action <arg>  further lines are detail, shown by -h
 #
 #   set -euo pipefail
 #

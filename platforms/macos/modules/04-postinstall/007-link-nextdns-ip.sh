@@ -2,7 +2,7 @@
 #
 # Installs a cron job that refreshes the NextDNS linked IP every 5 minutes, so
 # IPv4 DNS filtering survives a home public IP change. The job runs
-# box-nextdns-link-ip, which reads the secret update url from
+# box-nextdns-relink, which reads the secret update url from
 # ~/.config/nextdns/link-ip-url (created out of band, never committed).
 #
 # Skips cleanly on a fresh machine that has no url file yet -- add the file and
@@ -10,10 +10,13 @@
 
 set -euo pipefail
 
-runner="${HOME}/.local/scripts/box-nextdns-link-ip"
+runner="${HOME}/.local/scripts/box-nextdns-relink"
 url_file="${HOME}/.config/nextdns/link-ip-url"
 cron_line="*/5 * * * * ${runner} >/dev/null 2>&1"
-marker="box-nextdns-link-ip"
+
+# Every name the runner has ever had. crontab entries are matched by text, so a
+# renamed script leaves the old line behind unless its old name is listed here.
+markers=(box-nextdns-relink box-nextdns-link-ip)
 
 if [[ ! -r $url_file ]]; then
   echo "⏭️  box: no ${url_file}, skipping nextdns linked-ip cron"
@@ -23,11 +26,14 @@ fi
 
 current="$(crontab -l 2>/dev/null || true)"
 
-if grep -qF "$marker" <<<"$current"; then
-  echo "✅ box: nextdns linked-ip cron already installed"
-  exit 0
-fi
+# Drop every past and present box line, then add the current one back. Rewriting
+# rather than skipping is what retires a stale entry; it is also still
+# idempotent, since the line that goes back is always the same.
+kept="$current"
+for marker in "${markers[@]}"; do
+  kept="$(grep -vF "$marker" <<<"$kept" || true)"
+done
 
-printf '%s\n' "$current" "$cron_line" | grep -v '^[[:space:]]*$' | crontab -
+printf '%s\n' "$kept" "$cron_line" | grep -v '^[[:space:]]*$' | crontab -
 
 echo "✅ box: nextdns linked-ip cron installed (every 5 min)"

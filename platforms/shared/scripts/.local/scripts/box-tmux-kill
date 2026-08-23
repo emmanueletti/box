@@ -7,7 +7,7 @@ set -euo pipefail
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
 if ! tmux list-sessions > /dev/null 2>&1; then
-  echo "box-kill-tmux-session: no tmux server running" >&2
+  echo "box-tmux-kill: no tmux server running" >&2
   exit 0
 fi
 

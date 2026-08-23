@@ -3,9 +3,9 @@
 # Kills a process by pid, or picks one interactively (fzf, sorted by cpu,
 # TAB multi-selects) when no pid is given.
 #
-#   box-kill-process                  interactive picker, TERM
-#   box-kill-process [signal]         interactive picker, given signal
-#   box-kill-process <pid> [signal]   kill that pid (and its children) directly
+#   box-process-kill                  interactive picker, TERM
+#   box-process-kill [signal]         interactive picker, given signal
+#   box-process-kill <pid> [signal]   kill that pid (and its children) directly
 
 set -euo pipefail
 
@@ -22,7 +22,7 @@ kill_pid() {
   sleep 0.3
   if ps -p "$pid" > /dev/null 2>&1; then
     stat="$(ps -o stat= -p "$pid" 2>/dev/null | tr -d ' ')"
-    echo "box-kill-process: pid ${pid} still alive (stat: ${stat:-?})" >&2
+    echo "box-process-kill: pid ${pid} still alive (stat: ${stat:-?})" >&2
     [[ $stat == D* ]] && echo "  stuck in uninterruptible I/O wait -- even -9 can't touch this" >&2
   fi
 }

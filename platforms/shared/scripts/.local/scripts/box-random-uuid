@@ -2,7 +2,7 @@
 #
 # Generates a random v4 UUID, lowercased.
 #
-#   box-generate-uuid
+#   box-random-uuid
 
 set -euo pipefail
 

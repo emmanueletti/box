@@ -4,14 +4,14 @@
 # Icon is 🪫 at or below 20%, 🔋 above.
 # Prints nothing on machines without a battery (desktops).
 #
-#   box-battery            # 🔋 87%
-#   box-battery --plain    # 87
+#   box-battery-status            # 🔋 87%
+#   box-battery-status --plain    # 87
 
 set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-os="$(_box-detect-os)"
+os="$(_box-os-detect)"
 
 pct=""
 

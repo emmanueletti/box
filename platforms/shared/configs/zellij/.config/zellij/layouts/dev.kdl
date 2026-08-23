@@ -48,7 +48,7 @@ layout {
                 datetime_format   "%H:%M"
                 datetime_timezone "America/Toronto"
 
-                command_battery_command    "/usr/bin/env zsh -c box-battery"
+                command_battery_command    "/usr/bin/env zsh -c box-battery-status"
                 command_battery_format     "#[dim]{stdout} "
                 command_battery_interval   "60"
                 command_battery_rendermode "static"

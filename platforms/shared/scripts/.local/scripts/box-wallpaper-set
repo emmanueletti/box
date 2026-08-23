@@ -2,8 +2,8 @@
 #
 # Sets the desktop wallpaper.
 #
-#   box-theme-wallpaper ~/box/assets/wallpapers/light/blue-grid.png
-#   box-theme-wallpaper <light> <dark>
+#   box-wallpaper-set ~/box/assets/wallpapers/light/blue-grid.png
+#   box-wallpaper-set <light> <dark>
 #
 # GNOME holds a wallpaper per appearance, so a dark one is used when given.
 # macOS holds one picture, so the light one is used and the dark one ignored.
@@ -16,7 +16,7 @@ light="${1:-}"
 dark="${2:-}"
 
 if [[ -z $light ]]; then
-  echo "usage: box-theme-wallpaper <light> [dark]" >&2
+  echo "usage: box-wallpaper-set <light> [dark]" >&2
   exit 1
 fi
 
@@ -40,7 +40,7 @@ if [[ -n $dark ]]; then
   dark="$(absolute "$dark")"
 fi
 
-os="$(_box-detect-os)"
+os="$(_box-os-detect)"
 
 case "$os" in
   macos)
