@@ -2,8 +2,8 @@
 #
 # Re-syncs box config packages into $HOME (fzf menu, or named packages).
 #
-#   box-sync-config           # pick from a menu
-#   box-sync-config helix zsh # sync these packages
+#   _box-config-sync           # pick from a menu
+#   _box-config-sync helix zsh # sync these packages
 #
 # Only needed after adding, renaming, or removing files. Editing a file's
 # contents writes through the symlink already, so no sync is needed for that.
