@@ -6,12 +6,59 @@ description: Conventions for writing box scripts (box-* commands in platforms/sh
 # Writing box scripts
 
 box scripts are single bash 5 files in `platforms/shared/scripts/.local/scripts/`,
-named `box-<verb>-<noun>`. Each is self-contained and must run standalone.
+named `box-<noun>-<action>`. Each is self-contained and must run standalone.
 
 **Audience: a beginner reading this later without an agent.** Pick the simplest
 pattern that works. Reach for a complex one only when it makes the script
 *simpler overall* -- and when you do, add a short learning comment saying what it
 does and why. No cleverness for its own sake.
+
+## Naming: `box-<noun>-<action>`
+
+The noun comes first and is the **namespace** -- the thing the command acts on.
+The action comes last. This is what makes `box-<tab>` useful: every command that
+touches zellij sorts together, so you find one by the thing you have in mind
+rather than by remembering the verb someone picked.
+
+```
+box-port-kill        not  box-kill-port
+box-history-clear    not  box-clear-history
+box-wallpaper-set    not  box-theme-wallpaper
+```
+
+A noun with one command today still gets the pattern (`box-battery-status`), so
+the second one has somewhere to land.
+
+Do not put a platform in the name. `box-server-harden` is macOS-only, but the
+script says so by exiting early on other systems -- the name is for the thing it
+acts on, not the machine it runs on. Nouns are singular: `box-system-outdated`, not
+`box-updates-check`. The exception is a noun that names a collection rather than
+one thing, where the plural *is* the subject: `box-scripts-list` lists the
+scripts.
+
+### Verbs
+
+Reach for one of these first, so the tail is guessable:
+
+| kind | verbs |
+|---|---|
+| report | `status` `list` `check` |
+| create | `new` `add` |
+| destroy | `kill` `clear` `empty` |
+| change | `set` `sync` `enable` `harden` |
+| invoke | `run` `start` `setup` |
+
+Use a domain verb only where the generic one would lose meaning -- the whole
+current set of those is `compress` `extract` `copy` `paste` `flush` `relink`
+`checkout` `restore`. Add to that list reluctantly.
+
+Two namespaces end in an object instead of an action, because every command in
+them does the same single thing and the object is what varies: `box-random-*`
+(bytes, password, token, uuid) and `box-date-today`. Prefer this over splitting
+one generator into four one-command namespaces.
+
+Two commands are exempt, because they shadow a system verb everyone already
+knows: `box-help` and `box-open`.
 
 ## The header block (box-help contract)
 
@@ -27,16 +74,27 @@ Every script MUST have a summary line or `box-help --check` fails.
 
 ## Private scripts (`_box-*`)
 
-A script that exists to be called by another box script -- a sub-step of an
-orchestrator, or a shared detector like `_box-detect-os` -- is named with a
-leading underscore: `_box-detect-hw`, `_box-updates-run-os`. This is a *hint*, not a
-fence: it still sits on PATH and you can run it directly when you know you want
-just that step.
+A leading underscore means "not a command you reach for by name". Two kinds
+qualify: a detector whose output exists to be parsed by another script
+(`_box-os-detect`, `_box-hw-detect`), and a narrower variant of a public front
+door (`_box-config-sync` next to `box-system-sync`).
 
-box-help lists `box-*` only, so `_box-*` scripts stay out of the listing (and out
-of `--check`). The front-door command that orchestrates them is the public one
-(`box-updates-run` drives `_box-updates-run-*`; `box-updates-check` drives `_box-updates-check-*`).
-`_box-* -h` still prints the script's own header.
+A step of a multi-part command qualifies only when you would not reach for it on
+its own. Compare the two orchestrators:
+
+- `box-system-update` runs `box-os-update`, `box-pkgs-update`,
+  `box-tools-update` and `box-firmware-update` -- all public, because updating
+  just your packages or just your mise tools is an everyday thing to want.
+- `box-server-setup` runs `_box-server-power`, `_box-server-enable` and
+  `_box-server-autologin` -- all private, because they are one-time toggles for
+  turning a Mac into a headless box, not commands you use week to week.
+
+The test is how often the step is useful alone, not whether it happens to be a
+step.
+
+The underscore is a *hint*, not a fence: these still sit on PATH and run fine
+directly. box-help lists `box-*` only, so they stay out of the listing (and out
+of `--check`), but `_box-* -h` still prints the script's own header.
 
 ## The -h line
 
@@ -55,8 +113,8 @@ Passing `$0` lets box-help print this script's own header.
 #
 # One-line summary -- what it does, shown in the box-help listing.
 #
-#   box-thing <arg>        # detail line, shown by box-help box-thing
-#   box-thing --all        # another mode
+#   box-noun-action <arg>  # detail line, shown by box-help box-noun-action
+#   box-noun-action --all  # another mode
 
 set -euo pipefail
 
@@ -71,10 +129,10 @@ immediately -- no re-stow.
 ## Standalone rule
 
 A script may be run on its own, not just via install.sh. Detect the OS with the
-`_box-detect-os` command (it sits on PATH alongside the other box commands):
+`_box-os-detect` command (it sits on PATH alongside the other box commands):
 
 ```bash
-os="$(_box-detect-os)"
+os="$(_box-os-detect)"
 ```
 
 Per-OS work dispatches on that value (`macos`, `arch`, `fedora`).
