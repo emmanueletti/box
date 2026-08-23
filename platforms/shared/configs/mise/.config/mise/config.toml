@@ -33,7 +33,6 @@ stripe = "latest"
 
 [settings]
 prefer_offline = true
-lockfile = true
 
 [settings.ruby]
 compile = false
