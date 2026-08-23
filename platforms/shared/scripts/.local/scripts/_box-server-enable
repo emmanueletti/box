@@ -2,9 +2,9 @@
 #
 # Toggles macOS Remote Login (incoming SSH access) on or off.
 #
-#   box-mac-remote-login on       # enable incoming SSH
-#   box-mac-remote-login off      # disable incoming SSH
-#   box-mac-remote-login status   # show current setting
+#   _box-server-enable on       # enable incoming SSH
+#   _box-server-enable off      # disable incoming SSH
+#   _box-server-enable status   # show current setting
 
 set -euo pipefail
 
@@ -12,8 +12,8 @@ set -euo pipefail
 [[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
 
 # systemsetup is macOS-only. Same script ships everywhere, so no-op elsewhere.
-os="$(_box-detect-os)"
-[[ $os == "macos" ]] || { echo "box-mac-remote-login: macOS only, skipping."; exit 0; }
+os="$(_box-os-detect)"
+[[ $os == "macos" ]] || { echo "_box-server-enable: macOS only, skipping."; exit 0; }
 
 cmd="$1"
 
@@ -25,7 +25,7 @@ if [[ $cmd == "status" ]]; then
 fi
 
 if [[ $cmd != "on" && $cmd != "off" ]]; then
-  echo "❌ box-mac-remote-login: unknown argument '$cmd' (use on, off, status)" >&2
+  echo "❌ _box-server-enable: unknown argument '$cmd' (use on, off, status)" >&2
   exit 1
 fi
 

@@ -2,10 +2,10 @@
 #
 # Toggles macOS power for always-on (never sleep) vs normal desktop behaviour.
 #
-#   box-mac-power on        # never sleep, wake on network, auto-restart
-#   box-mac-power off       # restore normal desktop power behaviour
-#   box-mac-power toggle    # flip between the two
-#   box-mac-power status    # show current mode, change nothing
+#   _box-server-power on        # never sleep, wake on network, auto-restart
+#   _box-server-power off       # restore normal desktop power behaviour
+#   _box-server-power toggle    # flip between the two
+#   _box-server-power status    # show current mode, change nothing
 
 set -euo pipefail
 
@@ -14,8 +14,8 @@ set -euo pipefail
 
 # pmset lives only on macOS. On Linux this is a no-op, not a failure -- the
 # same script ships to every box, so exit clean instead of erroring.
-os="$(_box-detect-os)"
-[[ $os == "macos" ]] || { echo "box-mac-power: macOS only, skipping."; exit 0; }
+os="$(_box-os-detect)"
+[[ $os == "macos" ]] || { echo "_box-server-power: macOS only, skipping."; exit 0; }
 
 # Server mode is defined by sleep being disabled on AC power. `$1=="sleep"`
 # avoids matching disksleep/displaysleep. Empty if pmset can't read it.
@@ -31,7 +31,7 @@ if [[ $mode == "status" ]]; then
 fi
 
 if [[ $mode != "on" && $mode != "off" ]]; then
-  echo "❌ box-mac-power: unknown argument '$mode' (use on, off, toggle, status)" >&2
+  echo "❌ _box-server-power: unknown argument '$mode' (use on, off, toggle, status)" >&2
   exit 1
 fi
 

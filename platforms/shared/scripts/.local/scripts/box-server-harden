@@ -4,17 +4,17 @@
 # sshd_config.d override so macOS updates that rewrite the main sshd_config
 # leave it intact, then reloads sshd.
 #
-#   box-mac-ssh-harden on       # keys-only: disable password + root login
-#   box-mac-ssh-harden off      # remove the override, back to macOS default
-#   box-mac-ssh-harden status   # show the override and effective sshd settings
+#   box-server-harden on       # keys-only: disable password + root login
+#   box-server-harden off      # remove the override, back to macOS default
+#   box-server-harden status   # show the override and effective sshd settings
 
 set -euo pipefail
 
 # Naked call (or -h) prints this script's help instead of acting.
 [[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
 
-os="$(_box-detect-os)"
-[[ $os == "macos" ]] || { echo "box-mac-ssh-harden: macOS only, skipping."; exit 0; }
+os="$(_box-os-detect)"
+[[ $os == "macos" ]] || { echo "box-server-harden: macOS only, skipping."; exit 0; }
 
 # macOS sshd_config ends with `Include /etc/ssh/sshd_config.d/*`, so a file
 # here wins over the stock config and survives OS updates.
@@ -37,7 +37,7 @@ if [[ $cmd == "status" ]]; then
 fi
 
 if [[ $cmd != "on" && $cmd != "off" ]]; then
-  echo "❌ box-mac-ssh-harden: unknown argument '$cmd' (use on, off, status)" >&2
+  echo "❌ box-server-harden: unknown argument '$cmd' (use on, off, status)" >&2
   exit 1
 fi
 
@@ -54,7 +54,7 @@ fi
 # on that headless). Require at least one authorized key first.
 keys="$HOME/.ssh/authorized_keys"
 if [[ ! -s $keys ]]; then
-  echo "❌ box-mac-ssh-harden: $keys is empty or missing." >&2
+  echo "❌ box-server-harden: $keys is empty or missing." >&2
   echo "   Add your public key first, or you'll lock yourself out:" >&2
   echo "     ssh-copy-id $USER@<this-host>" >&2
   exit 1
@@ -62,7 +62,7 @@ fi
 
 # tee via sudo: the shell can't redirect into a root-owned path on its own.
 sudo tee "$DROPIN" >/dev/null <<'EOF'
-# Managed by box-mac-ssh-harden. Edit the script, not this file.
+# Managed by box-server-harden. Edit the script, not this file.
 PasswordAuthentication no
 KbdInteractiveAuthentication no
 PubkeyAuthentication yes
@@ -76,7 +76,7 @@ EOF
 # Reject the new config before reload -- a syntax error would otherwise leave
 # sshd refusing to start, killing remote access.
 if ! sudo sshd -t; then
-  echo "❌ box-mac-ssh-harden: sshd rejected the config, reverting." >&2
+  echo "❌ box-server-harden: sshd rejected the config, reverting." >&2
   sudo rm -f "$DROPIN"
   exit 1
 fi
