@@ -54,7 +54,7 @@ alias zka='zellij delete-all-sessions --force --yes'
 alias ztt='zellij action toggle-theme'
 
 
-alias cc='claude --chrome'
+alias cc='claude --chrome --permission-mode auto'
 alias lg='lazygit'
 alias ld='lazydocker'
 alias ts='tailscale'
@@ -120,6 +120,7 @@ alias bu="bundle update"
 alias bo='bundle outdated --only-explicit'
 alias bi='bundle install'
 
+alias r='bundle exec rails'
 alias rc='bin/rails console'
 alias rdbm='bin/rails db:migrate'
 alias rdbrb='bin/rails db:rollback'
