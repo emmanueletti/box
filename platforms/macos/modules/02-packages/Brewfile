@@ -37,6 +37,8 @@ brew "mas"
 brew "dockutil"
 brew "kubernetes-cli"
 brew "awscli"
+# arm64-only upstream; intel macs get a universal build shadowing it, see
+# 04-postinstall/008-install-idb-companion.sh
 brew "idb-companion"
 
 # gnu tools, so the shared shell config matches linux
