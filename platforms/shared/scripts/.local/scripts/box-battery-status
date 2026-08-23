@@ -16,7 +16,10 @@ os="$(_box-os-detect)"
 pct=""
 
 if [[ $os == "macos" ]]; then
-  pct="$(pmset -g batt | grep -o '[0-9]\+%' | head -1 | tr -d '%')"
+  # A desktop Mac has no percentage to print, so grep finds nothing and the
+  # pipeline fails. || true keeps set -e from killing us before the empty-pct
+  # check below, which is what actually handles "no battery".
+  pct="$(pmset -g batt | grep -o '[0-9]\+%' | head -1 | tr -d '%' || true)"
 else
   for bat in /sys/class/power_supply/BAT*; do
     [[ -r $bat/capacity ]] || continue
