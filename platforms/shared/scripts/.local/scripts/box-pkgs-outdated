@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #
-# Reports outdated packages from every package manager on this machine.
+# Reports outdated system packages: brew on macOS, pacman/dnf on Linux.
 #
-#   _box-updates-check-packages
+#   box-pkgs-outdated
 #
-# mise everywhere, plus brew (macOS) / pacman (arch) / dnf (fedora). The Linux
-# kernel is a package, so a pending kernel upgrade shows up here.
+# On Linux the kernel and base system are packages, so a pending kernel upgrade
+# shows up here rather than under box-os-outdated. The mise toolset is separate;
+# box-tools-outdated reports that.
 
 set -euo pipefail
 
@@ -14,11 +15,7 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
 
-os="$(_box-detect-os)"
-
-box_check_require mise
-# Run from $HOME so only the global toolset is checked, not a project's tools.
-( cd "$HOME" && box_check_run "packages (mise)" "" "re:up to date" mise outdated )
+os="$(_box-os-detect)"
 
 case "$os" in
   macos)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Shared helpers for the box-check-* update tools. Source, do not execute.
+# Shared helpers for the box-system-* update tools. Source, do not execute.
 
 # Bold section header. For substeps that only print context, not an update
 # check (hardware, "no updater on this OS" notes).

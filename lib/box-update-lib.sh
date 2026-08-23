@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Shared helpers for the box-update-* apply tools. Source, do not execute.
+# Shared helpers for the box-system-update-* apply tools. Source, do not execute.
 # Mirrors box-check-lib.sh; apply tools stream output live, so there's no run helper.
 
 # Bold section header.

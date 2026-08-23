@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
-# Applies package updates from every package manager on this machine.
+# Upgrades system packages: brew on macOS, pacman/dnf on Linux.
 #
-#   _box-updates-run-packages        # upgrade mise tools, then brew/pacman/dnf packages
+#   box-pkgs-update
 #
-# The mirror of _box-updates-check-packages: what that reports, this installs.
+# On Linux the kernel and base system are packages, so this is what updates
+# them. The mise toolset is separate; box-tools-update upgrades that.
 #
-# A package manager that fails does not stop the others; the run reports every
-# failure at the end and exits non-zero.
+# A manager that fails does not stop the others; the run reports every failure
+# at the end and exits non-zero.
 
 set -euo pipefail
 
@@ -16,13 +17,7 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
 
-os="$(_box-detect-os)"
-
-box_update_section "packages (mise)"
-box_update_require mise
-# Run from $HOME for the global toolset. Config pins "latest", so the upgrade
-# lands in this machine's mise.lock and leaves the git-tracked config alone.
-( cd "$HOME" && mise upgrade ) || box_update_fail mise
+os="$(_box-os-detect)"
 
 case "$os" in
   macos)

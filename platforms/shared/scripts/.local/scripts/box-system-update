@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Installs every available update on this machine, in one go.
+#
+#   box-system-update
+#
+# Runs box-os-update, box-tools-update, box-pkgs-update and box-firmware-update
+# in that order. Each of those also runs on its own when you only want that
+# part.
+#
+# A failing step does not stop the rest; every failure is listed at the end and
+# the run exits non-zero. Some steps use sudo and will prompt for your password.
+#
+# The read-only side is box-system-outdated.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+# shellcheck source=/dev/null
+. "${BOX_ROOT:-$HOME/box}/lib/box-update-lib.sh"
+
+box-os-update       || box_update_fail os
+box-tools-update    || box_update_fail tools
+box-pkgs-update     || box_update_fail packages
+box-firmware-update || box_update_fail firmware
+
+box_update_summary

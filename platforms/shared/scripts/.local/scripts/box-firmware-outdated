@@ -2,10 +2,10 @@
 #
 # Reports pending firmware/BIOS updates.
 #
-#   _box-updates-check-firmware
+#   box-firmware-outdated      # Linux fwupd; on macOS firmware ships with the OS
 #
-# Linux uses fwupd (refresh metadata, then list). macOS firmware ships through
-# softwareupdate, so there it defers to _box-updates-check-os.
+# Only Linux has real work here. Apple ships firmware through softwareupdate,
+# so on macOS box-os-outdated is what reports it.
 
 set -euo pipefail
 
@@ -14,12 +14,12 @@ set -euo pipefail
 # shellcheck source=/dev/null
 . "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
 
-os="$(_box-detect-os)"
+os="$(_box-os-detect)"
 
 case "$os" in
   macos)
     box_check_section "firmware & BIOS"
-    echo "macOS firmware ships through softwareupdate (see _box-updates-check-os)"
+    echo "macOS firmware ships through softwareupdate; run box-os-outdated"
     ;;
 
   arch | fedora)
