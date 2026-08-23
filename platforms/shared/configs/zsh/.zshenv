@@ -48,7 +48,8 @@ path=(
 )
 
 for _d in $ANDROID_HOME/platform-tools $ANDROID_HOME/emulator \
-          $ANDROID_HOME/cmdline-tools/latest/bin $HOME/android-studio/bin; do
+          $ANDROID_HOME/cmdline-tools/latest/bin $HOME/android-studio/bin \
+          $HOME/.docker/bin; do
   [[ -d $_d ]] && path=($path $_d)
 done
 unset _d
