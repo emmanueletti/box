@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # Lists an archive's contents without extracting.
+#
+#   box-zip-list thing.tar.zst
 
 set -euo pipefail
 

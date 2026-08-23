@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # Extracts one or more archives, format auto-detected.
+#
+#   box-zip-extract thing.tar.zst other.7z
 
 set -euo pipefail
 

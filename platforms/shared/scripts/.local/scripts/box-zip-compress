@@ -2,7 +2,7 @@
 #
 # Compresses files into an archive.
 #
-#   box-archive-compress f1 dir/ out.tar.zst
+#   box-zip-compress f1 dir/ out.tar.zst
 
 set -euo pipefail
 
