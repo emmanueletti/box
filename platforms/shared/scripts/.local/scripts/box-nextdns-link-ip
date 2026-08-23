@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# Refreshes the NextDNS linked IP so IPv4 filtering keeps working after the
+# home public IP changes. Reads the secret update URL from a local file that is
+# never committed (it holds a token that can re-point your linked IP).
+#
+# Run it by hand any time to force a refresh, or let the box cron call it.
+# Every run appends one line to the log and trims the log to its last N lines,
+# so it stays self-bounded (never grows without limit).
+
+set -euo pipefail
+
+url_file="${NEXTDNS_LINK_IP_FILE:-$HOME/.config/nextdns/link-ip-url}"
+log_file="${NEXTDNS_LINK_IP_LOG:-$HOME/.config/nextdns/link-ip.log}"
+log_max_lines="${NEXTDNS_LINK_IP_LOG_LINES:-2000}"
+
+mkdir -p "$(dirname "$log_file")"
+
+log() {
+  printf '%s  %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$1" >> "$log_file"
+  # Keep only the last N lines so the log can never take over the disk.
+  tmp="${log_file}.tmp"
+  tail -n "$log_max_lines" "$log_file" > "$tmp" && mv "$tmp" "$log_file"
+}
+
+if [[ ! -r $url_file ]]; then
+  log "ERROR no url file at $url_file"
+  echo "❌ box: no nextdns link-ip url at $url_file" >&2
+  echo "   put your secret link-ip.nextdns.io url in that file (chmod 600)" >&2
+  exit 1
+fi
+
+url="$(tr -d '[:space:]' < "$url_file")"
+
+if [[ -z $url ]]; then
+  log "ERROR url file empty"
+  echo "❌ box: $url_file is empty" >&2
+  exit 1
+fi
+
+if ip="$(curl -fsS --max-time 10 "$url")"; then
+  log "OK linked ip ${ip:-unknown}"
+  echo "✅ box: nextdns linked ip refreshed (${ip:-unknown})"
+else
+  status=$?
+  log "ERROR curl failed exit ${status}"
+  echo "❌ box: nextdns refresh failed (curl exit ${status})" >&2
+  exit "$status"
+fi
