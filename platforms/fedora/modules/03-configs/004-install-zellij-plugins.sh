@@ -2,11 +2,8 @@
 #
 # Downloads the zellij wasm plugins and pre-grants their permissions.
 #
-#   box-sync-zellij-plugins    # download the pinned plugins, grant permissions
-#
 # The kdl files reference plugins by path only, so the versions below are the
-# single place they are pinned. Every run re-downloads and re-grants, so bumping
-# a version or a permission here takes effect without a flag.
+# single place they are pinned.
 #
 # Granting matters as much as downloading: zellij asks for plugin permissions
 # inside the plugin's own pane, and the status bar pane is one row tall, so the
@@ -14,8 +11,6 @@
 # as nothing.
 
 set -euo pipefail
-
-[[ ${1:-} == -h ]] && exec box-help "$0"
 
 declare -A plugin_urls=(
   [zjstatus.wasm]="https://github.com/dj95/zjstatus/releases/download/v0.24.0/zjstatus.wasm"
