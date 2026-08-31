@@ -116,7 +116,7 @@ X = "select_line_above"
 left = "goto_first_nonwhitespace"
 right = "goto_line_end"
 
-# Space t = toggles
+# space t = toggles
 [keys.normal.space.t]
 a = ":theme dark_plus"
 b = ":theme solarized_light"
@@ -133,7 +133,7 @@ z = [
   ":toggle inline-diagnostics.cursor-line hint disable",
 ]
 
-# Space x = execute scripts
+# space x = execute scripts
 [keys.normal.space.x]
 f = ':open %sh{~/.config/helix/scripts/rails-file-to-test.sh %{buffer_name}}'
 p = ':open %sh{ruby ~/.config/helix/scripts/rails-render-to-partial.rb %{buffer_name} %{cursor_line}}'
