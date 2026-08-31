@@ -119,7 +119,7 @@ right = "goto_line_end"
 # Space t = toggles
 [keys.normal.space.t]
 a = ":theme dark_plus"
-b = ":theme rose_pine_dawn"
+b = ":theme solarized_light"
 w = ":toggle soft-wrap.enable"
 r = ":toggle line-number relative absolute"
 g = ":toggle indent-guides.render"
