@@ -35,6 +35,12 @@ layout {
                 mode_scroll  "#[bg=white,fg=black,bold] SCR "
                 mode_search  "#[bg=white,fg=black,bold] SEA "
                 mode_session "#[bg=red,fg=white,bold] SES "
+                mode_move    "#[bg=magenta,fg=white,bold] MOV "
+                mode_tmux    "#[bg=green,fg=black,bold] TMX "
+                mode_enter_search "#[bg=white,fg=black,bold] SEA "
+                mode_rename_pane  "#[bg=magenta,fg=white,bold] PAN "
+                mode_rename_tab   "#[bg=green,fg=black,bold] TAB "
+                mode_prompt       "#[bg=red,fg=white,bold] SES "
 
                 tab_normal              "#[dim] {index} {name} "
                 tab_normal_fullscreen   "#[dim] {index} {name} [F] "
