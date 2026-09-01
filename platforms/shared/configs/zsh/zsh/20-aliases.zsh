@@ -121,6 +121,7 @@ alias bo='bundle outdated --only-explicit'
 alias bi='bundle install'
 
 alias r='bundle exec rails'
+alias rnew='rails new . -c tailwind -d postgresql --skip-rubocop'
 alias rc='bin/rails console'
 alias rdbm='bin/rails db:migrate'
 alias rdbrb='bin/rails db:rollback'
