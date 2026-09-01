@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# Sets up fingerprint auth for sudo and polkit, then enrolls a finger.
+#
+#   box-fingerprint-setup       # configure PAM and enroll a finger
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+os="$(_box-detect-os)"
+
+if [[ $os != "arch" && $os != "fedora" ]]; then
+  echo "❌ box-fingerprint-setup: fingerprint auth only supported on arch/fedora" >&2
+  exit 1
+fi
+
+if ! command -v fprintd-enroll >/dev/null 2>&1; then
+  echo "❌ box-fingerprint-setup: fprintd not installed" >&2
+  exit 1
+fi
+
+devices=$(fprintd-list "$USER" 2>/dev/null || true)
+
+if [[ -z $devices ]]; then
+  echo "❌ box-fingerprint-setup: no fingerprint sensor detected" >&2
+  exit 1
+fi
+
+if ! grep -q pam_fprintd.so /etc/pam.d/sudo; then
+  sudo sed -i '1i auth    sufficient pam_fprintd.so' /etc/pam.d/sudo
+fi
+
+if [[ -f /etc/pam.d/polkit-1 ]]; then
+  if ! grep -q pam_fprintd.so /etc/pam.d/polkit-1; then
+    sudo sed -i '1i auth      sufficient pam_fprintd.so' /etc/pam.d/polkit-1
+  fi
+else
+  sudo tee /etc/pam.d/polkit-1 >/dev/null <<'EOF'
+auth      sufficient pam_fprintd.so
+auth      required pam_unix.so
+
+account   required pam_unix.so
+password  required pam_unix.so
+session   required pam_unix.so
+EOF
+fi
+
+echo "box-fingerprint-setup: scan a finger on the sensor until this completes"
+
+if sudo fprintd-enroll "$USER" && fprintd-verify; then
+  echo "✅ box-fingerprint-setup: fingerprint enrolled and verified"
+else
+  echo "❌ box-fingerprint-setup: enrollment or verification failed" >&2
+  exit 1
+fi

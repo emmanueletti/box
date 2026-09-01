@@ -36,6 +36,7 @@ fcitx5-qt
 fd
 ffmpegthumbnailer
 fontconfig
+fprintd
 fzf
 github-cli
 gnome-calculator
@@ -82,6 +83,7 @@ mpv
 nautilus
 nautilus-python
 gnome-disk-utility
+networkmanager
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
@@ -107,7 +109,6 @@ ripgrep
 ruby
 rust
 satty
-sddm
 signal-desktop
 slurp
 spotify
@@ -142,6 +143,7 @@ woff2-font-awesome
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
 xdg-terminal-exec
+xdg-user-dirs
 xmlstarlet
 xournalpp
 yaru-icon-theme

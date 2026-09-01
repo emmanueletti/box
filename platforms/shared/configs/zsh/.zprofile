@@ -5,10 +5,8 @@
 # this file is only for login-time concerns like starting a graphical session.
 # =========================================================
 
-# (linux) start hyprland on the first virtual terminal. Uncomment once the
-# compositor is installed. $XDG_VTNR avoids a subprocess; the $OSTYPE guard
-# keeps it inert on macOS.
-#
-#   if [[ $OSTYPE == linux* && -z $DISPLAY && $XDG_VTNR == 1 ]]; then
-#     exec Hyprland
-#   fi
+# (linux) start hyprland on the first virtual terminal. $XDG_VTNR avoids a
+# subprocess; the $OSTYPE guard keeps it inert on macOS.
+if [[ $OSTYPE == linux* && -z $DISPLAY && $XDG_VTNR == 1 ]]; then
+  exec Hyprland
+fi

@@ -1,0 +1,12 @@
+-- TODO: keybinds. None declared anywhere -- Hyprland ships no implicit
+-- defaults, so right now there is no way to open a terminal, open the
+-- launcher, close a window, switch workspaces, lock the screen, or quit.
+-- Candidates already installed with nothing bound to them:
+--   terminal                ghostty, alacritty
+--   launcher                omarchy-walker (installed, also unstarted)
+--   screenshot               grim, slurp, satty, hyprpicker
+--   volume/brightness OSD    swayosd, pamixer, brightnessctl, playerctl
+--   lock screen              hyprlock (see autostart.lua idle/lock TODO)
+--
+-- See hl.bind()/hl.dsp.* in the official example:
+-- https://github.com/hyprwm/Hyprland/blob/main/example/hyprland.lua

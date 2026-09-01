@@ -1,0 +1,4 @@
+-- TODO: input devices. No hl.config({ input = {...} }) -- keyboard layout,
+-- touchpad natural-scroll/tap-to-click, sensitivity are all defaults.
+--
+-- hl.config({ input = { kb_layout = "us", touchpad = { natural_scroll = false } } })

@@ -1,0 +1,5 @@
+-- TODO: environment variables (hl.env). Nothing set yet -- cursor size,
+-- theme names, toolkit backend hints (QT_QPA_PLATFORM etc) all still
+-- Hyprland/toolkit defaults.
+--
+-- hl.env("XCURSOR_SIZE", "24")

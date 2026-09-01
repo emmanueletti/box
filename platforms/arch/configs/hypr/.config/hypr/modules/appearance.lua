@@ -1,0 +1,6 @@
+-- TODO: look and feel. No hl.config() call at all -- gaps, borders,
+-- rounding, animations are all Hyprland's compiled-in defaults.
+-- kvantum-qt5, yaru-icon-theme, gnome-themes-extra are installed for
+-- GTK/Qt app theming, unwired to anything Hyprland-side.
+--
+-- hl.config({ general = {...}, decoration = {...}, animations = {...} })

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+# Removes fingerprint auth from sudo and polkit. Leaves fprintd installed
+# and any enrolled prints intact -- rerun box-fingerprint-setup to re-enable.
+#
+#   box-fingerprint-remove      # strip PAM config only
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if grep -q pam_fprintd.so /etc/pam.d/sudo 2>/dev/null; then
+  sudo sed -i '/pam_fprintd\.so/d' /etc/pam.d/sudo
+fi
+
+if [[ -f /etc/pam.d/polkit-1 ]] && grep -q pam_fprintd.so /etc/pam.d/polkit-1; then
+  sudo sed -i '/pam_fprintd\.so/d' /etc/pam.d/polkit-1
+fi
+
+echo "✅ box-fingerprint-remove: fingerprint auth removed from sudo and polkit"

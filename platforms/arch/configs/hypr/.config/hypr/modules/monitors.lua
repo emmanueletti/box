@@ -1,0 +1,5 @@
+-- TODO: monitor config. No hl.monitor() call anywhere -- runs on whatever
+-- Hyprland autodetects. Fine for a single laptop panel, matters once an
+-- external display is in the mix.
+--
+-- hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
