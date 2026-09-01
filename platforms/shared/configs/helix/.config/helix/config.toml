@@ -39,6 +39,7 @@ left = ["mode", "spinner", "version-control", "file-name", "file-modification-in
 center = ["diagnostics"]
 
 [editor.soft-wrap]
+enable = false
 wrap-at-text-width = true
 
 [editor.whitespace]
