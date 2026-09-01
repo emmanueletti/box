@@ -50,7 +50,7 @@ layout {
                 tab_active_sync         "#[bg=blue,fg=white,bold] {index} {name} [S] "
                 tab_separator           " "
 
-                datetime          "#[dim] 🕐 {format} "
+                datetime          "#[dim]  {format} "
                 datetime_format   "%H:%M"
                 datetime_timezone "America/Toronto"
 
