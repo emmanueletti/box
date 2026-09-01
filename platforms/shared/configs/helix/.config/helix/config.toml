@@ -42,7 +42,7 @@ center = ["diagnostics"]
 wrap-at-text-width = true
 
 [editor.whitespace]
-render = { newline = "all" }
+render = { newline = "none" }
 characters = { newline = "¬" }
 
 [keys.normal]
@@ -60,10 +60,9 @@ C-end = "jump_view_right"
 C-del = "delete_word_forward"
 C-backspace = "delete_word_backward"
 A-w = ":buffer-close"
-A-W = ":buffer-close-others"
 A-q = ":quit"
 C-r = ":reload-all"
-C-n = ':sh box-clipboard-copy %{buffer_name}' # Current filename to system clipboard
+C-n = ':sh box-clipboard-copy %{buffer_name}'
 C-s = ":format"
 C-j = "save_selection"
 ret = "goto_word"
@@ -127,6 +126,7 @@ f = ":toggle auto-format"
 c = ":toggle auto-completion"
 h = ":toggle lsp.display-inlay-hints"
 d = ":toggle inline-diagnostics.cursor-line hint disable"
+m = ":toggle whitespace.render.newline none all"
 z = [
   ":toggle auto-completion",
   ":toggle lsp.display-inlay-hints",
