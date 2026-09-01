@@ -1,14 +1,14 @@
 layout {
-    tab name="Agent" focus=true {
-        pane {
-            command "zsh"
-            args "-c" "claude --chrome"
-        }
-    }
-    tab name="Code" {
-        pane focus=true borderless=true {
-            command "hx"
-            args "."
+    tab name="Build" focus=true {
+        pane split_direction="vertical" {
+            pane {
+                command "zsh"
+                args "-c" "claude --chrome --permission-mode auto"
+            }
+            pane {
+                command "hx"
+                args "."
+            }
         }
     }
     tab name="Git" {
