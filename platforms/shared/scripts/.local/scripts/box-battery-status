@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 #
-# Prints battery charge with a level icon, e.g. "🔋 87%".
-# Icon is 🪫 at or below 20%, 🔋 above.
-# Prints nothing on machines without a battery (desktops).
+# Prints battery charge with a fullness-level glyph, e.g. " 87%".
+# Requires a Nerd Font. Prints nothing on machines without a battery (desktops).
 #
-#   box-battery-status            # 🔋 87%
+#   box-battery-status            #  87%
 #   box-battery-status --plain    # 87
 
 set -euo pipefail
@@ -35,7 +34,16 @@ if [[ ${1:-} == "--plain" ]]; then
   exit 0
 fi
 
-icon=🔋
-(( pct <= 20 )) && icon=🪫
+if (( pct <= 10 )); then
+  icon=""
+elif (( pct <= 35 )); then
+  icon=""
+elif (( pct <= 60 )); then
+  icon=""
+elif (( pct <= 85 )); then
+  icon=""
+else
+  icon=""
+fi
 
 echo "$icon $pct%"
