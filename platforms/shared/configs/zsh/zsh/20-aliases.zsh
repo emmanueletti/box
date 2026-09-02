@@ -32,6 +32,8 @@ alias dev='cd ~/projects'
 alias projects='cd ~/projects'
 alias notes='glow ~/notes'
 
+alias ladybird='/home/emmanueletti/projects/oss/ladybird/Meta/ladybird.py run ladybird -- --certificate /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
+
 z() {
   local name="${1:-${PWD:t}}"
   zellij attach -c "${name//[^a-zA-Z0-9_-]/-}"
