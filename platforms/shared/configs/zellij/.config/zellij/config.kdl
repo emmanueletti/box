@@ -395,6 +395,14 @@ themes {
         cyan 6
         white 15
         orange 3
+        text_selected {
+            base 197 200 198
+            background 55 59 65
+            emphasis_0 240 198 116
+            emphasis_1 181 189 104
+            emphasis_2 138 190 183
+            emphasis_3 178 148 187
+        }
     }
     base16-light {
         fg 0
@@ -408,6 +416,14 @@ themes {
         cyan 6
         white 15
         orange 3
+        text_selected {
+            base 0 0 0
+            background 191 219 254
+            emphasis_0 203 144 0
+            emphasis_1 68 140 39
+            emphasis_2 0 131 178
+            emphasis_3 122 62 157
+        }
     }
 }
  
