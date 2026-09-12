@@ -46,33 +46,22 @@ render = { newline = "none" }
 characters = { newline = "¬" }
 
 [keys.normal]
-"C-/" = ["toggle_comments"]
 esc = "collapse_selection"
-x = "select_line_below"
-X = "select_line_above"
-S-left = "goto_previous_buffer"
-S-right = "goto_next_buffer"
-S-z = ":toggle gutters.line-numbers.min-width 3 40 95" # cycle gutter width
-C-left = "move_prev_word_start"
-C-right = "move_next_word_start"
-C-home = "jump_view_left"
-C-end = "jump_view_right"
-C-del = "delete_word_forward"
-C-backspace = "delete_word_backward"
-A-w = ":buffer-close"
-A-q = ":quit"
-C-r = ":reload-all"
-C-n = ':sh box-clipboard-copy %{buffer_name}'
-C-s = ":format"
-C-j = "save_selection"
-ret = "goto_word"
-"C-`" = "switch_case"
-a = ["append_mode", "collapse_selection"]
-D = "delete_selection_noyank" # A-d is the default for this
 home = "goto_first_nonwhitespace"
 "^" = "extend_to_first_nonwhitespace"
 "$" = "extend_to_line_end"
+ret = "goto_word"
+x = "select_line_below"
+X = "select_line_above"
 V = ["goto_first_nonwhitespace", "extend_to_line_end"]
+a = ["append_mode", "collapse_selection"]
+D = "delete_selection_noyank" # A-d is the default for this
+
+C-left = "move_prev_word_start"
+C-right = "move_next_word_start"
+C-del = "delete_word_forward"
+C-backspace = "delete_word_backward"
+
 S-down = [
   "extend_to_line_bounds",
   "delete_selection",
@@ -88,6 +77,25 @@ S-up = [
   "paste_before",
   "flip_selections",
 ]
+
+S-left = "goto_previous_buffer"
+S-right = "goto_next_buffer"
+C-S-left = "jump_view_left"
+C-S-right = "jump_view_right"
+C-S-up = "jump_view_up"
+C-S-down = "jump_view_down"
+
+A-w = ":buffer-close"
+A-q = ":quit"
+C-r = ":reload-all"
+C-s = ":format"
+
+"C-/" = ["toggle_comments"]
+"C-`" = "switch_case"
+C-j = "save_selection"
+S-z = ":toggle gutters.line-numbers.min-width 3 40 95" # cycle gutter width
+
+C-n = ':sh box-clipboard-copy %{buffer_name}'
 
 [keys.normal.space]
 space = "command_palette"

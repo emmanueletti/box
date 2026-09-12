@@ -65,9 +65,6 @@ zstyle ':completion:*' matcher-list \
   'r:|[-_]=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# bun completions
-[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
-
 # fd as the engine: fast, respects .gitignore, includes dotfiles
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --strip-cwd-prefix'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
@@ -90,8 +87,6 @@ export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap 
 unset _clip
 
 source <(fzf --zsh)
-# zellij eats Ctrl-T (Tab mode), so move the file-paste widget to Ctrl-F
-# (Ctrl-F was just forward-char in emacs mode == redundant with the -> arrow)
 bindkey '^F' fzf-file-widget
 
 # =========================================================
@@ -99,27 +94,19 @@ bindkey '^F' fzf-file-widget
 # =========================================================
 
 alias shconfig='$EDITOR ~/.zshrc'
-alias hxlang='$EDITOR ~/.config/helix/languages.toml'
-alias zconfig='$EDITOR ~/.config/zellij/config.kdl'
-alias gconfig='$EDITOR ~/.config/ghostty/config'
-alias configdoots='$EDITOR ~/box/doots'
+alias dootsconfig='$EDITOR ~/box/doots'
 alias reload='exec $SHELL'
 alias c='clear'
 alias x='exit'
-# macOS ships pbcopy/pbpaste; on wayland, map them onto wl-clipboard
-(( $+commands[pbcopy] ))  || alias pbcopy='wl-copy'
-(( $+commands[pbpaste] )) || alias pbpaste='wl-paste'
 
 alias tm='tmux'
 alias tml='tmux list-sessions'
 alias tmks='tmux kill-session'
 
-# soft-delete via trash-cli (install: sudo dnf install trash-cli).
-# Deliberately NOT aliasing rm -> trash: keep rm meaning rm.
-alias trash='trash-put'    # trash a file (goes to GNOME Files trash)
-alias trl='trash-list'     # list trashed files
-alias trr='trash-restore'  # interactive restore
-alias tre='trash-empty'    # empty trash (trash-empty 30 = older than 30d)
+alias trash='trash-put'
+alias trl='trash-list'
+alias trr='trash-restore'
+alias tre='trash-empty'
 
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -265,9 +252,6 @@ alias mx='mise exec'
 alias mrun='mise run'
 alias mup='mise update && mise prune'
 
-# Only functions that need the calling shell live here. Everything else is a
-# script in box/bin, discoverable with box-<TAB>.
-
 galias() { alias | grep "$@" }
 
 mkcd() { mkdir -p "$1" && cd "$1" }
@@ -305,15 +289,6 @@ lf() {
 # Must load LAST -- zsh-syntax-highlighting has to be sourced after everything
 # else.
 
-# Point docker/compose at the engine's socket: rootless podman on Linux, Docker
-# Desktop on macOS. Literal paths, no subprocess, so shell start stays fast.
-if [[ -S ${XDG_RUNTIME_DIR:-/run/user/$UID}/podman/podman.sock ]]; then
-  export DOCKER_HOST="unix://${XDG_RUNTIME_DIR:-/run/user/$UID}/podman/podman.sock"
-elif [[ $OSTYPE == darwin* && -S $HOME/.docker/run/docker.sock ]]; then
-  export DOCKER_HOST="unix://$HOME/.docker/run/docker.sock"
-fi
-
-# starship prompt
 eval "$(starship init zsh)"
 
 # Homebrew's bin, ahead of the system dirs -- brew, mise, starship etc. need

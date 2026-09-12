@@ -1,14 +1,5 @@
-# =========================================================
-# .zprofile — LOGIN shells only (tty, ssh, terminals that start a login shell).
-# Sourced after ~/.zshenv and the system /etc/zprofile (macOS path_helper).
-# PATH and homebrew are set up in ~/.zshenv and ~/.zshrc's init section, so
-# this file is only for login-time concerns like starting a graphical session.
-# =========================================================
+# login shells only (tty, ssh, login terminals); PATH/homebrew live in .zshenv/.zshrc
 
-# (linux) start hyprland on the first virtual terminal. Uncomment once the
-# compositor is installed. $XDG_VTNR avoids a subprocess; the $OSTYPE guard
-# keeps it inert on macOS.
-#
-#   if [[ $OSTYPE == linux* && -z $DISPLAY && $XDG_VTNR == 1 ]]; then
-#     exec Hyprland
-#   fi
+if command -v uwsm >/dev/null 2>&1 && [[ -z $DISPLAY && -z $WAYLAND_DISPLAY && $XDG_VTNR == 1 ]]; then
+  exec uwsm start -- sway
+fi
