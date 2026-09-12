@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+#
+# Sets each visible workspace's outer gap based on its window count: a big
+# gap when alone (centered look), a small one once a second tile joins
+# (still floats off the screen edge, not full edge-to-edge). One workspace
+# per output can be visible at once, so multi-output setups apply this per
+# output, not just to whichever workspace currently has focus. Runs once,
+# then reacts to every window/workspace change.
+
+set -euo pipefail
+
+single_outer=200
+multi_outer=10
+
+declare -A last_gap
+
+gap_for() {
+  local ws=$1 tree=$2 count
+  count=$(jq --arg ws "$ws" \
+    '[.. | objects | select(.type == "workspace" and .name == $ws)][0].nodes | length' <<<"$tree")
+  (( count <= 1 )) && echo "$single_outer" || echo "$multi_outer"
+}
+
+set_gap() {
+  local ws=$1 gap=$2
+  [[ ${last_gap[$ws]-} == $gap ]] && return
+  swaymsg gaps outer current set "$gap" >/dev/null
+  last_gap[$ws]=$gap
+}
+
+apply() {
+  local tree workspaces focused_ws visible_ws ws changed=0
+  local -A desired
+
+  tree=$(swaymsg -t get_tree)
+  workspaces=$(swaymsg -t get_workspaces)
+  focused_ws=$(jq -r '.[] | select(.focused) | .name' <<<"$workspaces")
+  mapfile -t visible_ws < <(jq -r '.[] | select(.visible) | .name' <<<"$workspaces")
+
+  for ws in "${visible_ws[@]}"; do
+    desired[$ws]=$(gap_for "$ws" "$tree")
+    [[ ${last_gap[$ws]-} != "${desired[$ws]}" ]] && changed=1
+  done
+  (( changed )) || return
+
+  if (( ${#visible_ws[@]} <= 1 )); then
+    set_gap "$focused_ws" "${desired[$focused_ws]}"
+    return
+  fi
+
+  # gaps has no named-workspace target, only current|all, so reaching a
+  # non-focused output means switching to it and back; last_gap above is what
+  # keeps that switching from re-triggering itself forever through our own
+  # subscribe loop
+  swaymsg mouse_warping none >/dev/null
+  for ws in "${visible_ws[@]}"; do
+    [[ $ws == $focused_ws ]] && continue
+    swaymsg workspace "$ws" >/dev/null
+    set_gap "$ws" "${desired[$ws]}"
+  done
+  set_gap "$focused_ws" "${desired[$focused_ws]}"
+  swaymsg workspace "$focused_ws" >/dev/null
+  swaymsg mouse_warping container >/dev/null
+}
+
+apply
+swaymsg -t subscribe -m '["window", "workspace"]' | while read -r _; do
+  apply
+done

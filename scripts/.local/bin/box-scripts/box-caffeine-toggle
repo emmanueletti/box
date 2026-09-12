@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Toggles a systemd inhibit lock that blocks idle/sleep, like macOS Caffeine.
+#
+#   box-caffeine-toggle   # on if off, off if on
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+pidfile="${XDG_RUNTIME_DIR:-/tmp}/box-caffeine.pid"
+
+if [[ -f $pidfile ]] && kill -0 "$(<"$pidfile")" 2>/dev/null; then
+  kill -- "-$(<"$pidfile")"   # negative PID: kill the whole process group (systemd-inhibit + its sleep child)
+  rm -f "$pidfile"
+  echo "✅ box-caffeine-toggle: off"
+else
+  setsid systemd-inhibit --what=idle:sleep --why="box-caffeine-toggle" -- sleep infinity &
+  echo $! > "$pidfile"
+  disown
+  echo "✅ box-caffeine-toggle: on"
+fi

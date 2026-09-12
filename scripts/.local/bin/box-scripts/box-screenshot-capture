@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# Takes a screenshot on sway, saving it and putting it on the clipboard.
+#
+#   box-screenshot-capture            # drag out a region
+#   box-screenshot-capture window     # click a window to pick it
+#   box-screenshot-capture active     # the focused window, nothing to pick
+#   box-screenshot-capture output     # the monitor the focus sits on
+#   box-screenshot-capture screen     # every monitor at once
+#   box-screenshot-capture --copy     # clipboard only, leaves no file behind
+#
+# Running it again while the picker is up cancels the picker instead of opening
+# a second one. Files land in the SCREENSHOTS user dir.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+os="$(_box-os-detect)"
+
+if [[ $os != arch ]]; then
+  echo "❌ box: box-screenshot-capture needs sway, which box only runs on arch" >&2
+  exit 1
+fi
+
+if pkill -x slurp 2>/dev/null; then
+  exit 0
+fi
+
+action=savecopy
+
+if [[ ${1:-} == --copy ]]; then
+  action=copy
+  shift
+fi
+
+target="${1:-area}"
+
+if [[ $action == copy ]]; then
+  grimshot --notify copy "$target"
+  exit 0
+fi
+
+dir="$(xdg-user-dir SCREENSHOTS 2>/dev/null || true)"
+
+if [[ -z $dir || $dir == "$HOME" ]]; then
+  dir="$HOME/Pictures/Screenshots"
+fi
+
+mkdir -p "$dir"
+
+file="${dir}/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png"
+
+grimshot --notify savecopy "$target" "$file"
+
+echo "$file"

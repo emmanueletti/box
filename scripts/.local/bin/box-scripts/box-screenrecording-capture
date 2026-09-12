@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+#
+# Starts a screen recording on sway, or ends the one already running.
+#
+#   box-screenrecording-capture            # drag out a region, or end a recording
+#   box-screenrecording-capture screen     # the whole monitor the focus sits on
+#   box-screenrecording-capture --audio    # also record the default microphone
+#
+# One command does both ends of the job, so a single key starts and stops it.
+# Files land in the VIDEOS user dir, encoded on the GPU where VAAPI is offered.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+os="$(_box-os-detect)"
+
+if [[ $os != arch ]]; then
+  echo "❌ box: box-screenrecording-capture needs sway, which box only runs on arch" >&2
+  exit 1
+fi
+
+state="$HOME/.local/state/box"
+namefile="$state/screenrecording.file"
+log="$state/screenrecording.log"
+
+mkdir -p "$state"
+
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -a box "$1" "$2"
+  fi
+}
+
+if pgrep -x wf-recorder >/dev/null; then
+  file="$(cat "$namefile" 2>/dev/null || true)"
+
+  pkill -INT -x wf-recorder
+
+  for _ in {1..100}; do
+    if ! pgrep -x wf-recorder >/dev/null; then
+      break
+    fi
+    sleep 0.1
+  done
+
+  rm -f "$namefile"
+
+  if pgrep -x wf-recorder >/dev/null; then
+    pkill -KILL -x wf-recorder
+    notify "Recording broken" "Had to be killed outright, ${file} may not play"
+    echo "❌ box: the recorder ignored the stop, ${file} may not play" >&2
+    exit 1
+  fi
+
+  notify "Recording saved" "$file"
+  echo "$file"
+  exit 0
+fi
+
+if pkill -x slurp 2>/dev/null; then
+  exit 0
+fi
+
+audio=no
+
+if [[ ${1:-} == --audio ]]; then
+  audio=yes
+  shift
+fi
+
+target="${1:-area}"
+
+dir="$(xdg-user-dir VIDEOS 2>/dev/null || true)"
+
+if [[ -z $dir || $dir == "$HOME" ]]; then
+  dir="$HOME/Videos"
+fi
+
+mkdir -p "$dir"
+
+file="${dir}/screenrecording-$(date +%Y-%m-%d_%H-%M-%S).mp4"
+
+args=(-f "$file")
+
+case "$target" in
+  area)
+    args+=(-g "$(slurp)")
+    ;;
+  screen)
+    args+=(-o "$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')")
+    ;;
+  *)
+    echo "usage: box-screenrecording-capture [--audio] [area|screen]" >&2
+    exit 1
+    ;;
+esac
+
+if [[ $audio == yes ]]; then
+  args+=(-a)
+fi
+
+if [[ -e /dev/dri/renderD128 ]]; then
+  args+=(-c h264_vaapi -d /dev/dri/renderD128)
+fi
+
+wf-recorder "${args[@]}" >"$log" 2>&1 &
+pid=$!
+
+for _ in {1..50}; do
+  if [[ -f $file ]] || ! kill -0 "$pid" 2>/dev/null; then
+    break
+  fi
+  sleep 0.1
+done
+
+if ! kill -0 "$pid" 2>/dev/null; then
+  echo "❌ box: the recorder quit on startup" >&2
+  tail -n 5 "$log" >&2
+  exit 1
+fi
+
+echo "$file" > "$namefile"
+
+notify "Recording" "Same key again ends it"
+
+echo "$file"

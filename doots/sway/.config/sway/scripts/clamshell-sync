@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#
+# Enables clamshell mode (laptop screen off, no suspend on lid close) only
+# when docked to an external monitor AND on AC power. Called from sway's
+# bindswitch on lid open/close, and on every sway (re)start.
+
+set -euo pipefail
+
+lid_state_file="/proc/acpi/button/lid/LID0/state"
+pidfile="${XDG_RUNTIME_DIR:-/tmp}/sway-clamshell.pid"
+
+lid_closed=0
+[[ -r $lid_state_file ]] && [[ "$(<"$lid_state_file")" == *closed ]] && lid_closed=1
+
+ac_online=0
+for f in /sys/class/power_supply/A*/online; do
+  [[ -f $f ]] && [[ "$(<"$f")" == "1" ]] && ac_online=1
+done
+
+external_connected=$(swaymsg -t get_outputs | jq '[.[] | select(.name != "eDP-1" and .active)] | length')
+
+clamshell=0
+(( lid_closed )) && (( ac_online )) && (( external_connected > 0 )) && clamshell=1
+
+if (( clamshell )); then
+  swaymsg output eDP-1 disable
+  if [[ ! -f $pidfile ]] || ! kill -0 "$(<"$pidfile")" 2>/dev/null; then
+    setsid systemd-inhibit --what=handle-lid-switch --why="sway clamshell mode" -- sleep infinity &
+    echo $! > "$pidfile"
+    disown
+  fi
+else
+  swaymsg output eDP-1 enable
+  if [[ -f $pidfile ]] && kill -0 "$(<"$pidfile")" 2>/dev/null; then
+    kill -- "-$(<"$pidfile")"
+  fi
+  rm -f "$pidfile"
+fi

@@ -1,0 +1,8 @@
+profile docked {
+    output "<external monitor make/model/serial, from swaymsg -t get_outputs>" mode 3840x2160 position 0,0 scale 1.5
+    output eDP-1 mode 2256x1504 position 792,2160 scale 1.33
+}
+
+profile undocked {
+    output eDP-1 position 0,0
+}

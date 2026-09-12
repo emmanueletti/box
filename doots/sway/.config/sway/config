@@ -1,0 +1,308 @@
+# Read `man 5 sway` for a complete reference.
+
+### Variables
+#
+# Logo key. Use Mod1 for Alt.
+set $mod Mod4
+# Home row direction keys, like vim
+set $left h
+set $down j
+set $up k
+set $right l
+# Your preferred terminal emulator
+set $term foot
+# Your preferred application launcher
+set $menu rofi -show drun
+# Your preferred screen locker
+set $lock waylock -init-color 0x1a1b26 -input-color 0x7aa2f7 -fail-color 0xf7768e
+# box's sway-only helper scripts, colocated here (not in box-scripts, which is
+# for user-invoked commands, not internal wiring)
+set $scripts ~/.config/sway/scripts
+# TODO: get real output when on sway
+# same identifier as doots/kanshi/.config/kanshi/config's docked profile; fill
+# both from `swaymsg -t get_outputs` once the monitor's plugged in
+set $external_monitor "<external monitor make/model/serial, from swaymsg -t get_outputs>"
+
+### Appearance
+#
+font pango:JetBrainsMono Nerd Font 10
+default_border pixel 1
+default_floating_border pixel 1
+smart_borders on
+focus_follows_mouse no
+mouse_warping container
+gaps inner 10
+# smart_gaps only toggles outer gap fully on/off, no small-but-nonzero state,
+# so scripts/center-lone-window sets it live instead: big when alone
+# (centered look), a small floating gap once a second tile joins (never full
+# edge-to-edge)
+exec $scripts/center-lone-window
+
+### Output configuration
+#
+# Default wallpaper (more resolutions are available in @datadir@/backgrounds/sway/)
+output * bg ~/box/assets/wallpapers/dark/solid-gray.png fill
+include ~/.local/state/box/wallpaper*.conf
+#
+# Example configuration:
+#
+#   output HDMI-A-1 resolution 1920x1080 position 1920,0
+#
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+#
+# kanshi watches for dock/undock and applies a matching saved output profile
+# (see ~/.config/kanshi/config)
+exec kanshi
+
+### Idle configuration
+#
+# This will lock your screen after 900 seconds of inactivity, then turn off
+# your displays after another 300 seconds (turning them back on if resumed),
+# then suspend after another 300 seconds. It will also lock your screen
+# before your computer goes to sleep.
+exec swayidle -w \
+  timeout 900 '$lock' \
+  timeout 1200 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+  timeout 1500 'systemctl suspend' \
+  before-sleep '$lock'
+#
+# Clamshell mode: laptop screen disables and suspend is inhibited only when
+# docked to an external monitor AND on AC power. Runs on lid open/close and on
+# every reload so a config reload doesn't leave stale output state.
+exec_always $scripts/clamshell-sync
+bindswitch --reload --locked lid:on exec $scripts/clamshell-sync
+bindswitch --reload --locked lid:off exec $scripts/clamshell-sync
+
+### Input configuration
+#
+# Example configuration:
+#
+#   input type:touchpad {
+#       dwt enabled
+#       tap enabled
+#       natural_scroll enabled
+#       middle_emulation enabled
+#   }
+#
+#   input type:keyboard {
+#       xkb_layout "eu"
+#   }
+#
+# You can also configure each device individually.
+# Read `man 5 sway-input` for more information about this section.
+input type:keyboard {
+    xkb_options caps:escape
+}
+
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    dwt enabled
+}
+
+### Session environment
+#
+# Sway manages displays for you; xrandr should not be used. Propagate the
+# Wayland session environment into the systemd --user manager and dbus, so
+# portals (screen share, file pickers) and the polkit agent see the right
+# WAYLAND_DISPLAY etc. See the sway wiki's "Environment variables" section.
+exec systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK XCURSOR_SIZE XCURSOR_THEME
+exec dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK XCURSOR_SIZE XCURSOR_THEME
+
+exec gnome-keyring-daemon --start --components=secrets
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec wl-paste --watch cliphist store
+exec mako
+exec swayosd-server
+
+### Key bindings
+#
+# Basics:
+#
+    # Start a terminal
+    bindsym $mod+Return exec $term
+
+    # Kill focused window
+    bindsym $mod+Shift+q kill
+
+    # Start your launcher
+    bindsym $mod+d exec $menu
+    bindsym $mod+Shift+d exec rofi -show run
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod normal
+
+    # Reload the configuration file
+    bindsym $mod+Shift+c reload
+
+    # Exit sway (logs you out of your Wayland session)
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+    # Or use $mod+[up|down|left|right]
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+    # Move the focused window with the same, but add Shift
+    bindsym $mod+Shift+$left move left
+    bindsym $mod+Shift+$down move down
+    bindsym $mod+Shift+$up move up
+    bindsym $mod+Shift+$right move right
+    # Ditto, with arrow keys
+    bindsym $mod+Shift+Left move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move right
+#
+# Workspaces:
+#
+    # Pin workspace 1 to the external monitor when it's connected, falling
+    # back to the laptop screen otherwise -- also what sway starts on, so
+    # focus lands there on launch with no extra command needed
+    workspace 1 output $external_monitor eDP-1
+
+    # Switch to workspace
+    bindsym $mod+1 workspace number 1
+    bindsym $mod+2 workspace number 2
+    bindsym $mod+3 workspace number 3
+    bindsym $mod+4 workspace number 4
+    bindsym $mod+5 workspace number 5
+    bindsym $mod+6 workspace number 6
+    bindsym $mod+7 workspace number 7
+    bindsym $mod+8 workspace number 8
+    bindsym $mod+9 workspace number 9
+    bindsym $mod+0 workspace number 10
+    # Move focused container to workspace
+    bindsym $mod+Shift+1 move container to workspace number 1
+    bindsym $mod+Shift+2 move container to workspace number 2
+    bindsym $mod+Shift+3 move container to workspace number 3
+    bindsym $mod+Shift+4 move container to workspace number 4
+    bindsym $mod+Shift+5 move container to workspace number 5
+    bindsym $mod+Shift+6 move container to workspace number 6
+    bindsym $mod+Shift+7 move container to workspace number 7
+    bindsym $mod+Shift+8 move container to workspace number 8
+    bindsym $mod+Shift+9 move container to workspace number 9
+    bindsym $mod+Shift+0 move container to workspace number 10
+    # Note: workspaces can have any name you want, not just numbers.
+    # We just use 1-10 as the default.
+    #
+    # Move workspace to another output (monitor)
+    bindsym $mod+ctrl+Left move workspace to output left
+    bindsym $mod+ctrl+Right move workspace to output right
+#
+# Layout stuff:
+#
+    # You can "split" the current object of your focus with
+    # $mod+b or $mod+v, for horizontal and vertical splits
+    # respectively.
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
+
+    # Switch the current container between different layout styles
+    bindsym $mod+s layout stacking
+    bindsym $mod+w layout tabbed
+    bindsym $mod+e layout toggle split
+
+    # Make the current focus fullscreen
+    bindsym $mod+f fullscreen
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+Shift+space floating toggle
+
+    # Swap focus between the tiling area and the floating area
+    bindsym $mod+space focus mode_toggle
+
+    # Move focus to the parent container
+    bindsym $mod+a focus parent
+#
+# Scratchpad:
+#
+    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+minus move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+minus scratchpad show
+#
+# Resizing containers:
+#
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+
+    # Ditto, with arrow keys
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+#
+# Utilities:
+#
+    # Special keys to adjust volume, media, and brightness via swayosd (gives
+    # an on-screen indicator, unlike calling pactl/playerctl/brightnessctl
+    # directly). --locked so they still work while the screen is locked.
+    bindsym --locked XF86AudioRaiseVolume exec swayosd-client --output-volume raise
+    bindsym --locked XF86AudioLowerVolume exec swayosd-client --output-volume lower
+    bindsym --locked XF86AudioMute exec swayosd-client --output-volume mute-toggle
+    bindsym --locked XF86AudioMicMute exec swayosd-client --input-volume mute-toggle
+    bindsym --locked XF86MonBrightnessUp exec swayosd-client --brightness raise
+    bindsym --locked XF86MonBrightnessDown exec swayosd-client --brightness lower
+    bindsym --locked XF86AudioPlay exec playerctl play-pause
+    bindsym --locked XF86AudioNext exec playerctl next
+    bindsym --locked XF86AudioPrev exec playerctl previous
+
+    # Screenshots: region by default, Shift to click a window, Ctrl for every
+    # monitor. $mod+Shift+S opens satty to annotate before anything is saved.
+    bindsym Print exec box-screenshot-capture area
+    bindsym Shift+Print exec box-screenshot-capture window
+    bindsym Ctrl+Print exec box-screenshot-capture screen
+    bindsym $mod+Shift+s exec grimshot save area - | satty -f -
+
+    # Screen recording: the same key starts it and ends it
+    bindsym $mod+Shift+r exec box-screenrecording-capture area
+
+    # Pick a pixel's color under the cursor
+    bindsym $mod+p exec hyprpicker -a
+
+    # Clipboard history picker (cliphist store is running via exec above)
+    bindsym $mod+c exec cliphist list | rofi -dmenu | cliphist decode | wl-copy
+
+    # Lock the screen on demand
+    bindsym $mod+Escape exec $lock
+
+#
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+bar {
+    swaybar_command waybar
+}
+
+include /etc/sway/config.d/*

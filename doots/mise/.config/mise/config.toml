@@ -31,6 +31,7 @@ lazydocker = "latest"
 resvg = "latest"
 stripe = "latest"
 "github:render-oss/cli" = { version = "latest", bin = "render" }
+zellij = "0.45.1"
 
 [settings]
 prefer_offline = true

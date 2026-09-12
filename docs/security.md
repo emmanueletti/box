@@ -81,7 +81,7 @@ One memorized secret for the machine (TPM2 PIN), one for 1Password.
   adds friction, not protection. Adapt this line to whatever your login path
   actually is (a display manager's own autologin setting works the same way if
   you're using one).
-- Screen lock (`swaylock`) reuses the same PAM password, triggered by `swayidle`
+- Screen lock (`waylock`) reuses the same PAM password, triggered by `swayidle`
   on idle timeout and on any suspend (lid-close or otherwise).
 - 1Password SSH agent handles prod server keys — no raw private key files on
   disk. Unlock 1Password once, the agent signs on demand. Also autofills service
