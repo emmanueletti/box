@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# Upgrades system packages: brew on macOS, pacman/dnf on Linux.
+#
+#   box-pkgs-update
+#
+# On Linux the kernel and base system are packages, so this is what updates
+# them. The mise toolset is separate; box-tools-update upgrades that.
+#
+# A manager that fails does not stop the others; the run reports every failure
+# at the end and exits non-zero.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_update_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_update_require() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  echo "❌ ${0##*/}: required tool '$1' not installed (box should have set it up)" >&2
+  exit 1
+}
+
+BOX_UPDATE_FAILED=()
+
+box_update_fail() {
+  BOX_UPDATE_FAILED+=("$1")
+  echo "❌ ${0##*/}: $1 failed, continuing" >&2
+}
+
+box_update_summary() {
+  if (( ${#BOX_UPDATE_FAILED[@]} == 0 )); then
+    echo "✅ ${0##*/}: done"
+    return 0
+  fi
+  printf '\n\033[1m== failed ==\033[0m\n'
+  printf '  %s\n' "${BOX_UPDATE_FAILED[@]}"
+  return 1
+}
+
+os="$(_box-os-detect)"
+
+case "$os" in
+  macos)
+    box_update_section "packages (brew)"
+    box_update_require brew
+    ( brew update && brew upgrade && brew cleanup ) || box_update_fail brew
+    ;;
+
+  arch)
+    box_update_section "packages (pacman)"
+    box_update_require pacman
+    sudo pacman -Syu || box_update_fail pacman            # pacman prompts before applying
+    ;;
+
+  fedora)
+    box_update_section "packages (dnf)"
+    box_update_require dnf
+    sudo dnf upgrade --refresh || box_update_fail dnf     # --refresh pulls fresh metadata first; dnf prompts
+    ;;
+esac
+
+box_update_summary

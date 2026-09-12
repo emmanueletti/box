@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#
+# Installs pending firmware/BIOS updates.
+#
+#   box-firmware-update      # Linux fwupd; on macOS firmware ships with the OS
+#
+# Only Linux has real work here. Apple ships firmware through softwareupdate,
+# so on macOS box-os-update is what updates it.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_update_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_update_require() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  echo "❌ ${0##*/}: required tool '$1' not installed (box should have set it up)" >&2
+  exit 1
+}
+
+os="$(_box-os-detect)"
+
+box_update_section "firmware & BIOS"
+
+case "$os" in
+  macos)
+    echo "macOS firmware ships through softwareupdate; run box-os-update"
+    ;;
+
+  arch | fedora)
+    box_update_require fwupdmgr
+    fwupdmgr refresh --force >/dev/null 2>&1 || true   # refresh metadata; 2 == already current
+    fwupdmgr update                                    # applies updates; prompts to confirm
+    ;;
+esac
+
+echo "✅ box-firmware-update: done"

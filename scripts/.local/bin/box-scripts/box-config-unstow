@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Removes every symlink box's stow step created, without recreating them.
+#
+#   box-config-unstow
+#
+# Run this before moving or renaming an os/ directory, so links never go
+# dangling in between. Undoes both symlink-configs and symlink-scripts; re-run
+# box's setup.sh (or the 03-configs module) afterward to relink.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box="${BOX_ROOT:-$HOME/box}"
+os="$(_box-os-detect)"
+
+( cd "$box/doots" && stow -D --no-folding --ignore='\.DS_Store$' --dir=. --target="$HOME" */ )
+( cd "$box/os/$os/configs" && stow -D --no-folding --ignore='\.DS_Store$' --dir=. --target="$HOME" */ )
+stow -D --ignore='\.DS_Store$' --dir="$box" --target="$HOME" scripts
+
+echo "✅ box: unstowed"

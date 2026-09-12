@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Reports OS updates waiting from the vendor updater.
+#
+#   box-os-outdated      # macOS softwareupdate; on Linux the OS ships as packages
+#
+# Only macOS has real work here. On Linux the kernel and base system are just
+# packages, so box-pkgs-outdated is what reports them.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_check_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_check_section_ok() {
+  printf '\n\033[1m== %s ==\033[0m ✅\n' "$1"
+}
+
+box_check_require() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  echo "❌ ${0##*/}: required tool '$1' not installed (box should have set it up)" >&2
+  exit 1
+}
+
+os="$(_box-os-detect)"
+
+case "$os" in
+  macos)
+    box_check_require softwareupdate
+
+    out="$(softwareupdate -l 2>&1)" || {
+      rc=$?
+      echo "❌ ${0##*/}: 'softwareupdate -l' failed (exit $rc)" >&2
+      exit "$rc"
+    }
+
+    if [[ $out =~ "No new software" ]]; then
+      box_check_section_ok "OS update"
+    else
+      box_check_section "OS update"
+      printf '%s\n' "$out"
+    fi
+    ;;
+
+  arch | fedora)
+    box_check_section "OS update"
+    echo "no separate OS updater on $os; run box-pkgs-outdated for the kernel and base system"
+    ;;
+esac

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#
+# Reports outdated system packages: brew on macOS, pacman/dnf on Linux.
+#
+#   box-pkgs-outdated
+#
+# On Linux the kernel and base system are packages, so a pending kernel upgrade
+# shows up here rather than under box-os-outdated. The mise toolset is separate;
+# box-tools-outdated reports that.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_check_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_check_section_ok() {
+  printf '\n\033[1m== %s ==\033[0m ✅\n' "$1"
+}
+
+box_check_require() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  echo "❌ ${0##*/}: required tool '$1' not installed (box should have set it up)" >&2
+  exit 1
+}
+
+os="$(_box-os-detect)"
+
+case "$os" in
+  macos)
+    box_check_require brew
+
+    out="$(brew outdated --verbose 2>&1)" || {
+      rc=$?
+      echo "❌ ${0##*/}: 'brew outdated --verbose' failed (exit $rc)" >&2
+      exit "$rc"
+    }
+
+    if [[ -z ${out//[[:space:]]/} ]]; then
+      box_check_section_ok "packages (brew)"
+    else
+      box_check_section "packages (brew)"
+      printf '%s\n' "$out"
+    fi
+    ;;
+
+  arch)
+    box_check_require checkupdates   # from pacman-contrib; no DB lock, no sudo
+
+    rc=0
+    out="$(checkupdates 2>&1)" || rc=$?
+    if (( rc != 0 && rc != 2 )); then
+      echo "❌ ${0##*/}: 'checkupdates' failed (exit $rc)" >&2
+      exit "$rc"
+    fi
+
+    if (( rc == 2 )); then   # exit 2 == no updates
+      box_check_section_ok "packages (pacman)"
+    else
+      box_check_section "packages (pacman)"
+      [[ -n $out ]] && printf '%s\n' "$out"
+    fi
+    ;;
+
+  fedora)
+    box_check_require dnf
+
+    rc=0
+    out="$(dnf check-update 2>&1)" || rc=$?
+    if (( rc != 0 && rc != 100 )); then
+      echo "❌ ${0##*/}: 'dnf check-update' failed (exit $rc)" >&2
+      exit "$rc"
+    fi
+
+    if (( rc == 100 )); then   # exit 100 == updates available
+      box_check_section "packages (dnf)"
+      printf '%s\n' "$out"
+    else
+      box_check_section_ok "packages (dnf)"
+    fi
+    ;;
+esac

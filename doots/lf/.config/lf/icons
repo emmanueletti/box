@@ -1,0 +1,94 @@
+# vim:ft=conf
+
+# These examples require Nerd Fonts or a compatible font to be used.
+# See https://www.nerdfonts.com for more information.
+
+# file types (with matching order)
+ln            󰌷                         # LINK
+or            󰌸    00;38;2;255;0;0      # ORPHAN
+tw            t                         # STICKY_OTHER_WRITABLE
+ow            󰷌    00;38;2;255;200;0    # OTHER_WRITABLE
+st            t                         # STICKY
+di            󰉋                         # DIR
+pi            p                         # FIFO
+so            s                         # SOCK
+bd            b                         # BLK
+cd            c                         # CHR
+su            u                         # SETUID
+sg            g                         # SETGID
+ex            󱁻                         # EXEC
+fi            󰈔                         # FILE
+
+# Markdown
+*.md          󰈙                         # MARKDOWN
+*.mdx         󰈙
+*.markdown    󰈙
+*.rmd         󰈙
+
+# Archives
+*.zip         󰗄                         # ARCHIVE
+*.tar         󰗄
+*.tgz         󰗄
+*.tbz         󰗄
+*.tbz2        󰗄
+*.txz         󰗄
+*.tzst        󰗄
+*.gz          󰗄
+*.bz2         󰗄
+*.bz          󰗄
+*.xz          󰗄
+*.zst         󰗄
+*.7z          󰗄
+*.rar         󰗄
+*.lz          󰗄
+*.lz4         󰗄
+*.lzma        󰗄
+*.lzo         󰗄
+*.z           󰗄
+*.rz          󰗄
+*.cab         󰗄
+*.deb         󰗄
+*.rpm         󰗄
+*.jar         󰗄
+*.war         󰗄
+
+# Audio
+*.mp3         󰈣                         # AUDIO
+*.flac        󰈣
+*.wav         󰈣
+*.aac         󰈣
+*.ogg         󰈣
+*.opus        󰈣
+*.m4a         󰈣
+*.mid         󰈣
+*.midi        󰈣
+*.mka         󰈣
+*.au          󰈣
+
+# Video
+*.mp4         󰈫                         # VIDEO
+*.mkv         󰈫
+*.webm        󰈫
+*.mov         󰈫
+*.avi         󰈫
+*.wmv         󰈫
+*.flv         󰈫
+*.m4v         󰈫
+*.mpg         󰈫
+*.mpeg        󰈫
+*.ogv         󰈫
+
+# Images
+*.png         󰈟                         # IMAGE
+*.jpg         󰈟
+*.jpeg        󰈟
+*.gif         󰈟
+*.bmp         󰈟
+*.webp        󰈟
+*.ico         󰈟
+*.tif         󰈟
+*.tiff        󰈟
+*.svg         󰈟
+*.svgz        󰈟
+*.psd         󰈟
+*.ai          󰈟

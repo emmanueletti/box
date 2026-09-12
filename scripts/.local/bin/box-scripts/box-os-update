@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Installs OS updates from the vendor updater.
+#
+#   box-os-update      # macOS softwareupdate; on Linux the OS ships as packages
+#
+# Only macOS has real work here. On Linux the kernel and base system are just
+# packages, so box-pkgs-update is what updates them.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_update_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_update_require() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  echo "❌ ${0##*/}: required tool '$1' not installed (box should have set it up)" >&2
+  exit 1
+}
+
+os="$(_box-os-detect)"
+
+box_update_section "OS update"
+
+case "$os" in
+  macos)
+    box_update_require softwareupdate
+    sudo softwareupdate -i -a   # -i install, -a all recommended; needs root
+    ;;
+
+  arch | fedora)
+    echo "no separate OS updater on $os; run box-pkgs-update for the kernel and base system"
+    ;;
+esac
+
+echo "✅ box-os-update: done"

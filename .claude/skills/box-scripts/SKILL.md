@@ -1,24 +1,16 @@
 ---
 name: box-scripts
-description: Conventions for writing box scripts (box-* commands in platforms/shared/scripts). Use when creating or editing any box-* script, its comment header, or the box-help contract. Covers the -h/box-help line, the header block box-help parses, and the beginner-first style box uses.
+description: Conventions for writing box scripts (box-* commands in scripts/.local/bin/box-scripts). Use when creating or editing any box-* script, its comment header, or the box-help contract. Covers the -h/box-help line, the header block box-help parses, and the beginner-first style box uses.
 ---
-
 # Writing box scripts
 
-box scripts are single bash 5 files in `platforms/shared/scripts/.local/scripts/`,
-named `box-<noun>-<action>`. Each is self-contained and must run standalone.
+box scripts: single bash 5 files in `scripts/.local/bin/box-scripts/`, named `box-<noun>-<action>`. Self-contained, run standalone.
 
-**Audience: a beginner reading this later without an agent.** Pick the simplest
-pattern that works. Reach for a complex one only when it makes the script
-*simpler overall* -- and when you do, add a short learning comment saying what it
-does and why. No cleverness for its own sake.
+**Audience: beginner reading later, no agent.** Pick simplest pattern that works. Complex pattern only if makes script *simpler overall* — then add short learning comment saying what + why. No cleverness for its own sake.
 
 ## Naming: `box-<noun>-<action>`
 
-The noun comes first and is the **namespace** -- the thing the command acts on.
-The action comes last. This is what makes `box-<tab>` useful: every command that
-touches zellij sorts together, so you find one by the thing you have in mind
-rather than by remembering the verb someone picked.
+Noun first = **namespace**, thing command acts on. Action last. Makes `box-<tab>` useful: every zellij command sorts together, find by thing in mind not verb someone picked.
 
 ```
 box-port-kill        not  box-kill-port
@@ -26,19 +18,13 @@ box-history-clear    not  box-clear-history
 box-wallpaper-set    not  box-theme-wallpaper
 ```
 
-A noun with one command today still gets the pattern (`box-battery-status`), so
-the second one has somewhere to land.
+Noun with one command today still gets pattern (`box-battery-status`) — gives second command somewhere to land.
 
-Do not put a platform in the name. `box-server-harden` is macOS-only, but the
-script says so by exiting early on other systems -- the name is for the thing it
-acts on, not the machine it runs on. Nouns are singular: `box-system-outdated`, not
-`box-updates-check`. The exception is a noun that names a collection rather than
-one thing, where the plural *is* the subject: `box-scripts-list` lists the
-scripts.
+No platform in name. `box-server-harden` macOS-only, but script says so by exiting early on other systems — name for thing acted on, not machine ran on. Nouns singular: `box-system-outdated`, not `box-updates-check`. Exception: noun naming collection not one thing, plural *is* subject: `box-scripts-list` lists scripts.
 
 ### Verbs
 
-Reach for one of these first, so the tail is guessable:
+Reach for one of these first, tail stays guessable:
 
 | kind | verbs |
 |---|---|
@@ -48,53 +34,35 @@ Reach for one of these first, so the tail is guessable:
 | change | `set` `sync` `enable` `harden` |
 | invoke | `run` `start` `setup` |
 
-Use a domain verb only where the generic one would lose meaning -- the whole
-current set of those is `compress` `extract` `copy` `paste` `flush` `relink`
-`checkout` `restore`. Add to that list reluctantly.
+Domain verb only where generic one loses meaning — current full set: `compress` `extract` `copy` `paste` `flush` `relink` `checkout` `restore`. Add reluctantly.
 
-Two namespaces end in an object instead of an action, because every command in
-them does the same single thing and the object is what varies: `box-random-*`
-(bytes, password, token, uuid) and `box-date-today`. Prefer this over splitting
-one generator into four one-command namespaces.
+Two namespaces end in object not action, since every command in them does same single thing and object is what varies: `box-random-*` (bytes, password, token, uuid) and `box-date-today`. Prefer over splitting one generator into four one-command namespaces.
 
-Two commands are exempt, because they shadow a system verb everyone already
-knows: `box-help` and `box-open`.
+Two commands exempt — shadow system verb everyone knows: `box-help` and `box-open`.
 
 ## The header block (box-help contract)
 
-box-help builds its listing and `-h` output by parsing the comment block under
-the shebang. No registration -- the comment *is* the docs. Rules:
+box-help builds listing + `-h` output by parsing comment block under shebang. No registration — comment *is* docs. Rules:
 
-- First non-blank comment line = the one-line **summary** in `box-help`.
-- A bare `#` = a blank line in the block.
-- Indented lines starting with the command name = usage detail, shown by `-h`.
-- The block ends at the first non-comment line (`set -euo pipefail`).
+- First non-blank comment line = one-line **summary** in `box-help`.
+- Bare `#` = blank line in block.
+- Indented lines starting with command name = usage detail, shown by `-h`.
+- Block ends at first non-comment line (`set -euo pipefail`).
 
-Every script MUST have a summary line or `box-help --check` fails.
+Every script MUST have summary line or `box-help --check` fails.
 
 ## Private scripts (`_box-*`)
 
-A leading underscore means "not a command you reach for by name". Two kinds
-qualify: a detector whose output exists to be parsed by another script
-(`_box-os-detect`, `_box-hw-detect`), and a narrower variant of a public front
-door (`_box-config-sync` next to `box-system-sync`).
+Leading underscore = "not a command reached for by name". Two kinds qualify: detector whose output exists to be parsed by another script (`_box-os-detect`, `_box-hw-detect`), and narrower variant of public front door (`_box-config-sync` next to `box-system-sync` -- the latter pending a rebuild after the module restructure).
 
-A step of a multi-part command qualifies only when you would not reach for it on
-its own. Compare the two orchestrators:
+Step of multi-part command qualifies only when wouldn't reach for it alone. Compare two orchestrators:
 
-- `box-system-update` runs `box-os-update`, `box-pkgs-update`,
-  `box-tools-update` and `box-firmware-update` -- all public, because updating
-  just your packages or just your mise tools is an everyday thing to want.
-- `box-server-setup` runs `_box-server-power`, `_box-server-enable` and
-  `_box-server-autologin` -- all private, because they are one-time toggles for
-  turning a Mac into a headless box, not commands you use week to week.
+- `box-system-update` runs `box-os-update`, `box-pkgs-update`, `box-tools-update`, `box-firmware-update` — all public, since updating just packages or just mise tools is everyday want.
+- `box-server-setup` runs `_box-server-power`, `_box-server-enable`, `_box-server-autologin` — all private, one-time toggles turning Mac into headless box, not week-to-week commands.
 
-The test is how often the step is useful alone, not whether it happens to be a
-step.
+Test: how often step useful alone, not whether it happens to be a step.
 
-The underscore is a *hint*, not a fence: these still sit on PATH and run fine
-directly. box-help lists `box-*` only, so they stay out of the listing (and out
-of `--check`), but `_box-* -h` still prints the script's own header.
+Underscore is *hint*, not fence: still sit on PATH, run fine directly. box-help lists `box-*` only — stay out of listing (and `--check`), but `_box-* -h` still prints script's own header.
 
 ## The -h line
 
@@ -104,7 +72,7 @@ Right after `set -euo pipefail`, forward `-h` to box-help:
 [[ ${1:-} == -h ]] && exec box-help "$0"
 ```
 
-Passing `$0` lets box-help print this script's own header.
+Passing `$0` lets box-help print script's own header.
 
 ## Template
 
@@ -123,13 +91,11 @@ set -euo pipefail
 # ... work here
 ```
 
-Then `chmod +x`. The scripts dir is stow-folded, so a new file appears on PATH
-immediately -- no re-stow.
+Then `chmod +x`. Scripts dir stow-folded — new file appears on PATH immediately, no re-stow.
 
 ## Standalone rule
 
-A script may be run on its own, not just via install.sh. Detect the OS with the
-`_box-os-detect` command (it sits on PATH alongside the other box commands):
+Script may run on its own, not just via setup.sh. Detect OS with `_box-os-detect` command (sits on PATH alongside other box commands):
 
 ```bash
 os="$(_box-os-detect)"
@@ -139,15 +105,14 @@ Per-OS work dispatches on that value (`macos`, `arch`, `fedora`).
 
 ## Shared helpers
 
-Cross-script helpers live in `lib/*.sh`, sourced (not executed) via BOX_ROOT:
+Cross-script helpers live in `os/lib/*.sh`, sourced (not executed) via BOX_ROOT:
 
 ```bash
 # shellcheck source=/dev/null
-. "${BOX_ROOT:-$HOME/box}/lib/box-check-lib.sh"
+. "${BOX_ROOT:-$HOME/box}/os/lib/<name>.sh"
 ```
 
-Add a lib only when 2+ scripts share real logic. One-off logic stays inline --
-easier for the beginner to follow one file top to bottom.
+Add lib only when 2+ scripts share real logic. One-off logic stays inline — easier for beginner to follow one file top to bottom. `os/lib/run-module.sh` is the current one (shared by every module's `setup.sh`).
 
 ## Style (from CLAUDE.md)
 
@@ -160,10 +125,8 @@ easier for the beginner to follow one file top to bottom.
 
 ## Comment style
 
-Terse. Say why, not what the code already says. A comment earns its place by
-teaching the beginner something the code doesn't show -- an exit code, a gotcha,
-a reason for the odd choice:
+Terse. Say why, not what code already shows. Comment earns place by teaching beginner something code doesn't show — exit code, gotcha, reason for odd choice:
 
 ```bash
-box_check_run 2 checkupdates   # exit 2 == no updates, not an error
+checkupdates 2>&1 || rc=$?   # exit 2 == no updates, not an error
 ```

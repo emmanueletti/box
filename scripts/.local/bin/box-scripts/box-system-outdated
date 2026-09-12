@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Reports available updates on this machine (read-only, installs nothing).
+#
+#   box-system-outdated
+#
+# Prints this machine's hardware for context, then runs box-os-outdated,
+# box-tools-outdated, box-pkgs-outdated and box-firmware-outdated in that
+# order. Each of those also runs on its own when you only want that part.
+#
+# A failing check aborts the run. The apply side is box-system-update.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_check_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_check_section "hardware"
+_box-hw-detect
+
+box-os-outdated
+box-tools-outdated
+box-pkgs-outdated
+box-firmware-outdated

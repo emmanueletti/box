@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Upgrades the mise tools -- the language runtimes and CLIs box pins.
+#
+#   box-tools-update
+#
+# mise tools are separate from system packages: they are pinned per-user in
+# ~/.config/mise/config.toml, never need sudo, and box-pkgs-* does not touch
+# them. box-pkgs-update covers brew/pacman/dnf instead.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+box_update_section() {
+  printf '\n\033[1m== %s ==\033[0m\n' "$1"
+}
+
+box_update_require() {
+  command -v "$1" >/dev/null 2>&1 && return 0
+  echo "❌ ${0##*/}: required tool '$1' not installed (box should have set it up)" >&2
+  exit 1
+}
+
+box_update_section "tools (mise)"
+box_update_require mise
+
+# Run from $HOME for the global toolset. Config pins "latest", so the upgrade
+# lands in this machine's mise.lock and leaves the git-tracked config alone.
+( cd "$HOME" && mise upgrade )
+
+echo "✅ box-tools-update: done"

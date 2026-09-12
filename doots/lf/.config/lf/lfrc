@@ -1,0 +1,112 @@
+# BASIC SETTINGS
+
+set hidden true
+set ignorecase true
+set drawbox true
+set number
+set relativenumber
+set preview true
+set mouse true
+set icons true
+set previewer ~/.config/lf/scripts/preview.sh
+
+
+# COMMANDS
+
+cmd open ${{
+    case $(file --mime-type -Lb "$f") in
+        text/*|application/json) $EDITOR "$f";;
+        application/pdf) setsid zathura "$f" >/dev/null 2>&1 & ;;
+        *) for f in $fx; do setsid xdg-open "$f" >/dev/null 2>&1 & done ;;
+    esac
+}}
+
+cmd trash ${{
+    clear
+    printf "trash %s? [y/N] " "$fx"
+    read -r ans
+    [ "$ans" = y ] || exit 0
+    trash-put $fx
+    lf -remote "send $id reload"
+}}
+
+cmd copy-path ${{ printf %s "$fx" | box-clipboard-copy }}
+
+cmd fuzzyfind ${{
+    clear
+    rg --files | fzf | xargs -r -I{} lf -remote "send $id select \"$PWD/{}\""
+}}
+
+cmd zoxide ${{
+    clear
+    dir=$(zoxide query --interactive 2>/dev/null) && lf -remote "send $id cd \"$dir\""
+}}
+
+cmd extract ${{
+    clear
+    box-zip-extract $fx
+    lf -remote "send $id reload"
+}}
+
+cmd compress ${{
+    clear
+    printf "output archive name (e.g. out.tar.zst): "
+    read -r name
+    [ -n "$name" ] || exit 0
+    box-zip-compress $fx "$name"
+    lf -remote "send $id reload"
+}}
+
+cmd mkfile ${{
+    printf "file name: "
+    read -r name
+    $EDITOR -- "$name"
+}}
+
+cmd mkdir ${{
+    printf "directory name: "
+    read -r name
+    mkdir -p -- "$name"
+}}
+
+cmd new-window ${{
+    case $TERM in
+        foot|foot-*) term=foot ;;
+        *) term=ghostty ;;
+    esac
+    setsid "$term" -e lf "$PWD" >/dev/null 2>&1 &
+}}
+
+
+# KEYBINDINGS
+
+# Basic functions
+map . set hidden!
+map y copy
+map Y copy-path
+map x cut
+map p paste
+map <enter> open
+map C clear
+map <c-r> reload
+
+map D trash
+map <delete> trash
+map <backspace> trash
+
+# Movement
+map gh cd ~
+map ge bottom
+map gd cd ~/Documents
+map gD cd ~/Downloads
+map gp cd ~/Pictures
+map gn cd ~/notes
+map gz zoxide
+map gf fuzzyfind
+map gw new-window
+
+# Actions
+map at mkfile
+map ad mkdir
+map ax extract
+map ac compress
