@@ -43,9 +43,11 @@ awscli2
 libyaml-devel
 vips
 
-podman
-podman-docker
-podman-compose
+docker-ce
+docker-ce-cli
+containerd.io
+docker-buildx-plugin
+docker-compose-plugin
 
 remmina
 remmina-plugins-vnc

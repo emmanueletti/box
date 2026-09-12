@@ -54,3 +54,8 @@ fi
 if [[ ! -f /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo ]]; then
   sudo dnf copr enable -y scottames/ghostty
 fi
+
+if [[ ! -f /etc/yum.repos.d/docker-ce.repo ]]; then
+  sudo dnf config-manager addrepo \
+    --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+fi
