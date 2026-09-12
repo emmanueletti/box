@@ -1,0 +1,191 @@
+# Default apps: which app opens each file type and link.
+#
+# This is only the seed for a new Arch install. setup-default-apps.sh copies it
+# to ~/.config/mimeapps.list when that file doesn't exist yet. After that, the
+# live file is the machine's own and apps may change it.
+#
+# Change a default on this machine:
+#   xdg-mime query filetype video.mkv                   # its type, e.g. video/x-matroska
+#   ls /usr/share/applications ~/.local/share/applications
+#                                                       # find the app's .desktop name
+#   xdg-mime default mpv.desktop video/x-matroska       # set it (several types allowed)
+#   xdg-mime query default video/x-matroska             # check it
+#   xdg-open video.mkv                                  # try it
+# Or edit ~/.config/mimeapps.list directly.
+#
+# Set a whole kind at once, every type the app opens:
+#   box-default-browser brave
+#   box-default-video mpv
+#   box-default-audio mpv
+#   box-default-image imv
+#   box-default-pdf zathura
+#   box-default-text helix
+#
+# Make it the default on future installs: edit the same line in this file.
+#
+# Reset a machine back to this seed:
+#   rm ~/.config/mimeapps.list
+#   bash ~/box/os/arch/modules/03-configs/setup-default-apps.sh
+
+[Default Applications]
+text/html=brave-browser.desktop
+application/xhtml+xml=brave-browser.desktop
+application/x-extension-htm=brave-browser.desktop
+application/x-extension-html=brave-browser.desktop
+application/x-extension-shtml=brave-browser.desktop
+application/x-extension-xhtml=brave-browser.desktop
+application/x-extension-xht=brave-browser.desktop
+x-scheme-handler/http=brave-browser.desktop
+x-scheme-handler/https=brave-browser.desktop
+x-scheme-handler/about=brave-browser.desktop
+x-scheme-handler/unknown=brave-browser.desktop
+x-scheme-handler/webcal=brave-browser.desktop
+x-scheme-handler/mailto=brave-browser.desktop
+application/pdf=org.pwmt.zathura-pdf-poppler.desktop
+inode/directory=lf-foot.desktop
+text/plain=helix-foot.desktop
+text/markdown=helix-foot.desktop
+text/english=helix-foot.desktop
+text/x-makefile=helix-foot.desktop
+text/x-c=helix-foot.desktop
+text/x-c++=helix-foot.desktop
+text/x-chdr=helix-foot.desktop
+text/x-csrc=helix-foot.desktop
+text/x-c++hdr=helix-foot.desktop
+text/x-c++src=helix-foot.desktop
+text/x-java=helix-foot.desktop
+text/x-python=helix-foot.desktop
+text/x-ruby=helix-foot.desktop
+text/x-go=helix-foot.desktop
+text/x-rust=helix-foot.desktop
+text/x-tex=helix-foot.desktop
+text/x-log=helix-foot.desktop
+text/css=helix-foot.desktop
+text/csv=helix-foot.desktop
+text/javascript=helix-foot.desktop
+application/javascript=helix-foot.desktop
+application/json=helix-foot.desktop
+application/toml=helix-foot.desktop
+application/x-yaml=helix-foot.desktop
+application/xml=helix-foot.desktop
+application/x-shellscript=helix-foot.desktop
+image/png=imv.desktop
+image/jpeg=imv.desktop
+image/gif=imv.desktop
+image/webp=imv.desktop
+image/bmp=imv.desktop
+image/tiff=imv.desktop
+video/x-ogm+ogg=mpv.desktop
+video/ogg=mpv.desktop
+video/x-ogm=mpv.desktop
+video/x-theora+ogg=mpv.desktop
+video/x-theora=mpv.desktop
+video/x-ms-asf=mpv.desktop
+video/x-ms-asf-plugin=mpv.desktop
+video/x-ms-asx=mpv.desktop
+video/x-ms-wm=mpv.desktop
+video/x-ms-wmv=mpv.desktop
+video/x-ms-wmx=mpv.desktop
+video/x-ms-wvx=mpv.desktop
+video/x-msvideo=mpv.desktop
+video/divx=mpv.desktop
+video/msvideo=mpv.desktop
+video/vnd.divx=mpv.desktop
+video/avi=mpv.desktop
+video/x-avi=mpv.desktop
+video/vnd.rn-realvideo=mpv.desktop
+video/mp2t=mpv.desktop
+video/mpeg=mpv.desktop
+video/mpeg-system=mpv.desktop
+video/x-mpeg=mpv.desktop
+video/x-mpeg2=mpv.desktop
+video/x-mpeg-system=mpv.desktop
+video/mp4=mpv.desktop
+video/mp4v-es=mpv.desktop
+video/x-m4v=mpv.desktop
+video/quicktime=mpv.desktop
+video/x-matroska=mpv.desktop
+video/webm=mpv.desktop
+video/3gp=mpv.desktop
+video/3gpp=mpv.desktop
+video/3gpp2=mpv.desktop
+video/vnd.mpegurl=mpv.desktop
+video/dv=mpv.desktop
+video/x-anim=mpv.desktop
+video/x-nsv=mpv.desktop
+video/fli=mpv.desktop
+video/flv=mpv.desktop
+video/x-flc=mpv.desktop
+video/x-fli=mpv.desktop
+video/x-flv=mpv.desktop
+audio/x-vorbis+ogg=mpv.desktop
+audio/ogg=mpv.desktop
+audio/vorbis=mpv.desktop
+audio/x-vorbis=mpv.desktop
+audio/x-speex=mpv.desktop
+audio/opus=mpv.desktop
+audio/flac=mpv.desktop
+audio/x-flac=mpv.desktop
+audio/x-ms-asf=mpv.desktop
+audio/x-ms-asx=mpv.desktop
+audio/x-ms-wax=mpv.desktop
+audio/x-ms-wma=mpv.desktop
+audio/x-pn-windows-acm=mpv.desktop
+audio/vnd.rn-realaudio=mpv.desktop
+audio/x-pn-realaudio=mpv.desktop
+audio/x-pn-realaudio-plugin=mpv.desktop
+audio/x-real-audio=mpv.desktop
+audio/x-realaudio=mpv.desktop
+audio/mpeg=mpv.desktop
+audio/mpg=mpv.desktop
+audio/mp1=mpv.desktop
+audio/mp2=mpv.desktop
+audio/mp3=mpv.desktop
+audio/x-mp1=mpv.desktop
+audio/x-mp2=mpv.desktop
+audio/x-mp3=mpv.desktop
+audio/x-mpeg=mpv.desktop
+audio/x-mpg=mpv.desktop
+audio/aac=mpv.desktop
+audio/m4a=mpv.desktop
+audio/mp4=mpv.desktop
+audio/x-m4a=mpv.desktop
+audio/x-aac=mpv.desktop
+audio/x-matroska=mpv.desktop
+audio/webm=mpv.desktop
+audio/3gpp=mpv.desktop
+audio/3gpp2=mpv.desktop
+audio/AMR=mpv.desktop
+audio/AMR-WB=mpv.desktop
+audio/mpegurl=mpv.desktop
+audio/x-mpegurl=mpv.desktop
+audio/scpls=mpv.desktop
+audio/x-scpls=mpv.desktop
+audio/dv=mpv.desktop
+audio/x-aiff=mpv.desktop
+audio/x-pn-aiff=mpv.desktop
+audio/wav=mpv.desktop
+audio/x-pn-au=mpv.desktop
+audio/x-pn-wav=mpv.desktop
+audio/x-wav=mpv.desktop
+audio/x-adpcm=mpv.desktop
+audio/ac3=mpv.desktop
+audio/eac3=mpv.desktop
+audio/vnd.dts=mpv.desktop
+audio/vnd.dts.hd=mpv.desktop
+audio/vnd.dolby.heaac.1=mpv.desktop
+audio/vnd.dolby.heaac.2=mpv.desktop
+audio/vnd.dolby.mlp=mpv.desktop
+audio/basic=mpv.desktop
+audio/midi=mpv.desktop
+audio/x-ape=mpv.desktop
+audio/x-gsm=mpv.desktop
+audio/x-musepack=mpv.desktop
+audio/x-tta=mpv.desktop
+audio/x-wavpack=mpv.desktop
+audio/x-shorten=mpv.desktop
+audio/x-it=mpv.desktop
+audio/x-mod=mpv.desktop
+audio/x-s3m=mpv.desktop
+audio/x-xm=mpv.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop

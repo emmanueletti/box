@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Claude Code status line — mirrors the Starship prompt in ~/.config/starship.toml:
-#   truncate_to_repo=true, truncation_length=3, blue path, (branch) dimmed green, status dimmed red
+# Claude Code status line — mirrors the zsh prompt in ~/.zshrc:
+#   last 3 path components in blue, (branch) in green, dirty marker in yellow
 
 input=$(cat)
 cwd=$(echo "$input" | jq -r '.cwd')
@@ -50,7 +50,7 @@ removed=$(echo "$input" | jq -r '.cost.total_lines_removed // empty')
 
 # ---- Path ---------------------------------------------------------------
 # Resolve path relative to git repo root's parent (keeps repo dir name),
-# then truncate to the last 3 components — same as starship's settings.
+# then truncate to the last 3 components — same as the zsh prompt's %3~.
 
 git_root=$(git -C "$cwd" --no-optional-locks rev-parse --show-toplevel 2>/dev/null)
 
@@ -89,7 +89,7 @@ if [ -n "$branch" ]; then
   fi
 fi
 
-# ---- Colors (match starship config) -------------------------------------
+# ---- Colors (match the zsh prompt) --------------------------------------
 blue=$'\033[34m'
 dim_green=$'\033[2;32m'
 dim_red=$'\033[2;31m'

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Takes a screenshot on sway and opens it in satty to annotate.
+#
+#   box-screenshot-capture         # drag out a region, on any monitor
+#   box-screenshot-capture window  # click a window to pick it
+#   box-screenshot-capture output  # click a monitor to pick it
+#
+# In satty, Enter saves to the SCREENSHOTS user dir, copies to the clipboard
+# and closes. Escape throws it away. Running it again while the picker is up
+# cancels the picker.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os != arch ]]; then
+  echo "❌ box: box-screenshot-capture needs sway, which box only runs on arch" >&2
+  exit 1
+fi
+
+geometry="$("$lib/screen-select" "${1:-area}")"
+
+dir="$(xdg-user-dir SCREENSHOTS 2>/dev/null || true)"
+
+if [[ -z $dir || $dir == "$HOME" ]]; then
+  dir="$HOME/Pictures/Screenshots"
+fi
+
+mkdir -p "$dir"
+
+grim -g "$geometry" - \
+  | satty --filename - --output-filename "${dir}/screenshot-%Y-%m-%d_%H-%M-%S.png"

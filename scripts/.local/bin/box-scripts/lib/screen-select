@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Prints the geometry of a screen area picked with slurp, for grim or wf-recorder.
+# Exits 1 without printing when the pick is cancelled, or when a picker is
+# already up (which it closes, so the same key toggles it).
+#
+#   screen-select         # drag out a region, on any monitor
+#   screen-select window  # click a window
+#   screen-select output  # click a monitor
+
+set -euo pipefail
+
+if pkill -x slurp 2>/dev/null; then
+  exit 1
+fi
+
+case ${1:-area} in
+  area)
+    slurp -d
+    ;;
+  window)
+    swaymsg -t get_tree \
+      | jq -r '.. | select(.pid? and .visible?) | .rect | "\(.x),\(.y) \(.width)x\(.height)"' \
+      | slurp -r
+    ;;
+  output)
+    slurp -o -r
+    ;;
+  *)
+    echo "usage: screen-select [area|window|output]" >&2
+    exit 1
+    ;;
+esac

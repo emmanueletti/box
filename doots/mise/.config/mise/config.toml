@@ -25,9 +25,7 @@ uv = "latest"
 marksman = "latest"
 
 "github:erasin/hx-lsp" = "latest"
-"github:gokcehan/lf" = "latest"
 
-lazydocker = "latest"
 resvg = "latest"
 stripe = "latest"
 "github:render-oss/cli" = { version = "latest", bin = "render" }

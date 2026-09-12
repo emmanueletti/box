@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Lowers the brightness of the screen that has focus (laptop or external monitor).
+#
+#   box-brightness-decrease     # by 5%
+#   box-brightness-decrease 10  # by 10%
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/brightness" decrease "${1:-5}"

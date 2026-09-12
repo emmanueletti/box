@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# Opens the box menu: search every box action, or open a section.
+#
+#   box-launcher          # sections first, then every action
+#   box-launcher capture  # one section: keybinds, capture, toggle,
+#                         # hardware, tools or system
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+if [[ -z ${1:-} ]]; then
+  exec rofi -show combi -modi combi \
+    -combi-modi "menu:${lib}/launcher-entries menu,actions:${lib}/launcher-entries actions" \
+    -combi-hide-mode-prefix -display-combi menu
+fi
+
+exec rofi -show "$1" -modi "$1:${lib}/launcher-entries $1"

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Locks the screen. Apps keep running behind the lock.
+#
+#   box-system-lock
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+case $os in
+  arch | fedora) loginctl lock-session ;;
+  macos) pmset displaysleepnow ;;
+esac

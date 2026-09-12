@@ -45,13 +45,20 @@ box-help parses the comment block under the shebang — no registration.
 
 Every script needs a summary line or `box-help --check` fails.
 
-## Private scripts (`_box-*`)
+## Private scripts (`lib/`)
 
-Leading underscore = not reached for by name. Two kinds: detectors whose output is parsed by another script (`_box-os-detect`, `_box-hw-detect`), and narrower variants of a public command (`_box-config-sync` next to `box-system-sync`).
+Scripts only other box scripts call live in `scripts/.local/bin/box-scripts/lib/`, named without the `box-` prefix. `lib/` is not on PATH, so the user never reaches for them by name. Two kinds: detectors whose output is parsed by another script (`lib/os-detect`, `lib/hw-detect`), and helpers that back a public command (`lib/screen-select` behind the capture scripts, `lib/launcher-entries` behind `box-launcher`).
 
-A step of a multi-part command qualifies only if it wouldn't be reached for alone. `box-system-update` runs public sub-steps (`box-os-update`, `box-pkgs-update`, ...) since running just one is a real want. `box-server-setup` runs private sub-steps (`_box-server-power`, ...) since they're one-time toggles, not everyday commands.
+A step of a multi-part command belongs in `lib/` only if it wouldn't be reached for alone. `box-system-update` runs public sub-steps (`box-os-update`, `box-pkgs-update`, ...) since running just one is a real want. `box-server-setup` runs `lib/server-power`, ... since they're one-time toggles, not everyday commands.
 
-Underscore is a hint, not a fence — still on PATH, still runs directly. box-help lists `box-*` only.
+Call them by path, resolved from the calling script so it works through the stow symlink:
+
+```bash
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+"$lib/os-detect"
+```
+
+Inside `lib/` itself, drop the trailing `/lib`. box-help lists `box-*` only.
 
 ## The -h line
 
@@ -82,21 +89,16 @@ set -euo pipefail
 
 ## Standalone rule
 
-Script must run on its own, not just via setup.sh. Detect OS with `_box-os-detect`:
+Script must run on its own, not just via setup.sh. Detect OS with `lib/os-detect`:
 
 ```bash
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 ```
 
 Dispatch per-OS work on that value (`macos`, `arch`, `fedora`).
 
 ## Shared helpers
 
-Cross-script helpers live in `lib/*.sh`, sourced via BOX_ROOT:
-
-```bash
-# shellcheck source=/dev/null
-. "${BOX_ROOT:-$HOME/box}/lib/<name>.sh"
-```
-
-Add a lib only when 2+ scripts share real logic. `lib/run-module.sh` is the current one.
+Put logic 2+ scripts share in a `lib/` script (see Private scripts). Add one only when the logic is real, not for a one-liner.

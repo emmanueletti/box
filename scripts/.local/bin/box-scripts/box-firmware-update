@@ -21,7 +21,9 @@ box_update_require() {
   exit 1
 }
 
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 
 box_update_section "firmware & BIOS"
 

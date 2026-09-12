@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+#
+# Starts a screen recording on sway, or ends the one already running.
+#
+#   box-screenrecording-capture         # drag out a region, or end a recording
+#   box-screenrecording-capture window  # click a window to pick it
+#   box-screenrecording-capture output  # click a monitor to pick it
+#
+# Before picking, a rofi menu asks which sound to record: the computer's sound
+# on any output, a microphone, or none. The default output comes first.
+#
+# One command does both ends of the job, so a single key starts and stops it.
+# Files land in the VIDEOS user dir, encoded on the GPU where VAAPI is offered.
+# Waybar shows a REC indicator while it runs.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os != arch ]]; then
+  echo "❌ box: box-screenrecording-capture needs sway, which box only runs on arch" >&2
+  exit 1
+fi
+
+state="$HOME/.local/state/box"
+namefile="$state/screenrecording.file"
+log="$state/screenrecording.log"
+
+mkdir -p "$state"
+
+if pgrep -x wf-recorder >/dev/null; then
+  file="$(cat "$namefile" 2>/dev/null || true)"
+
+  pkill -INT -x wf-recorder
+
+  for _ in {1..100}; do
+    if ! pgrep -x wf-recorder >/dev/null; then
+      break
+    fi
+    sleep 0.1
+  done
+
+  rm -f "$namefile"
+
+  if pgrep -x wf-recorder >/dev/null; then
+    pkill -KILL -x wf-recorder
+    pkill -RTMIN+8 waybar || true
+    notify-send -a box "Recording broken" "Had to be killed outright, ${file} may not play"
+    echo "❌ box: the recorder ignored the stop, ${file} may not play" >&2
+    exit 1
+  fi
+
+  pkill -RTMIN+8 waybar || true
+  notify-send -a box "Recording saved" "$file"
+  echo "$file"
+  exit 0
+fi
+
+default_output="$(pactl get-default-sink).monitor"
+default_mic="$(pactl get-default-source)"
+
+sources="$(pactl -f json list sources | jq -r --arg output "$default_output" --arg mic "$default_mic" '
+  map(
+    if (.name | endswith(".monitor"))
+    then {rank: (if .name == $output then 0 else 2 end), label: "Computer sound: \(.description | ltrimstr("Monitor of "))", name}
+    else {rank: (if .name == $mic then 1 else 3 end), label: "Microphone: \(.description)", name}
+    end
+  )
+  | sort_by(.rank) | .[] | "\(.label)\t\(.name)"')"
+
+source="$(printf '%s\nNo sound\tnone\n' "$sources" \
+  | rofi -dmenu -i -no-custom -p sound -display-columns 1 -display-column-separator '\t' \
+  | cut -f2)"
+
+args=()
+
+if [[ $source != "none" ]]; then
+  args+=(--audio="$source")
+fi
+
+geometry="$("$lib/screen-select" "${1:-area}")"
+
+dir="$(xdg-user-dir VIDEOS 2>/dev/null || true)"
+
+if [[ -z $dir || $dir == "$HOME" ]]; then
+  dir="$HOME/Videos"
+fi
+
+mkdir -p "$dir"
+
+file="${dir}/screenrecording-$(date +%Y-%m-%d_%H-%M-%S).mp4"
+
+args+=(-f "$file" -g "$geometry")
+
+if [[ -e /dev/dri/renderD128 ]]; then
+  args+=(-c h264_vaapi -d /dev/dri/renderD128)
+fi
+
+wf-recorder "${args[@]}" >"$log" 2>&1 &
+pid=$!
+
+for _ in {1..50}; do
+  if [[ -f $file ]] || ! kill -0 "$pid" 2>/dev/null; then
+    break
+  fi
+  sleep 0.1
+done
+
+if ! kill -0 "$pid" 2>/dev/null; then
+  echo "❌ box: the recorder quit on startup" >&2
+  tail -n 5 "$log" >&2
+  exit 1
+fi
+
+echo "$file" > "$namefile"
+
+pkill -RTMIN+8 waybar || true
+notify-send -a box "Recording" "Same key again ends it"
+
+echo "$file"

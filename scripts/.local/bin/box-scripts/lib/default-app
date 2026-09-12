@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# Finds the installed app matching a name, shows it, asks, then makes it the
+# default for a whole kind of file: every type of that kind the app says it opens.
+#
+#   default-app browser brave
+#   default-app video mpv
+#   default-app audio mpv
+#   default-app image imv
+#   default-app pdf zathura
+#   default-app text helix
+
+set -euo pipefail
+
+kind="$1"
+query="$2"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+exclude=""
+
+case $kind in
+  browser) types='^(text/html|application/xhtml\+xml|x-scheme-handler/(http|https|about|unknown))$' ;;
+  video) types='^video/' ;;
+  audio) types='^audio/' ;;
+  image) types='^image/' ;;
+  pdf) types='^application/pdf$' ;;
+  text)
+    types='^(text/|application/(javascript|json|toml|x-yaml|xml|x-shellscript)$)'
+    exclude='text/html'
+    ;;
+  *)
+    echo "usage: default-app browser|video|audio|image|pdf|text <name>" >&2
+    exit 1
+    ;;
+esac
+
+dirs=(
+  /usr/share/applications
+  /usr/local/share/applications
+  "$HOME/.local/share/applications"
+  /var/lib/flatpak/exports/share/applications
+  "$HOME/.local/share/flatpak/exports/share/applications"
+)
+
+supported() {
+  grep -m1 '^MimeType=' "$1" | cut -d= -f2- | tr ';' '\n' | grep -E "$types" | grep -vxF -e "${exclude:-}" -e "" || true
+}
+
+matches=()
+
+for dir in "${dirs[@]}"; do
+  [[ -d $dir ]] || continue
+
+  for file in "$dir"/*.desktop; do
+    [[ -f $file ]] || continue
+    grep -qx 'Terminal=true' "$file" && continue
+    [[ -n $(supported "$file") ]] || continue
+
+    id="$(basename "$file" .desktop)"
+
+    if [[ ${id,,} == "${query,,}" ]]; then
+      matches=("$file")
+      break 2
+    fi
+
+    if [[ ${id,,} == *"${query,,}"* ]] || grep -qi "^Name=.*${query}" "$file"; then
+      matches+=("$file")
+    fi
+  done
+done
+
+if (( ${#matches[@]} == 0 )); then
+  echo "❌ box: no installed ${kind} app matches '${query}'" >&2
+  exit 1
+fi
+
+if (( ${#matches[@]} > 1 )); then
+  echo "❌ box: '${query}' matches more than one ${kind} app, use one of these names:" >&2
+  for file in "${matches[@]}"; do
+    echo "  $(basename "$file" .desktop)  ($(grep -m1 '^Name=' "$file" | cut -d= -f2-))" >&2
+  done
+  exit 1
+fi
+
+file="${matches[0]}"
+desktop="$(basename "$file")"
+name="$(grep -m1 '^Name=' "$file" | cut -d= -f2-)"
+mapfile -t mime_types < <(supported "$file")
+
+echo "Found: ${name} (${desktop}), opens ${#mime_types[@]} ${kind} types"
+
+"$lib/confirm" "Make ${name} the default ${kind} app?" || { echo "Cancelled."; exit 0; }
+
+if [[ $kind == "browser" ]]; then
+  xdg-settings set default-web-browser "$desktop"
+fi
+
+xdg-mime default "$desktop" "${mime_types[@]}"
+
+echo "✅ box: default ${kind} app set to ${name}"

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Toggles airplane mode: turns every radio (Wi-Fi, Bluetooth) off, or back on.
+#
+#   box-airplane-toggle  # on if any radio is on, off if all are already off
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  echo "❌ box: box-airplane-toggle uses rfkill, which only exists on linux" >&2
+  exit 1
+fi
+
+if rfkill -n -o SOFT | grep -qx 'unblocked'; then
+  rfkill block all
+  notify-send -a box -t 2000 "Airplane mode on"
+  echo "✅ box-airplane-toggle: on"
+else
+  rfkill unblock all
+  notify-send -a box -t 2000 "Airplane mode off"
+  echo "✅ box-airplane-toggle: off"
+fi

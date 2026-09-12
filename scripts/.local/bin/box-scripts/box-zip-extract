@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Extracts one or more archives, format auto-detected.
+# Extracts one or more archives into the current directory, format auto-detected.
 #
 #   box-zip-extract thing.tar.zst other.7z
 
@@ -8,4 +8,6 @@ set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-ouch decompress "$@"
+for archive in "$@"; do
+  bsdtar -xf "$archive"
+done

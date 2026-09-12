@@ -13,6 +13,9 @@
 ## Style
 
 - All scripts use bash 5
+- Shebangs: `os/arch` and `os/fedora` scripts use `#!/bin/bash`. `os/macos`
+  scripts, the root `setup.sh`, and `box-*` scripts use `#!/usr/bin/env bash`
+  (macOS `/bin/bash` is 3.2, so they need brew's bash from PATH)
 - Use `[[ ]]` for string/file tests and `(( ))` for numeric tests
 - In `[[ ]]`, don't quote variables; do quote string literals when comparing
   (e.g. `[[ $branch == "dev" ]]`)

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Toggles do not disturb, which hides mako notifications until turned off.
+#
+#   box-dnd-toggle  # on if off, off if on
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os != arch ]]; then
+  echo "❌ box: box-dnd-toggle needs mako, which box only runs on arch" >&2
+  exit 1
+fi
+
+makoctl mode -t do-not-disturb >/dev/null
+
+if makoctl mode | grep -qx do-not-disturb; then
+  echo "✅ box-dnd-toggle: on"
+else
+  notify-send -a box -t 2000 "Do not disturb off"
+  echo "✅ box-dnd-toggle: off"
+fi

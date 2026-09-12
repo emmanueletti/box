@@ -1,0 +1,35 @@
+# Placing monitors
+#
+# 1. List outputs (names, modes, current scale and position):
+#      swaymsg -t get_outputs
+#
+# 2. Positions use scaled sizes, not pixels:
+#      width  = pixel width  / scale
+#      height = pixel height / scale
+#    e.g. Dell 3840x2160 @ 1.5 = 2560x1440, laptop 2256x1504 @ 1.3333 = 1692x1128.
+#    A rotated output (transform 90/270) swaps width and height.
+#
+# 3. Position is the top-left corner; 0,0 is the top-left of the whole layout
+#    and y grows downward. Screens should touch, not overlap or leave gaps.
+#      right of A:            x = A width,                y = 0
+#      below A:               x = 0,                      y = A height
+#      below A, centered:     x = (A width - B width) / 2, y = A height
+#      right of A, bottoms:   x = A width,                y = A height - B height
+#
+# 4. Try it live (resets on reload):
+#      swaymsg output DP-2 position 0 0 scale 1.5
+#      swaymsg output eDP-1 position 434 1440 scale 1.3333
+#
+# 5. Copy the numbers into a profile below, then: kanshictl reload
+#
+# Prefer scales that divide the pixel size evenly (3840 / 1.5 = 2560) so the
+# math stays in whole numbers.
+
+profile docked {
+    output "Dell Inc. DELL U2723QE DQLDBP3" mode 3840x2160 position 0,0 scale 1.5
+    output eDP-1 mode 2256x1504 position 434,1440 scale 1.33
+}
+
+profile undocked {
+    output eDP-1 position 0,0
+}

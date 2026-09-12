@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+#
+# Sets which device plays sound, and moves anything already playing to it.
+#
+#   box-audio-set            # pick an output from a menu
+#   box-audio-set HDMI       # skip the menu when the name matches one
+#   box-audio-set --input    # pick a microphone instead
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  echo "❌ box: box-audio-set uses pipewire, which only exists on linux" >&2
+  exit 1
+fi
+
+if [[ ${1:-} == "--input" ]]; then
+  kind=sources
+  shift
+else
+  kind=sinks
+fi
+
+current="$(pactl "get-default-${kind%s}" 2>/dev/null || true)"
+
+devices="$(pactl -f json list "$kind" |
+  jq -r '.[] | select(.name | endswith(".monitor") | not) | "\(.name)\t\(.description)"')"
+
+if [[ -z $devices ]]; then
+  echo "box-audio-set: no audio devices found" >&2
+  exit 1
+fi
+
+choice="$(fzf --prompt="${kind%s}> " --delimiter=$'\t' --with-nth=2.. --select-1 --query "${1:-}" <<<"$devices")" || exit 0
+
+name="${choice%%$'\t'*}"
+description="${choice#*$'\t'}"
+
+if [[ $name == "$current" ]]; then
+  echo "Already using $description."
+  exit 0
+fi
+
+pactl "set-default-${kind%s}" "$name"
+
+if [[ $kind == "sinks" ]]; then
+  for stream in $(pactl list short sink-inputs | cut -f1); do
+    pactl move-sink-input "$stream" "$name" 2>/dev/null || true
+  done
+fi
+
+echo "✅ box-audio-set: ${kind%s} set to $description"

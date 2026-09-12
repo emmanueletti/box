@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#
+# Reports how this boot unlocked the encrypted disk.
+#
+#   box-tpm-status            # ok | drift | unknown | not-enrolled
+#   box-tpm-status --notify   # same, plus a desktop warning when it finds drift
+#
+# "drift" means the TPM refused to release the key and you typed the recovery
+# passphrase instead. Re-seal with box-tpm-reenroll.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  echo "not-enrolled"
+  exit 0
+fi
+
+if ! grep -qs "tpm2-device=" /etc/crypttab; then
+  echo "not-enrolled"
+  exit 0
+fi
+
+log="$(journalctl -b 0 --no-pager -o cat -g "TPM2" 2>/dev/null || true)"
+
+if grep -qiE "unlocked.*TPM2 token|TPM2 token.*unlocked" <<<"$log"; then
+  state="ok"
+elif grep -qiE "failed to unseal|pcr value mismatch|policy hash mismatch" <<<"$log"; then
+  state="drift"
+else
+  state="unknown"
+fi
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/box"
+mkdir -p "$state_dir"
+echo "$state" >"$state_dir/tpm-status"
+
+echo "$state"
+
+[[ ${1:-} == "--notify" && $state == "drift" ]] || exit 0
+
+# mako starts with sway, so a unit that fires at login can beat it to the bus.
+for _ in 1 2 3 4 5 6; do
+  notify-send -u critical -t 0 \
+    "Disk unlocked with recovery passphrase" \
+    "Secure Boot state changed. Review why, then run box-tpm-reenroll." && exit 0
+  sleep 5
+done
+
+exit 0

@@ -1,12 +1,60 @@
 #!/usr/bin/env bash
 #
-# Restores files from the trash (shows a numbered menu to pick from).
+# Restores a file from the trash (pick it with fzf).
 #
-#   box-trash-restore          # pick from everything in the trash
-#   box-trash-restore ~/notes  # only items that were under this path
+#   box-trash-restore        # pick from everything in the trash
+#   box-trash-restore notes  # start the search with "notes"
+#
+# Reads the trash folder directly: every trashed file has a small .trashinfo
+# file recording where it came from. Covers the home trash, not trash folders
+# on other drives.
+#
+# macOS keeps no original paths a script can read, so there it opens the Trash
+# in Finder: select a file and use File > Put Back.
 
 set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-trash-restore "$@"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  open "$HOME/.Trash"
+  echo "box: select the file in Finder and use File > Put Back"
+  exit 0
+fi
+
+trash="${XDG_DATA_HOME:-$HOME/.local/share}/Trash"
+
+decode() {
+  printf '%b' "${1//%/\\x}"
+}
+
+list() {
+  local info name path deleted
+  for info in "$trash"/info/*.trashinfo; do
+    [[ -f $info ]] || continue
+    name="$(basename "$info" .trashinfo)"
+    path="$(decode "$(grep -m1 '^Path=' "$info" | cut -d= -f2-)")"
+    deleted="$(grep -m1 '^DeletionDate=' "$info" | cut -d= -f2- | tr T ' ')"
+    printf '%s\t%s\t%s\n' "$name" "$deleted" "$path"
+  done
+}
+
+item="$(list | sort -k2 -r | fzf --delimiter=$'\t' --with-nth=2,3 --query="${1:-}")"
+
+name="${item%%$'\t'*}"
+path="${item##*$'\t'}"
+
+if [[ -e $path ]]; then
+  echo "❌ box: ${path} already exists, not overwriting" >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "$path")"
+mv -- "${trash}/files/${name}" "$path"
+rm -f -- "${trash}/info/${name}.trashinfo"
+
+echo "$path"

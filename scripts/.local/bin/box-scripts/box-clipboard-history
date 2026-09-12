@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# Picks an entry from the clipboard history in rofi, with thumbnails for images.
+#
+#   box-clipboard-history  # the picked entry goes back on the clipboard
+#
+# Rofi runs this same script to fill the list and to handle the pick. Image
+# thumbnails are decoded once into the runtime dir and reused after that.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if [[ -z ${ROFI_RETV:-} ]]; then
+  exec rofi -modi "clipboard:$0" -show clipboard -show-icons \
+    -theme-str 'element-icon { size: 3em; }'
+fi
+
+if (( ROFI_RETV == 1 )); then
+  cliphist decode "$ROFI_INFO" | box-clipboard-copy
+  exit 0
+fi
+
+thumbs="${XDG_RUNTIME_DIR:-/tmp}/box-clipboard-history"
+mkdir -p "$thumbs"
+
+cliphist list | while IFS=$'\t' read -r id preview; do
+  if [[ $preview == "<meta http-equiv="* ]]; then
+    continue
+  fi
+
+  if [[ $preview =~ ^\[\[\ binary\ data\ .*\ ([a-z]+)\ [0-9]+x[0-9]+\ \]\]$ ]]; then
+    image="${thumbs}/${id}.${BASH_REMATCH[1]}"
+    if [[ ! -f $image ]]; then
+      cliphist decode "$id" > "$image"
+    fi
+    printf '%s\0icon\x1f%s\x1finfo\x1f%s\n' "$preview" "$image" "$id"
+  else
+    printf '%s\0info\x1f%s\n' "$preview" "$id"
+  fi
+done

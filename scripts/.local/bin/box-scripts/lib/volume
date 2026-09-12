@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Changes the volume or mute state through wireplumber, then shows a mako
+# progress bar.
+#
+#   volume increase 5
+#   volume decrease 5
+#   volume toggle-mute
+#   volume mic-toggle-mute
+
+set -euo pipefail
+
+action="${1:-}"
+step="${2:-5}"
+
+sink="@DEFAULT_AUDIO_SINK@"
+source="@DEFAULT_AUDIO_SOURCE@"
+
+percent() {
+  wpctl get-volume "$1" | awk '{ printf "%d", $2 * 100 + 0.5 }'
+}
+
+muted() {
+  wpctl get-volume "$1" | grep -q MUTED
+}
+
+notify() {
+  notify-send -t 1000 -h string:x-canonical-private-synchronous:"$3" "$1" ${2:+-h "int:value:$2"}
+}
+
+case $action in
+  increase)
+    wpctl set-mute "$sink" 0
+    wpctl set-volume --limit 1.0 "$sink" "${step}%+"
+    notify "Volume $(percent "$sink")%" "$(percent "$sink")" volume
+    ;;
+  decrease)
+    wpctl set-volume "$sink" "${step}%-"
+    notify "Volume $(percent "$sink")%" "$(percent "$sink")" volume
+    ;;
+  toggle-mute)
+    wpctl set-mute "$sink" toggle
+    if muted "$sink"; then
+      notify "Volume muted" "" volume
+    else
+      notify "Volume $(percent "$sink")%" "$(percent "$sink")" volume
+    fi
+    ;;
+  mic-toggle-mute)
+    wpctl set-mute "$source" toggle
+    if muted "$source"; then
+      notify "Microphone muted" "" mic
+    else
+      notify "Microphone on" "" mic
+    fi
+    ;;
+  *)
+    echo "usage: volume increase|decrease [step] | toggle-mute | mic-toggle-mute" >&2
+    exit 1
+    ;;
+esac

@@ -1,0 +1,13 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+Target = linux-lts
+Target = linux-zen
+Target = limine
+
+[Action]
+Description = Re-signing EFI binaries for secure boot (sbctl)
+When = PostTransaction
+Exec = /usr/bin/sbctl sign-all

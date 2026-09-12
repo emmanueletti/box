@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Picks a pixel's color on screen and copies its hex code to the clipboard.
+#
+#   box-color-pick  # click a pixel, e.g. #1A1B26 lands on the clipboard
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os != arch ]]; then
+  echo "❌ box: box-color-pick needs sway, which box only runs on arch" >&2
+  exit 1
+fi
+
+color="#$(grim -g "$(slurp -p)" -t ppm - | tail -n +4 | head -c 3 | od -An -tx1 | tr -d " \n" | tr "a-f" "A-F")"
+
+printf '%s' "$color" | box-clipboard-copy
+echo "$color"

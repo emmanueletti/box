@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Reboots the machine, after asking first.
+#
+#   box-system-reboot              # asks first: [y/N] in a terminal, rofi otherwise
+#   box-system-reboot --noconfirm  # no question, for menus that already confirmed
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+if [[ ${1:-} != "--noconfirm" ]]; then
+  "$lib/confirm" "Reboot now?" || { echo "Cancelled."; exit 0; }
+fi
+
+os="$("$lib/os-detect")"
+
+case $os in
+  arch | fedora) systemctl reboot ;;
+  macos) osascript -e 'tell application "System Events" to restart' ;;
+esac

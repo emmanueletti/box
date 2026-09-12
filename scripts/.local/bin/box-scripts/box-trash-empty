@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 #
-# Permanently deletes trashed files. This cannot be undone.
+# Permanently deletes everything in the trash. This cannot be undone.
 #
-#   box-trash-empty      # empty the whole trash (asks first)
-#   box-trash-empty 30   # only items trashed more than 30 days ago
+#   box-trash-empty  # empty the whole trash (asks first)
 
 set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-# Emptying everything is irreversible, so confirm when no age limit is given.
-if (( $# == 0 )); then
-  read -r -p "Permanently empty the ENTIRE trash? [y/N] " reply
-  [[ $reply == [yY]* ]] || { echo "Cancelled."; exit 0; }
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+"$lib/confirm" "Permanently empty the ENTIRE trash?" || { echo "Cancelled."; exit 0; }
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  osascript -e 'tell application "Finder" to empty trash'
+  exit 0
 fi
 
-trash-empty "$@"
+trash="${XDG_DATA_HOME:-$HOME/.local/share}/Trash"
+
+find "${trash}/files" "${trash}/info" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+
+echo "✅ box: trash emptied"

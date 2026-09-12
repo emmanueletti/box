@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# Mutes or unmutes the speakers.
+#
+#   box-volume-toggle-mute
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/volume" toggle-mute

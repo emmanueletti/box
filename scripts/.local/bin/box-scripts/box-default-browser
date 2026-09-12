@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Sets the default web browser (what opens when a link is clicked).
+#
+#   box-default-browser brave  # finds the installed app matching "brave",
+#                              # shows it, and asks before setting it
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if (( $# == 0 )); then
+  echo "usage: box-default-browser <name>" >&2
+  exit 1
+fi
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/default-app" browser "$1"

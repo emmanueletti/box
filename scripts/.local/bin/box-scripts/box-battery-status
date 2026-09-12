@@ -10,7 +10,9 @@ set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 
 pct=""
 

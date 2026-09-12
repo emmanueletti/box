@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# Connects a paired bluetooth device (pick it with fzf).
+#
+#   box-bluetooth-connect         # pick from everything already paired
+#   box-bluetooth-connect WH-100  # skip the menu when the name matches one
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  echo "❌ box: box-bluetooth-connect uses bluetoothctl, which only exists on linux" >&2
+  exit 1
+fi
+
+devices="$(bluetoothctl devices Paired)"
+
+if [[ -z $devices ]]; then
+  echo "box-bluetooth-connect: nothing paired yet, run box-bluetooth-pair" >&2
+  exit 1
+fi
+
+choice="$(fzf --prompt='connect> ' --with-nth=3.. --select-1 --query "${1:-}" <<<"$devices")" || exit 0
+
+mac="$(cut -d' ' -f2 <<<"$choice")"
+name="$(cut -d' ' -f3- <<<"$choice")"
+
+bluetoothctl connect "$mac" >/dev/null
+
+echo "✅ box-bluetooth-connect: connected to $name"

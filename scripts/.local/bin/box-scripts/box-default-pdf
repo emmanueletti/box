@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Sets the default PDF viewer.
+#
+#   box-default-pdf zathura  # finds the installed app matching "zathura",
+#                            # shows it, and asks before setting it
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if (( $# == 0 )); then
+  echo "usage: box-default-pdf <name>" >&2
+  exit 1
+fi
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/default-app" pdf "$1"

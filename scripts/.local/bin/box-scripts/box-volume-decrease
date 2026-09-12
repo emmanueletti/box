@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Lowers the speaker volume.
+#
+#   box-volume-decrease     # by 5%
+#   box-volume-decrease 10  # by 10%
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/volume" decrease "${1:-5}"

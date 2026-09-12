@@ -13,7 +13,9 @@ set -euo pipefail
 # Naked call (or -h) prints this script's help instead of acting.
 [[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
 
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 [[ $os == "macos" ]] || { echo "box-server-harden: macOS only, skipping."; exit 0; }
 
 # macOS sshd_config ends with `Include /etc/ssh/sshd_config.d/*`, so a file

@@ -14,33 +14,26 @@ bindkey '^[[F' end-of-line       # End key
 
 # Treat `/` as a word boundary, so word motions and kills stop at each path
 # segment instead of jumping the whole path. Also makes ctrl + -> take an
-# autosuggested path one segment at a time (see the init section below).
+# autosuggested path one segment at a time.
 WORDCHARS="${WORDCHARS:s@/@}"
+
+# Type a command and press Esc then h to open its man page.
+autoload -Uz run-help run-help-git run-help-ip run-help-openssl run-help-sudo
+(( $+aliases[run-help] )) && unalias run-help
 
 setopt INTERACTIVE_COMMENTS
 setopt AUTO_CD
-setopt HIST_IGNORE_ALL_DUPS   # supersedes HIST_IGNORE_DUPS
-setopt INC_APPEND_HISTORY     # write each command to $HISTFILE at once, but don't pull other panes' history into up-arrow
+setopt HIST_IGNORE_ALL_DUPS
+setopt INC_APPEND_HISTORY
 setopt HIST_REDUCE_BLANKS
 setopt EXTENDED_GLOB
 setopt PROMPT_SUBST
-setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT  # cd builds a stack: cd -<TAB>
-setopt HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS        # dedupe search + saved history
-setopt EXTENDED_HISTORY                            # timestamps in history
+setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
+setopt EXTENDED_HISTORY
 
 HISTSIZE=100000
 SAVEHIST=100000
 HISTFILE=~/.zsh_history
-
-# LS_COLORS via dircolors — uses ANSI palette indices, so file colors track
-# the terminal theme automatically. Drop a custom ~/.dircolors to override.
-if (( $+commands[dircolors] )); then
-  if [[ -r "$HOME/.dircolors" ]]; then
-    eval "$(dircolors -b "$HOME/.dircolors")"
-  else
-    eval "$(dircolors -b)"
-  fi
-fi
 
 # =========================================================
 # COMPLETION
@@ -50,7 +43,7 @@ autoload -Uz compinit
 # keep the dump out of $HOME, in the XDG cache dir
 _zdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
 [[ -d ${_zdump:h} ]] || mkdir -p "${_zdump:h}"
-# rebuild the completion dump at most once a day; otherwise fast path
+# full rebuild at most once a day; -C reuses the dump (24 ms vs 507 ms)
 if [[ -n $_zdump(#qN.mh+24) ]]; then
   compinit -d "$_zdump"
 else
@@ -63,85 +56,21 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list \
   'm:{a-z}={A-Za-z}' \
   'r:|[-_]=* r:|=*'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# fd as the engine: fast, respects .gitignore, includes dotfiles
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --strip-cwd-prefix'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --strip-cwd-prefix'
 export FZF_DEFAULT_OPTS="--height=60% --layout=reverse --border --info=inline \
   --bind 'ctrl-/:toggle-preview' --bind 'ctrl-u:preview-half-page-up' \
   --bind 'ctrl-d:preview-half-page-down'"
-# Ctrl-T (file widget, rebound to Ctrl-F below): bat preview
-export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always --line-range :500 {}'"
-# Alt-C (cd into dir): tree preview
-export FZF_ALT_C_OPTS="--preview 'tree -C -L 2 {} | head -200'"
-# Ctrl-R (history): wrapped command preview + Ctrl-Y copies it to clipboard
-if (( $+commands[wl-copy] )); then
-  _clip=wl-copy
-else
-  _clip=pbcopy
-fi
-export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap \
-  --bind 'ctrl-y:execute-silent(echo -n {2..} | $_clip)+abort'"
-unset _clip
-
 source <(fzf --zsh)
-bindkey '^F' fzf-file-widget
 
 # =========================================================
-# ALIASES
+# FUNCTIONS
 # =========================================================
 
-alias shconfig='$EDITOR ~/.zshrc'
-alias dootsconfig='$EDITOR ~/box/doots'
-alias reload='exec $SHELL'
-alias c='clear'
-alias x='exit'
+mkcd() { mkdir -p "$1" && cd "$1" }
 
-alias tm='tmux'
-alias tml='tmux list-sessions'
-alias tmks='tmux kill-session'
+galias() { alias | grep "$@" }
 
-alias trash='trash-put'
-alias trl='trash-list'
-alias trr='trash-restore'
-alias tre='trash-empty'
-
-alias ..='cd ..'
-alias ...='cd ../..'
-
-alias ls='eza --color=auto --group-directories-first'
-alias ll='eza -lah --color=auto --group-directories-first --git --icons=auto'
-alias top='btop'   # dust / procs also installed — call by name (don't shadow du/ps)
-
-alias box='cd ~/box'
-alias dev='cd ~/projects'
-alias projects='cd ~/projects'
-alias notes='glow ~/notes'
-
-alias ladybird='/home/emmanueletti/projects/oss/ladybird/Meta/ladybird.py run ladybird -- --certificate /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
-
-z() {
-  local name="${1:-${PWD:t}}"
-  zellij attach -c "${name//[^a-zA-Z0-9_-]/-}"
-}
-
-zd() {
-  local name="${1:-${PWD:t}}"
-  zellij attach -c "${name//[^a-zA-Z0-9_-]/-}" options --default-layout dev
-}
-
-zkill() {
-  local session="${1:-$(zellij list-sessions --short | fzf --prompt='kill zellij session> ')}"
-  [[ -n $session ]] || return 0
-  zellij delete-session --force "$session"
-}
-
-alias zls='zellij list-sessions'
-alias zc='zellij --layout compact'
-alias zka='zellij delete-all-sessions --force --yes'
-alias ztt='zellij action toggle-theme'
+glog() { git log --oneline --decorate --color --graph -${1:-10} }
 
 td() {
   local name="${1:-${PWD:t}}"
@@ -154,18 +83,52 @@ tkill() {
   tmux kill-session -t "$session"
 }
 
+# cd into the dir lf quit on
+lf() {
+  local tmp="$(mktemp -t "lf-cwd.XXXXXX")" cwd
+  command lf -last-dir-path="$tmp" "$@"
+  [[ -f $tmp ]] && cwd="$(cat -- "$tmp")"
+  [[ -n $cwd && $cwd != "$PWD" && -d $cwd ]] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+
+# Ctrl-Z again to bring the backgrounded job back to the foreground.
+Resume() {
+  fg
+  zle push-input
+  BUFFER=""
+  zle accept-line
+}
+zle -N Resume
+bindkey "^Z" Resume
+
+# =========================================================
+# ALIASES
+# =========================================================
+
+alias shconfig='$EDITOR ~/.zshrc'
+alias dootsconfig='$EDITOR ~/box/doots'
+alias reload='exec $SHELL'
+alias c='clear'
+alias x='exit'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+
+alias ls='ls --color=auto --group-directories-first'
+alias ll='ls -lah'
+
+alias box='cd ~/box'
+alias dev='cd ~/projects'
+alias notes='$EDITOR ~/notes'
+
+
 alias t='tmux'
-alias ta='tmux attach -t'
-alias tn='tmux new -s'
 alias tls='tmux ls'
 
-
-alias cc='claude --chrome --permission-mode auto'
+alias cx='claude --chrome --permission-mode auto'
 alias lg='lazygit'
-alias ld='lazydocker'
 alias ts='tailscale'
-alias tss='sudo tailscale serve'
-alias tsfd='sudo tailscale file get'
 
 alias ga='git add'
 alias gs='git status -sb'
@@ -189,9 +152,6 @@ alias gsc='git switch -b'
 alias grs='git restore --staged'
 
 alias grpr='git remote prune origin'
-alias glog='git log --oneline --decorate --color --graph -10'
-alias glog50='git log --oneline --decorate --color --graph -50'
-alias glog100='git log --oneline --decorate --color --graph -100'
 alias gloga='git log --oneline --decorate --color --graph --all'
 alias glogfull='git log --pretty=fuller'
 alias gd='git diff'
@@ -230,8 +190,8 @@ alias r='bundle exec rails'
 alias rnew='rails new . -c tailwind -d postgresql --skip-rubocop'
 alias rc='bin/rails console'
 alias rdbm='bin/rails db:migrate'
-alias rdbrb='bin/rails db:rollback'
-alias rdbr='bin/rails db:reset'
+alias rdbroll='bin/rails db:rollback'
+alias rdbreset='bin/rails db:reset'
 alias rdbs='bin/rails db:seed'
 alias rdbsrp='bin/rails db:seed:replant'
 alias rr='bin/rails routes --expanded -g'
@@ -252,56 +212,42 @@ alias mx='mise exec'
 alias mrun='mise run'
 alias mup='mise update && mise prune'
 
-galias() { alias | grep "$@" }
-
-mkcd() { mkdir -p "$1" && cd "$1" }
-
-Resume() {
-  fg
-  zle push-input
-  BUFFER=""
-  zle accept-line
-}
-zle -N Resume
-bindkey "^Z" Resume
-
-# yazi: cd into the dir you quit on
-y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  command yazi "$@" --cwd-file="$tmp"
-  IFS= read -r -d '' cwd < "$tmp"
-  [[ $cwd != "$PWD" && -d $cwd ]] && builtin cd -- "$cwd"
-  rm -f -- "$tmp"
-}
-
-lf() {
-  local tmp="$(mktemp -t "lf-cwd.XXXXXX")" cwd
-  command lf -last-dir-path="$tmp" "$@"
-  [[ -f $tmp ]] && cwd="$(cat -- "$tmp")"
-  [[ -n $cwd && $cwd != "$PWD" && -d $cwd ]] && builtin cd -- "$cwd"
-  rm -f -- "$tmp"
-}
-
 # =========================================================
 # INIT
 # =========================================================
 
-# Must load LAST -- zsh-syntax-highlighting has to be sourced after everything
-# else.
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git:*' formats '%F{green}(%b)%f%m '
+zstyle ':vcs_info:git:*' actionformats '%F{green}(%b|%a)%f%m '
+zstyle ':vcs_info:git*+set-message:*' hooks git-status
++vi-git-status() {
+  local misc='' line ahead=0 behind=0
+  for line in "${(@f)$(git status --porcelain=v2 --branch 2>/dev/null)}"; do
+    if [[ $line == "# branch.ab "* ]]; then
+      line=${line#\# branch.ab +}
+      ahead=${line%% *}
+      behind=${line##*-}
+    elif [[ $line != "#"* && -n $line ]]; then
+      misc='%F{yellow}*%f'
+    fi
+  done
+  if (( ahead > 0 && behind > 0 )); then
+    misc+='%F{red}⇕%f'
+  elif (( ahead > 0 )); then
+    misc+='%F{cyan}⇡%f'
+  elif (( behind > 0 )); then
+    misc+='%F{cyan}⇣%f'
+  fi
+  hook_com[misc]=$misc
+}
+precmd_functions+=(vcs_info)
 
-eval "$(starship init zsh)"
-
-# Homebrew's bin, ahead of the system dirs -- brew, mise, starship etc. need
-# to resolve before the calls below. Must run before `mise activate` --
-# mise snapshots PATH at that point (__MISE_ORIG_PATH) and every prompt
-# rebuilds from that snapshot, so anything prepended after activation gets
-# buried again on the next prompt.
-if [[ -n $HOMEBREW_PREFIX ]]; then
-  path=($HOMEBREW_PREFIX/bin $HOMEBREW_PREFIX/sbin $path)
-fi
+[[ -n $SSH_CONNECTION ]] && prompt_host='%B%F{red}ssh:%m%f%b '
+PROMPT='${prompt_host}%B%F{blue}%3~%f%b ${vcs_info_msg_0_}%(?.%F{green}.%F{red})❯%f '
 
 # mise
-eval "$(mise activate zsh)"
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
 
 # The plugin files ship with the packages, in a different place per platform.
 if [[ $OSTYPE == darwin* ]]; then
@@ -325,5 +271,4 @@ fi
 unset _plugins
 
 # zoxide
-export _ZO_EXCLUDE_DIRS="$HOME:*/server:*/ios:*/android:*/marketing"
-eval "$(zoxide init --cmd cd zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init --cmd cd zsh)"

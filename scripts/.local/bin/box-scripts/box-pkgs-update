@@ -41,7 +41,9 @@ box_update_summary() {
   return 1
 }
 
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 
 case "$os" in
   macos)

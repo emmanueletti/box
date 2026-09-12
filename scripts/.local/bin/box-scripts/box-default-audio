@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Sets the default audio player, for every audio type it opens.
+#
+#   box-default-audio mpv  # finds the installed app matching "mpv",
+#                          # shows it, and asks before setting it
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if (( $# == 0 )); then
+  echo "usage: box-default-audio <name>" >&2
+  exit 1
+fi
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/default-app" audio "$1"

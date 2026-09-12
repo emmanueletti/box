@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Raises the brightness of the screen that has focus (laptop or external monitor).
+#
+#   box-brightness-increase     # by 5%
+#   box-brightness-increase 10  # by 10%
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/brightness" increase "${1:-5}"

@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# Re-seals the LUKS key to the TPM's current PCR values, after PCR drift forced
+# a recovery-passphrase unlock.
+#
+#   box-tpm-reenroll             # re-seal against PCR 7 (Secure Boot state)
+#   box-tpm-reenroll --pcrs 0+7  # re-seal against a different PCR set
+#
+# Prompts for the recovery passphrase and a new TPM2 PIN. box never sees or
+# stores either -- systemd-cryptenroll collects them directly.
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+pcrs="7"
+
+if [[ ${1:-} == "--pcrs" ]]; then
+  pcrs="${2:?box-tpm-reenroll: --pcrs needs a value, e.g. 0+7}"
+fi
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  echo "❌ box-tpm-reenroll: linux only" >&2
+  exit 1
+fi
+
+for tool in cryptsetup systemd-cryptenroll findmnt; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "❌ box-tpm-reenroll: $tool not installed" >&2
+    exit 1
+  fi
+done
+
+mapper="$(findmnt -no SOURCE / | sed 's/\[.*//')"
+
+if ! sudo cryptsetup status "$mapper" >/dev/null 2>&1; then
+  echo "❌ box-tpm-reenroll: / is not on a LUKS device ($mapper)" >&2
+  exit 1
+fi
+
+device="$(sudo cryptsetup status "$mapper" | awk '/device:/ { print $2 }')"
+
+if [[ -z $device ]]; then
+  echo "❌ box-tpm-reenroll: could not find the LUKS device behind $mapper" >&2
+  exit 1
+fi
+
+echo "box: re-sealing $device to PCR $pcrs"
+echo
+echo "This wipes the existing TPM2 keyslot and seals a new one to the PCR values"
+echo "the machine has RIGHT NOW. If you did not cause this change yourself -- no"
+echo "firmware update, no Secure Boot key rotation -- stop and investigate first."
+echo
+read -rp "Continue? [y/N] " reply
+
+if [[ $reply != "y" && $reply != "Y" ]]; then
+  echo "box: nothing changed"
+  exit 0
+fi
+
+sudo systemd-cryptenroll \
+  --wipe-slot=tpm2 \
+  --tpm2-device=auto \
+  --tpm2-pcrs="$pcrs" \
+  --tpm2-with-pin=yes \
+  "$device"
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/box"
+mkdir -p "$state_dir"
+echo "ok" >"$state_dir/tpm-status"
+
+echo "✅ box-tpm-reenroll: sealed to PCR $pcrs, reboot to confirm the TPM unlocks it"

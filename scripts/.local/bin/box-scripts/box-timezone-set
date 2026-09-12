@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#
+# Sets the system timezone.
+#
+#   box-timezone-set                  # pick from a menu
+#   box-timezone-set America/Toronto
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  current="$(readlink /etc/localtime | sed 's|.*/zoneinfo/||')"
+else
+  current="$(timedatectl show --property=Timezone --value)"
+fi
+
+if (( $# == 0 )); then
+  if [[ $os == "macos" ]]; then
+    zones="$(sudo systemsetup -listtimezones | awk 'NR > 1 { print $1 }')"
+  else
+    zones="$(timedatectl list-timezones)"
+  fi
+  choice="$(fzf --prompt="timezone (now ${current})> " <<<"$zones")" || exit 0
+else
+  choice=$1
+fi
+
+if [[ $choice == "$current" ]]; then
+  echo "Timezone already $choice."
+  exit 0
+fi
+
+if [[ $os == "macos" ]]; then
+  sudo systemsetup -settimezone "$choice" >/dev/null
+else
+  sudo timedatectl set-timezone "$choice"
+fi
+
+echo "Timezone set to $choice."

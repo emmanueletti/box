@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Toggles macOS Remote Login (incoming SSH access) on or off.
+#
+#   server-enable on       # enable incoming SSH
+#   server-enable off      # disable incoming SSH
+#   server-enable status   # show current setting
+
+set -euo pipefail
+
+# Naked call (or -h) prints this script's help instead of acting.
+[[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+# systemsetup is macOS-only. Same script ships everywhere, so no-op elsewhere.
+os="$("$lib/os-detect")"
+[[ $os == "macos" ]] || { echo "server-enable: macOS only, skipping."; exit 0; }
+
+cmd="$1"
+
+if [[ $cmd == "status" ]]; then
+  # getremotelogin needs Full Disk Access on recent macOS; blank if denied.
+  state="$(systemsetup -getremotelogin 2>/dev/null | awk -F': ' 'NR == 1 { print $2 }')"
+  echo "Remote Login: ${state:-unknown}"
+  exit 0
+fi
+
+if [[ $cmd != "on" && $cmd != "off" ]]; then
+  echo "❌ server-enable: unknown argument '$cmd' (use on, off, status)" >&2
+  exit 1
+fi
+
+# -f skips the interactive confirmation prompt.
+sudo systemsetup -f -setremotelogin "$cmd"
+echo "Remote Login: $cmd"

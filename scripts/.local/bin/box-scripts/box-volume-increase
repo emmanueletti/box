@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Raises the speaker volume, unmuting it first.
+#
+#   box-volume-increase     # by 5%
+#   box-volume-increase 10  # by 10%
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/volume" increase "${1:-5}"

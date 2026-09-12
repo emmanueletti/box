@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Suspends the machine (sleep). The screen locks first.
+#
+#   box-system-suspend
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+case $os in
+  arch | fedora) systemctl suspend ;;
+  macos) pmset sleepnow ;;
+esac

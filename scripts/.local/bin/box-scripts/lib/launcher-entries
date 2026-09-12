@@ -1,0 +1,286 @@
+#!/usr/bin/env bash
+#
+# Rofi script mode behind box-launcher. Prints a list's entries, and when one is
+# picked runs its command after rofi has closed.
+#
+#   launcher-entries menu      # the section entries
+#   launcher-entries actions   # every runnable entry, prefixed by section
+#   launcher-entries capture   # one section's entries
+
+set -euo pipefail
+
+if (( ${ROFI_RETV:-0} == 1 )); then
+  if [[ -n ${ROFI_INFO:-} ]]; then
+    setsid -f bash -c "sleep 0.2; ${ROFI_INFO}" >/dev/null 2>&1
+  fi
+  exit 0
+fi
+
+on_off() {
+  if "$@" >/dev/null 2>&1; then
+    echo on
+  else
+    echo off
+  fi
+}
+
+caffeine_on() {
+  local pidfile="${XDG_RUNTIME_DIR:-/tmp}/box-caffeine.pid"
+  [[ -f $pidfile ]] && kill -0 "$(<"$pidfile")"
+}
+
+do_not_disturb_on() {
+  makoctl mode | grep -qx do-not-disturb
+}
+
+speakers_muted() {
+  wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -q MUTED
+}
+
+airplane_on() {
+  ! rfkill -n -o SOFT | grep -qx 'unblocked'
+}
+
+mic_muted() {
+  wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED
+}
+
+capture() {
+  cat <<'EOF'
+Screenshot region   :: box-screenshot-capture area
+Screenshot window   :: box-screenshot-capture window
+Screenshot monitor  :: box-screenshot-capture output
+Record region       :: box-screenrecording-capture area
+Record window       :: box-screenrecording-capture window
+Record monitor      :: box-screenrecording-capture output
+Stop recording      :: pgrep -x wf-recorder && box-screenrecording-capture
+Color picker        :: box-color-pick
+EOF
+}
+
+toggle() {
+  cat <<EOF
+Caffeine: $(on_off caffeine_on)             :: box-caffeine-toggle
+Do not disturb: $(on_off do_not_disturb_on) :: box-dnd-toggle
+Airplane mode: $(on_off airplane_on)        :: box-airplane-toggle
+Top bar                                     :: pkill -SIGUSR1 waybar
+Mute speakers: $(on_off speakers_muted)     :: box-volume-toggle-mute
+Mute microphone: $(on_off mic_muted)        :: box-mic-toggle-mute
+EOF
+}
+
+hardware() {
+  local performance="" balanced="" power_saver=""
+
+  case $(powerprofilesctl get 2>/dev/null || true) in
+    performance) performance=" (current)" ;;
+    balanced) balanced=" (current)" ;;
+    power-saver) power_saver=" (current)" ;;
+  esac
+
+  cat <<EOF
+Audio output                              :: foot --app-id=float.audio box-audio-set
+Bluetooth                                 :: foot --app-id=float.bluetooth box-bluetooth-connect
+Wi-Fi                                     :: foot --app-id=float.nmtui nmtui
+Power profile: performance${performance}  :: powerprofilesctl set performance
+Power profile: balanced${balanced}        :: powerprofilesctl set balanced
+Power profile: power saver${power_saver}  :: powerprofilesctl set power-saver
+Monitors: reapply layout                  :: kanshictl reload
+EOF
+}
+
+tools() {
+  cat <<'EOF'
+Clipboard history               :: box-clipboard-history
+Calculator, units and currency  :: rofi -show calc -modi calc -no-show-match -no-sort -calc-command "echo -n '{result}' | wl-copy"
+Emoji picker                    :: rofi -show emoji -modi emoji -emoji-mode copy
+EOF
+}
+
+system() {
+  cat <<'EOF'
+Lock       :: box-system-lock
+Suspend    :: box-system-suspend
+Log out    :: box-system-logout
+Reboot     :: box-system-reboot
+Shut down  :: box-system-shutdown
+EOF
+}
+
+keybinds() {
+  swaymsg -t get_config | jq -r .config | parse_bindings
+}
+
+parse_bindings() {
+  awk '
+    function expand(text,   i) {
+      for (i = 1; i <= count; i++) {
+        gsub("[$]" names[i], values[names[i]], text)
+      }
+      return text
+    }
+
+    function modifiers(key,   parts, n, i, out) {
+      n = split(key, parts, "+")
+      out = ""
+      for (i = 1; i <= n; i++) {
+        if (parts[i] == "Mod4") parts[i] = "Super"
+        else if (parts[i] == "Mod1") parts[i] = "Alt"
+        else if (tolower(parts[i]) == "ctrl" || tolower(parts[i]) == "control") parts[i] = "Ctrl"
+        else if (tolower(parts[i]) == "shift") parts[i] = "Shift"
+        out = out (i > 1 ? "+" : "") parts[i]
+      }
+      return out
+    }
+
+    function span(list, from, to,   i, out, numeric) {
+      numeric = 1
+      for (i = from; i <= to; i++) if (list[i] !~ /^[0-9]+$/) numeric = 0
+      if (numeric) return list[from] ".." list[to]
+      out = list[from]
+      for (i = from + 1; i <= to; i++) out = out "/" list[i]
+      return out
+    }
+
+    function quote(text) {
+      gsub(/\047/, "\047\\\047\047", text)
+      return "\047" text "\047"
+    }
+
+    /^[[:space:]]*set[[:space:]]+[$]/ {
+      name = substr($2, 2)
+      value = $0
+      sub(/^[[:space:]]*set[[:space:]]+[$][A-Za-z0-9_]+[[:space:]]+/, "", value)
+      values[name] = value
+      i = ++count
+      while (i > 1 && length(names[i - 1]) < length(name)) { names[i] = names[i - 1]; i-- }
+      names[i] = name
+      next
+    }
+
+    /^[[:space:]]*mode[[:space:]]+"/ {
+      mode = $0
+      sub(/^[[:space:]]*mode[[:space:]]+"/, "", mode)
+      sub(/".*/, "", mode)
+      next
+    }
+
+    /^[[:space:]]*}/ { mode = ""; next }
+
+    /^[[:space:]]*bindsym[[:space:]]/ {
+      line = $0
+      sub(/^[[:space:]]*bindsym[[:space:]]+/, "", line)
+      while (line ~ /^--/) sub(/^--[^[:space:]]+[[:space:]]+/, "", line)
+      key = line
+      sub(/[[:space:]].*/, "", key)
+      command = line
+      sub(/^[^[:space:]]+[[:space:]]+/, "", command)
+
+      n++
+      keys[n] = modifiers(expand(key))
+      commands[n] = expand(command)
+      modes[n] = mode
+
+      prefix[n] = keys[n]
+      last[n] = keys[n]
+      if (keys[n] ~ /[+]/) {
+        sub(/[+][^+]*$/, "", prefix[n])
+        sub(/^.*[+]/, "", last[n])
+      } else {
+        prefix[n] = ""
+      }
+
+      verb[n] = commands[n]
+      arg[n] = commands[n]
+      sub(/[[:space:]]+[^[:space:]]+$/, "", verb[n])
+      sub(/^.*[[:space:]]/, "", arg[n])
+    }
+
+    END {
+      i = 1
+      while (i <= n) {
+        j = i
+        split("", seen)
+        seen[arg[i]] = 1
+        while (j < n && prefix[j + 1] == prefix[i] && verb[j + 1] == verb[i] && modes[j + 1] == modes[i] \
+               && verb[i] != commands[i] && commands[i] !~ /^exec[[:space:]]/ && !(arg[j + 1] in seen)) {
+          j++
+          seen[arg[j]] = 1
+        }
+
+        where = modes[i] == "" ? "" : "(" modes[i] " mode) "
+
+        if (j - i >= 2) {
+          label = (prefix[i] == "" ? "" : prefix[i] "+") span(last, i, j)
+          shown = verb[i] " " span(arg, i, j)
+          printf "%-28s %s%s\t\n", label, where, shown
+        } else {
+          for (k = i; k <= j; k++) {
+            shown = commands[k]
+            sub(/^exec[[:space:]]+/, "", shown)
+            run = modes[k] == "" ? "swaymsg " quote(commands[k]) : ""
+            printf "%-28s %s%s\t%s\n", keys[k], where, shown, run
+          }
+        }
+
+        i = j + 1
+      }
+    }
+  '
+}
+
+runnable() {
+  local line label command
+
+  while IFS= read -r line; do
+    label="${line%%::*}"
+    label="${label%"${label##*[! ]}"}"
+    command="${line#*::}"
+    command="${command#"${command%%[! ]*}"}"
+    printf '%s\0info\x1f%s\n' "$label" "$command"
+  done
+}
+
+prefixed() {
+  sed "s/^/$1: /"
+}
+
+case ${1:-menu} in
+  menu)
+    runnable <<'EOF'
+Keybinds ›  :: box-launcher keybinds
+Capture ›   :: box-launcher capture
+Toggle ›    :: box-launcher toggle
+Hardware ›  :: box-launcher hardware
+Tools ›     :: box-launcher tools
+System ›    :: box-launcher system
+EOF
+    ;;
+  actions)
+    {
+      capture | prefixed Capture
+      toggle | prefixed Toggle
+      hardware | prefixed Hardware
+      tools | prefixed Tools
+      system | prefixed System
+    } | runnable
+    ;;
+  capture | toggle | hardware | tools | system)
+    echo "‹ Back :: box-launcher" | runnable
+    "$1" | runnable
+    ;;
+  keybinds)
+    echo "‹ Back :: box-launcher" | runnable
+    keybinds | while IFS=$'\t' read -r label command; do
+      if [[ -n $command ]]; then
+        printf '%s\0info\x1f%s\n' "$label" "$command"
+      else
+        printf '%s\0nonselectable\x1ftrue\n' "$label"
+      fi
+    done
+    ;;
+  *)
+    echo "usage: launcher-entries [menu|actions|keybinds|capture|toggle|hardware|tools|system]" >&2
+    exit 1
+    ;;
+esac

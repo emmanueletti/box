@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copies text to the system clipboard, picking the right tool per platform.
+# Copies input to the system clipboard, picking the right tool per platform.
 #
 #   echo hello | box-clipboard-copy      # from stdin
 #   box-clipboard-copy "some text"       # from arguments

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if command -v stow >/dev/null 2>&1; then
+  echo "✅ box: stow already installed"
+  exit 0
+fi
+
+echo "box: installing stow"
+sudo pacman -S --needed --noconfirm stow
+
+echo "✅ box: stow installed"

@@ -19,7 +19,7 @@ while true; do
   kill -0 "$$" 2>/dev/null || exit
 done 2>/dev/null &
 
-"${MACOS_ROOT}/modules/01-preflight/setup.sh"
+"${MACOS_ROOT}/modules/01-preflight/all.sh"
 
 # Preflight installs brew. Put it on PATH here so every module below inherits it.
 if [[ -x /opt/homebrew/bin/brew ]]; then
@@ -28,7 +28,7 @@ elif [[ -x /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-"${MACOS_ROOT}/modules/02-packages/setup.sh"
-"${MACOS_ROOT}/modules/03-configs/setup.sh"
-"${MACOS_ROOT}/modules/04-system/setup.sh"
-"${MACOS_ROOT}/modules/05-fixes/setup.sh"
+"${MACOS_ROOT}/modules/02-packages/all.sh"
+"${MACOS_ROOT}/modules/03-configs/all.sh"
+"${MACOS_ROOT}/modules/04-system/all.sh"
+"${MACOS_ROOT}/modules/05-fixes/all.sh"

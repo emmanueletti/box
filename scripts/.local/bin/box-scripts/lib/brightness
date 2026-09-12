@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+# Changes the brightness of the screen that has focus, then shows a mako
+# progress bar: brightnessctl for the laptop panel, ddcutil for an external
+# monitor over DDC/CI.
+#
+#   brightness increase 5
+#   brightness decrease 5
+#
+# ddcutil needs a bus number, and finding it takes about a second, so it is
+# cached per output and looked up again only when a change fails (e.g. after
+# replugging). Presses that land while a change is still running are dropped,
+# so holding the key never queues up a backlog.
+
+set -euo pipefail
+
+direction="${1:-}"
+step="${2:-5}"
+
+case $direction in
+  increase) sign="+" ;;
+  decrease) sign="-" ;;
+  *)
+    echo "usage: brightness increase|decrease [step]" >&2
+    exit 1
+    ;;
+esac
+
+output="$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')"
+
+notify() {
+  notify-send -t 1000 -h "int:value:$2" -h string:x-canonical-private-synchronous:brightness "$1 $2%"
+}
+
+if [[ $output == eDP-* || $output == LVDS-* ]]; then
+  brightnessctl --quiet --min-value=1 set "${step}%${sign}"
+  notify "Brightness" "$(brightnessctl --machine-readable | cut -d, -f4 | tr -d %)"
+  exit 0
+fi
+
+state="${XDG_RUNTIME_DIR:-/tmp}/box-brightness"
+mkdir -p "$state"
+
+exec 9>"${state}/lock"
+flock -n 9 || exit 0
+
+busfile="${state}/${output}.bus"
+
+find_bus() {
+  ddcutil detect --terse 2>/dev/null | awk -v want="$output" '
+    /I2C bus:/ { bus = $3; sub(/.*i2c-/, "", bus) }
+    /DRM connector:/ { name = $3; sub(/^card[0-9]+-/, "", name); if (name == want) { print bus; exit } }
+  '
+}
+
+ddc() {
+  ddcutil --bus "$bus" --noverify --sleep-multiplier .1 --disable-dynamic-sleep --skip-ddc-checks "$@"
+}
+
+read_brightness() {
+  read -r _ _ _ current max < <(ddc getvcp 10 --brief 2>/dev/null)
+}
+
+bus="$(cat "$busfile" 2>/dev/null || true)"
+
+if [[ -z $bus ]] || ! read_brightness; then
+  bus="$(find_bus)"
+
+  if [[ -z $bus ]] || ! read_brightness; then
+    notify-send -t 2000 "Brightness" "${output} does not answer DDC/CI"
+    exit 1
+  fi
+
+  echo "$bus" > "$busfile"
+fi
+
+change=$(( step * max / 100 ))
+
+if [[ $sign == "+" ]]; then
+  value=$(( current + change > max ? max : current + change ))
+else
+  value=$(( current - change < 0 ? 0 : current - change ))
+fi
+
+ddc setvcp 10 "$value" >/dev/null
+
+model="$(swaymsg -t get_outputs | jq -r --arg name "$output" '.[] | select(.name == $name) | .model')"
+
+notify "Brightness ${model}" "$(( value * 100 / max ))"

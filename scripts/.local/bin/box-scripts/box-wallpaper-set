@@ -5,8 +5,9 @@
 #   box-wallpaper-set ~/box/assets/wallpapers/light/blue-grid.png
 #   box-wallpaper-set <light> <dark>
 #
-# GNOME holds a wallpaper per appearance, so a dark one is used when given.
-# macOS holds one picture, so the light one is used and the dark one ignored.
+# GNOME (fedora) holds a wallpaper per appearance, so a dark one is used when
+# given. macOS and sway (arch) hold one picture, so the light one is used and
+# the dark one ignored.
 
 set -euo pipefail
 
@@ -40,7 +41,9 @@ if [[ -n $dark ]]; then
   dark="$(absolute "$dark")"
 fi
 
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 
 case "$os" in
   macos)
@@ -50,7 +53,16 @@ case "$os" in
       echo "⚠️ box: macOS holds one wallpaper, so the dark one needs a .heic pair"
     fi
     ;;
-  arch | fedora)
+  arch)
+    mkdir -p "$HOME/.local/state/box"
+    echo "output * bg ${light} fill" > "$HOME/.local/state/box/wallpaper.conf"
+    command -v swaymsg >/dev/null 2>&1 && swaymsg output '*' bg "$light" fill
+
+    if [[ -n $dark ]]; then
+      echo "⚠️ box: sway holds one wallpaper, dark one ignored"
+    fi
+    ;;
+  fedora)
     gsettings set org.gnome.desktop.background picture-uri "file://${light}"
     gsettings set org.gnome.desktop.background picture-uri-dark "file://${dark:-$light}"
     gsettings set org.gnome.desktop.background picture-options zoom

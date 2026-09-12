@@ -1,0 +1,55 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+  "modules-left": ["sway/workspaces", "sway/mode"],
+  "modules-center": ["clock"],
+  "modules-right": ["custom/recording", "power-profiles-daemon", "pulseaudio", "backlight", "network", "cpu", "memory", "battery", "tray"],
+
+  "sway/workspaces": {
+    "disable-scroll": true
+  },
+  "custom/recording": {
+    "exec": "pgrep -x wf-recorder >/dev/null && echo \"<span color='#f7768e'>● REC</span>\" || true",
+    "interval": "once",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "box-screenrecording-capture"
+  },
+  "clock": {
+    "format": "{:%Y-%m-%d %H:%M}"
+  },
+  "power-profiles-daemon": {
+    "format": "{profile}"
+  },
+  "cpu": {
+    "format": "cpu {usage}%"
+  },
+  "memory": {
+    "format": "mem {percentage}%"
+  },
+  "battery": {
+    "format": "{icon} {capacity}%",
+    "format-icons": ["", "", "", "", ""]
+  },
+  "network": {
+    "format-wifi": " {essid}",
+    "format-ethernet": "eth",
+    "format-disconnected": "disconnected"
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": " muted",
+    "format-icons": {
+      "default": ["", "", ""]
+    },
+    "on-click": "box-volume-toggle-mute"
+  },
+  "backlight": {
+    "format": "{icon} {percent}%",
+    "format-icons": ["󰃞", "󰃟", "󰃠"]
+  },
+  "tray": {
+    "spacing": 8
+  }
+}

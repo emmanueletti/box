@@ -19,7 +19,9 @@ box_check_section() {
 }
 
 box_check_section "hardware"
-_box-hw-detect
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+"$lib/hw-detect"
 
 box-os-outdated
 box-tools-outdated

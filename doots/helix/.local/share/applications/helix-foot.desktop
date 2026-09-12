@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Helix
+Comment=Edit text files with Helix in foot
+TryExec=foot
+Exec=foot hx %F
+Icon=helix
+Terminal=false
+NoDisplay=true
+MimeType=text/plain;text/markdown;text/english;text/x-makefile;text/x-c;text/x-c++;text/x-chdr;text/x-csrc;text/x-c++hdr;text/x-c++src;text/x-java;text/x-python;text/x-ruby;text/x-go;text/x-rust;text/x-tex;text/x-log;text/css;text/csv;text/javascript;application/javascript;application/json;application/toml;application/x-yaml;application/xml;application/x-shellscript;

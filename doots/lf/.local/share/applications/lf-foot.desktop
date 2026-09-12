@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=lf
+Comment=Browse a folder with lf in foot
+TryExec=foot
+Exec=foot lf %f
+Icon=utilities-terminal
+Terminal=false
+NoDisplay=true
+MimeType=inode/directory;

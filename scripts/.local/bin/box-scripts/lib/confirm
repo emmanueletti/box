@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Asks a yes/no question and exits 0 only on yes. Asks [y/N] in a terminal, and
+# falls back to a rofi Cancel/Yes list when started from a key or menu.
+#
+#   confirm "Reboot now?"
+
+set -euo pipefail
+
+question="$1"
+
+if [[ -t 0 ]]; then
+  read -r -p "${question} [y/N] " reply
+  [[ $reply == [yY]* ]]
+elif command -v rofi >/dev/null 2>&1; then
+  [[ $(printf 'Cancel\nYes\n' | rofi -dmenu -no-custom -p "$question") == "Yes" ]]
+else
+  exit 1
+fi

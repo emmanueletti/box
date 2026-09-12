@@ -14,4 +14,21 @@ if (( $# == 0 )); then
   exit 1
 fi
 
-trash-put "$@"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
+
+case $os in
+  arch | fedora)
+    gio trash -- "$@"
+    ;;
+  macos)
+    for path in "$@"; do
+      osascript \
+        -e 'on run argv' \
+        -e 'tell application "Finder" to delete (POSIX file (item 1 of argv))' \
+        -e 'end run' \
+        "$(realpath -- "$path")" >/dev/null
+    done
+    ;;
+esac

@@ -17,7 +17,7 @@ fi
 mapfile -t files < <(
   {
     find "$root/os" -type f -name '*.sh'
-    find "$root/scripts/.local/bin/box-scripts" -type f \( -name 'box-*' -o -name '_box-*' \)
+    find "$root/scripts/.local/bin/box-scripts" -type f \( -name 'box-*' -o -path '*/lib/*' \)
     echo "$root/setup.sh"
   } | sort -u
 )

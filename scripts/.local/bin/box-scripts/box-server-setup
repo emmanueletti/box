@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Orchestrates always-on headless server setup: power, SSH, Tailscale and a
-# solid-gray idle screen. Sequences the _box-server-power and _box-server-enable
+# solid-gray idle screen. Sequences the lib/server-power and lib/server-enable
 # primitives; auto-login stays a separate step (it writes a password, so you
 # run it deliberately).
 #
@@ -14,21 +14,23 @@ set -euo pipefail
 # Naked call (or -h) prints this script's help instead of acting.
 [[ ${1:-} == -h || $# == 0 ]] && exec box-help "$0"
 
-os="$(_box-os-detect)"
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+os="$("$lib/os-detect")"
 [[ $os == "macos" ]] || { echo "box-server-setup: macOS only, skipping."; exit 0; }
 
 cmd="$1"
 
 if [[ $cmd == "status" ]]; then
   # Each primitive prints its own labelled line; just run them.
-  _box-server-power status
-  _box-server-enable status
+  "$lib/server-power" status
+  "$lib/server-enable" status
   if command -v tailscale >/dev/null; then
     tailscale status >/dev/null 2>&1 && echo "Tailscale: up" || echo "Tailscale: down"
   else
     echo "Tailscale: not installed"
   fi
-  _box-server-autologin status
+  "$lib/server-autologin" status
   exit 0
 fi
 
@@ -37,8 +39,8 @@ if [[ $cmd != "on" && $cmd != "off" ]]; then
   exit 1
 fi
 
-_box-server-power "$cmd"
-_box-server-enable "$cmd"
+"$lib/server-power" "$cmd"
+"$lib/server-enable" "$cmd"
 
 if [[ $cmd == "on" ]]; then
   if command -v tailscale >/dev/null; then
@@ -60,7 +62,7 @@ if [[ $cmd == "on" ]]; then
   if fdesetup status | grep -q "FileVault is On"; then
     echo "⚠️  box-server-setup: FileVault is on -- mini won't reboot unattended." >&2
   fi
-  echo "Next: run '_box-server-autologin on' so the keychain unlocks after boot."
+  echo "Next: run '${lib}/server-autologin on' so the keychain unlocks after boot."
 else
   command -v tailscale >/dev/null && tailscale down || true
   defaults -currentHost write com.apple.screensaver idleTime 1200  # 20 min, normal

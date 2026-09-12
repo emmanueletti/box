@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Sets the default text editor, for every text type it opens (never web pages).
+#
+#   box-default-text helix  # finds the installed app matching "helix",
+#                           # shows it, and asks before setting it
+
+set -euo pipefail
+
+[[ ${1:-} == -h ]] && exec box-help "$0"
+
+if (( $# == 0 )); then
+  echo "usage: box-default-text <name>" >&2
+  exit 1
+fi
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/lib"
+
+exec "$lib/default-app" text "$1"

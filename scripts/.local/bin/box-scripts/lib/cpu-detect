@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Prints the cpu maker: amd, intel, apple or unknown.
+#
+#   cpu-detect
+
+set -euo pipefail
+
+lib="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+os="$("$lib/os-detect")"
+
+if [[ $os == "macos" ]]; then
+  echo apple
+  exit 0
+fi
+
+vendor="$(awk -F': ' '/^vendor_id/ { print $2; exit }' /proc/cpuinfo 2>/dev/null || true)"
+
+case $vendor in
+  AuthenticAMD) echo amd ;;
+  GenuineIntel) echo intel ;;
+  *) echo unknown ;;
+esac
