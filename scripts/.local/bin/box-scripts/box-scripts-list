@@ -20,6 +20,9 @@ choice="$(box-help \
   | fzf --query="${1:-}" \
         --delimiter='\t' --with-nth=1,2 \
         --preview='box-help {1}' --preview-window=right:60% \
+        --bind='ctrl-/:toggle-preview' \
+        --bind='shift-up:preview-half-page-up' \
+        --bind='shift-down:preview-half-page-down' \
   | cut -f1)"
 
 # Empty on ESC/Ctrl-C -- nothing picked, nothing to show.

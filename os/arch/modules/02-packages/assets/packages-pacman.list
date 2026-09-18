@@ -16,6 +16,7 @@ tree
 lf
 lazygit
 btop
+ncdu
 libqalculate
 less
 man-db
@@ -69,6 +70,7 @@ ddcutil
 framework-system
 bluez
 bluez-utils
+bluetui
 polkit-gnome
 power-profiles-daemon
 gnome-keyring
@@ -82,6 +84,7 @@ libpulse
 wireplumber
 playerctl
 easyeffects
+wiremix
 
 # dev
 libyaml
@@ -89,6 +92,7 @@ libvips
 docker
 docker-buildx
 docker-compose
+lazydocker
 
 # system
 dosfstools

@@ -25,8 +25,7 @@ on_off() {
 }
 
 caffeine_on() {
-  local pidfile="${XDG_RUNTIME_DIR:-/tmp}/box-caffeine.pid"
-  [[ -f $pidfile ]] && kill -0 "$(<"$pidfile")"
+  systemctl --user is-active --quiet box-caffeine.service
 }
 
 do_not_disturb_on() {
@@ -80,7 +79,9 @@ hardware() {
 
   cat <<EOF
 Audio output                              :: foot --app-id=float.audio box-audio-set
+Audio mixer                               :: foot --app-id=float.wiremix wiremix
 Bluetooth                                 :: foot --app-id=float.bluetooth box-bluetooth-connect
+Bluetooth manager                         :: foot --app-id=float.bluetui bluetui
 Wi-Fi                                     :: foot --app-id=float.nmtui nmtui
 Power profile: performance${performance}  :: powerprofilesctl set performance
 Power profile: balanced${balanced}        :: powerprofilesctl set balanced
@@ -94,6 +95,8 @@ tools() {
 Clipboard history               :: box-clipboard-history
 Calculator, units and currency  :: rofi -show calc -modi calc -no-show-match -no-sort -calc-command "echo -n '{result}' | wl-copy"
 Emoji picker                    :: rofi -show emoji -modi emoji -emoji-mode copy
+Disk usage                      :: foot --app-id=float.ncdu ncdu -x /
+Docker                          :: foot --app-id=float.lazydocker lazydocker
 EOF
 }
 

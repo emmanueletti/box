@@ -8,15 +8,15 @@ set -euo pipefail
 
 [[ ${1:-} == -h ]] && exec box-help "$0"
 
-pidfile="${XDG_RUNTIME_DIR:-/tmp}/box-caffeine.pid"
+unit="box-caffeine"
 
-if [[ -f $pidfile ]] && kill -0 "$(<"$pidfile")" 2>/dev/null; then
-  kill -- "-$(<"$pidfile")"   # negative PID: kill the whole process group (systemd-inhibit + its sleep child)
-  rm -f "$pidfile"
+if systemctl --user is-active --quiet "$unit.service"; then
+  systemctl --user stop "$unit.service"
+  pkill -RTMIN+9 waybar || true
   echo "✅ box-caffeine-toggle: off"
 else
-  setsid systemd-inhibit --what=idle:sleep --why="box-caffeine-toggle" -- sleep infinity &
-  echo $! > "$pidfile"
-  disown
+  systemd-run --user --quiet --unit="$unit" \
+    systemd-inhibit --what=idle:sleep --why="box-caffeine-toggle" sleep infinity
+  pkill -RTMIN+9 waybar || true
   echo "✅ box-caffeine-toggle: on"
 fi

@@ -1,0 +1,21 @@
+inherits = "base16_terminal"
+
+"ui.background" = {}
+"ui.window" = {}
+"ui.gutter" = {}
+"ui.virtual.ruler" = {}
+"ui.linenr" = { fg = "gray" }
+"comment" = { fg = "gray" }
+"ui.cursor" = { modifiers = ["reversed"] }
+"ui.cursor.primary" = { modifiers = ["reversed"] }
+"ui.linenr.selected" = { modifiers = ["bold"] }
+"ui.bufferline.background" = { bg = "black" }
+"ui.bufferline" = { fg = "white", bg = "black" }
+"ui.bufferline.active" = { fg = "white", bg = "gray", modifiers = ["bold"] }
+"ui.statusline" = { modifiers = ["reversed"] }
+"ui.statusline.inactive" = { fg = "gray", modifiers = ["reversed"] }
+"ui.popup" = { modifiers = ["reversed"] }
+"ui.help" = { modifiers = ["reversed"] }
+"ui.menu" = { modifiers = ["reversed"] }
+"ui.menu.selected" = { fg = "blue", modifiers = ["bold"] }
+"ui.text.focus" = { fg = "blue", modifiers = ["bold"] }

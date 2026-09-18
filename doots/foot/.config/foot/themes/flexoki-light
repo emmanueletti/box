@@ -1,0 +1,28 @@
+# -*- conf -*-
+#
+# flexoki-light
+# Official palette from https://github.com/kepano/flexoki (alacritty port)
+#
+
+[main]
+initial-color-theme=light
+
+[colors-light]
+background=fffcf0
+foreground=100f0f
+regular0=100f0f
+regular1=d14d41
+regular2=879a39
+regular3=d0a215
+regular4=4385be
+regular5=ce5d97
+regular6=3aa99f
+regular7=cecdc3
+bright0=6f6e69
+bright1=d14d41
+bright2=879a39
+bright3=d0a215
+bright4=4385be
+bright5=ce5d97
+bright6=3aa99f
+bright7=fffcf0

@@ -1,0 +1,31 @@
+# -*- conf -*-
+#
+# modus-operandi-tinted
+# Values from modus-themes-operandi-tinted-palette upstream:
+# https://github.com/protesilaos/modus-themes
+# Slot mapping follows the shipped modus-operandi foot theme, so this differs
+# from it by palette only. regular = base hue, bright = warmer/cooler variant.
+#
+
+[main]
+initial-color-theme=light
+
+[colors-light]
+background=fbf7f0
+foreground=000000
+regular0=000000
+regular1=a60000
+regular2=006300
+regular3=894000
+regular4=0031a9
+regular5=721045
+regular6=00598b
+regular7=c9b9b0
+bright0=595959
+bright1=972500
+bright2=306010
+bright3=574316
+bright4=3546c2
+bright5=531ab6
+bright6=005f5f
+bright7=fbf7f0

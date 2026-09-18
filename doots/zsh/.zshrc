@@ -39,13 +39,29 @@ HISTFILE=~/.zsh_history
 # COMPLETION
 # =========================================================
 
-autoload -Uz compinit
 # keep the dump out of $HOME, in the XDG cache dir
-_zdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
-[[ -d ${_zdump:h} ]] || mkdir -p "${_zdump:h}"
+_zcache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d $_zcache_dir ]] || mkdir -p "$_zcache_dir"
+
+_zcache() {
+  local out="$_zcache_dir/$1.zsh"
+  shift
+  if [[ ! -s $out || $commands[$1] -nt $out ]]; then
+    if "$@" >| "$out.tmp" 2>/dev/null; then
+      mv -- "$out.tmp" "$out"
+    else
+      rm -f -- "$out.tmp"
+    fi
+  fi
+  [[ -s $out ]] && source "$out"
+}
+
+autoload -Uz compinit
+_zdump="$_zcache_dir/zcompdump"
 # full rebuild at most once a day; -C reuses the dump (24 ms vs 507 ms)
 if [[ -n $_zdump(#qN.mh+24) ]]; then
   compinit -d "$_zdump"
+  touch "$_zdump"
 else
   compinit -C -d "$_zdump"
 fi
@@ -58,7 +74,7 @@ zstyle ':completion:*' matcher-list \
   'r:|[-_]=* r:|=*'
 
 export FZF_DEFAULT_OPTS="--height=60% --layout=reverse --border --info=inline"
-source <(fzf --zsh)
+_zcache fzf fzf --zsh
 
 # =========================================================
 # FUNCTIONS
@@ -127,6 +143,8 @@ alias tls='tmux ls'
 alias cx='claude --chrome --permission-mode auto'
 alias lg='lazygit'
 alias ts='tailscale'
+alias foot-dark='pkill -x -USR1 -u $USER foot'
+alias foot-light='pkill -x -USR2 -u $USER foot'
 
 alias ga='git add'
 alias gs='git status -sb'
@@ -245,7 +263,7 @@ precmd_functions+=(vcs_info)
 PROMPT='${prompt_host}%B%F{blue}%3~%f%b ${vcs_info_msg_0_}%(?.%F{green}.%F{red})❯%f '
 
 # mise
-(( $+commands[mise] )) && eval "$(mise activate zsh)"
+(( $+commands[mise] )) && _zcache mise mise activate zsh
 
 # The plugin files ship with the packages, in a different place per platform.
 if [[ $OSTYPE == darwin* ]]; then
@@ -269,4 +287,7 @@ fi
 unset _plugins
 
 # zoxide
-(( $+commands[zoxide] )) && eval "$(zoxide init --cmd cd zsh)"
+(( $+commands[zoxide] )) && _zcache zoxide zoxide init --cmd cd zsh
+
+unset _zcache_dir
+unfunction _zcache

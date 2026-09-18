@@ -1,7 +1,7 @@
 # TODO: once plugin system is finished, add the following plugins
 # https://github.com/thomasschafer/scooter.hx
 
-theme = "dark_plus"
+theme = "custom_terminal_base"
 
 [editor]
 text-width = 80

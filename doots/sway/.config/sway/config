@@ -27,14 +27,19 @@ default_floating_border pixel 1
 smart_borders on
 focus_follows_mouse no
 mouse_warping container
+
 for_window [app_id="com.gabm.satty"] floating enable
 for_window [app_id="^$FLOAT[.]"] floating enable, resize set 900 600, move position center
+for_window [title="(?i)^picture[- ]in[- ]picture"] floating enable, sticky enable
+
 # inner: spacing around every window, screen edge included
 # outer: extra inset at the workspace boundary only, added on top of inner
-# so a lone window sits 200px off the edge, tiled ones 10px
+# inverse_outer applies outer only when one window is on the workspace, so a
+# lone window sits 190+10=200px off the edge and tiled ones sit 10px off
 gaps inner 10
 gaps outer 190
 smart_gaps inverse_outer
+
 exec autotiling
 
 # =========================================================
@@ -100,6 +105,7 @@ input type:touchpad {
     tap enabled
     natural_scroll enabled
     dwt enabled
+    click_method clickfinger
 }
 
 seat * hide_cursor 5000
@@ -122,7 +128,6 @@ exec gnome-keyring-daemon --start --components=secrets
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec wl-paste --watch cliphist store
 exec mako
-exec systemd-inhibit --what=handle-power-key --why="sway power menu" sleep infinity
 
 # =========================================================
 # KEY BINDINGS
@@ -257,6 +262,12 @@ mode "resize" {
 }
 bindsym --to-code $MOD+r mode "resize"
 
+# Passthrough
+mode "passthrough" {
+    bindsym --to-code $MOD+Shift+p mode "default"
+}
+bindsym --to-code $MOD+Shift+p mode "passthrough"
+
 # Utilities
     bindsym --locked XF86AudioRaiseVolume exec box-volume-increase
     bindsym --locked XF86AudioLowerVolume exec box-volume-decrease
@@ -275,7 +286,9 @@ bindsym --to-code $MOD+r mode "resize"
     bindsym --to-code $MOD+p exec box-color-pick
 
     # Clipboard history picker (cliphist store is running via exec above)
-    bindsym --to-code Ctrl+Shift+v exec box-clipboard-history
+    bindsym --to-code $MOD+Shift+v exec box-clipboard-history
+
+    bindsym --to-code $MOD+Shift+n exec makoctl dismiss --all
 
     bindsym XF86AudioMedia exec rofi -show window
 

@@ -2,12 +2,36 @@
   "layer": "top",
   "position": "top",
   "height": 28,
-  "modules-left": ["sway/workspaces", "sway/mode"],
+  "modules-left": ["sway/workspaces", "sway/mode", "sway/scratchpad"],
   "modules-center": ["clock"],
-  "modules-right": ["custom/recording", "power-profiles-daemon", "pulseaudio", "backlight", "network", "cpu", "memory", "battery", "tray"],
+  "modules-right": ["mpris", "privacy", "custom/recording", "custom/caffeine", "custom/updates", "systemd-failed-units", "bluetooth", "network", "temperature", "battery", "tray"],
 
   "sway/workspaces": {
     "disable-scroll": true
+  },
+  "sway/scratchpad": {
+    "format": "{icon} {count}",
+    "format-icons": ["", ""],
+    "show-empty": false,
+    "tooltip": true,
+    "tooltip-format": "{app}: {title}"
+  },
+  "mpris": {
+    "format": "{status_icon} {dynamic}",
+    "status-icons": {
+      "playing": "",
+      "paused": ""
+    },
+    "dynamic-len": 30,
+    "tooltip": false
+  },
+  "privacy": {
+    "icon-size": 12,
+    "icon-spacing": 6,
+    "modules": [
+      { "type": "screenshare" },
+      { "type": "audio-in" }
+    ]
   },
   "custom/recording": {
     "exec": "pgrep -x wf-recorder >/dev/null && echo \"<span color='#f7768e'>● REC</span>\" || true",
@@ -16,38 +40,57 @@
     "tooltip": false,
     "on-click": "box-screenrecording-capture"
   },
+  "custom/caffeine": {
+    "exec": "systemctl --user is-active --quiet box-caffeine.service && printf '' || true",
+    "interval": "once",
+    "signal": 9,
+    "tooltip": false,
+    "on-click": "box-caffeine-toggle"
+  },
+  "custom/updates": {
+    "exec": "checkupdates 2>/dev/null | wc -l",
+    "exec-if": "checkupdates 2>/dev/null | grep -q .",
+    "interval": 3600,
+    "format": " {}",
+    "tooltip": false,
+    "on-click": "foot --app-id=float.updates sh -c 'checkupdates; read -r'"
+  },
+  "systemd-failed-units": {
+    "hide-on-ok": true,
+    "format": " {nr_failed}",
+    "system": true,
+    "user": true
+  },
+  "bluetooth": {
+    "format": "",
+    "format-off": "",
+    "format-disabled": "",
+    "format-connected": " {num_connections}",
+    "tooltip-format": "{device_alias}",
+    "on-click": "foot --app-id=float.bluetooth box-bluetooth-connect"
+  },
+  "temperature": {
+    "critical-threshold": 80,
+    "format": "{temperatureC}°C",
+    "format-critical": " {temperatureC}°C"
+  },
   "clock": {
     "format": "{:%Y-%m-%d %H:%M}"
-  },
-  "power-profiles-daemon": {
-    "format": "{profile}"
-  },
-  "cpu": {
-    "format": "cpu {usage}%"
-  },
-  "memory": {
-    "format": "mem {percentage}%"
-  },
-  "battery": {
-    "format": "{icon} {capacity}%",
-    "format-icons": ["", "", "", "", ""]
   },
   "network": {
     "format-wifi": " {essid}",
     "format-ethernet": "eth",
-    "format-disconnected": "disconnected"
+    "format-disconnected": "disconnected",
+    "on-click": "foot --app-id=float.nmtui nmtui"
   },
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": " muted",
-    "format-icons": {
-      "default": ["", "", ""]
+  "battery": {
+    "states": {
+      "warning": 30,
+      "critical": 15
     },
-    "on-click": "box-volume-toggle-mute"
-  },
-  "backlight": {
-    "format": "{icon} {percent}%",
-    "format-icons": ["󰃞", "󰃟", "󰃠"]
+    "format": "{icon} {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-icons": ["", "", "", "", ""]
   },
   "tray": {
     "spacing": 8
