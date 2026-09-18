@@ -57,9 +57,7 @@ zstyle ':completion:*' matcher-list \
   'm:{a-z}={A-Za-z}' \
   'r:|[-_]=* r:|=*'
 
-export FZF_DEFAULT_OPTS="--height=60% --layout=reverse --border --info=inline \
-  --bind 'ctrl-/:toggle-preview' --bind 'ctrl-u:preview-half-page-up' \
-  --bind 'ctrl-d:preview-half-page-down'"
+export FZF_DEFAULT_OPTS="--height=60% --layout=reverse --border --info=inline"
 source <(fzf --zsh)
 
 # =========================================================
